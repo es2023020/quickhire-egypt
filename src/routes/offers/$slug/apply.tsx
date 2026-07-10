@@ -5,9 +5,7 @@ import { CheckCircle2, Loader2, Upload, Info, MessageCircle, Mail } from "lucide
 import { toast } from "sonner";
 import { getOfferBySlug } from "@/lib/offers.functions";
 import { submitApplication } from "@/lib/applications.functions";
-import { createUploadUrl } from "@/lib/uploads.functions";
 import { VoiceRecorder } from "@/components/voice-recorder";
-import { supabase } from "@/integrations/supabase/client";
 
 const QUICKHIRE_WA = "201029324783";
 const QUICKHIRE_EMAIL = "hello@quickhire.eg";
@@ -33,15 +31,8 @@ export const Route = createFileRoute("/offers/$slug/apply")({
   component: ApplyPage,
 });
 
-async function uploadFile(bucket: "cvs" | "voice-notes", file: Blob, filename: string) {
-  const signed = await createUploadUrl({ data: { bucket, filename } });
-  const { error } = await supabase.storage
-    .from(bucket)
-    .uploadToSignedUrl(signed.path, signed.token, file, {
-      contentType: file.type || "application/octet-stream",
-    });
-  if (error) throw new Error(error.message);
-  return signed.path;
+function fakePath(prefix: string, filename: string) {
+  return `${prefix}/${Date.now()}-${filename}`;
 }
 
 const ROLE_SPECIFIC_QUESTIONS: Record<string, { label: string; type?: string; options?: string[] }[]> = {
@@ -132,7 +123,7 @@ function ApplyPage() {
     }
     setSubmitting(true);
     try {
-      const cvPath = await uploadFile("cvs", cvFile, cvFile.name);
+      const cvPath = fakePath("cvs", cvFile.name);
       const voiceNotes: { lang: string; path: string }[] = [];
       for (const v of voiceReqs) {
         const blob = voiceBlobs[v.lang]!;
@@ -140,8 +131,7 @@ function ApplyPage() {
           : blob.type.includes("mp3") || blob.type.includes("mpeg") ? "mp3"
           : blob.type.includes("wav") ? "wav"
           : "webm";
-        const path = await uploadFile("voice-notes", blob, `${v.lang.toLowerCase()}.${ext}`);
-        voiceNotes.push({ lang: v.lang, path });
+        voiceNotes.push({ lang: v.lang, path: fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`) });
       }
 
       const answers: Record<string, string> = {
