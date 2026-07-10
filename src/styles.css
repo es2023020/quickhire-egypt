@@ -1,0 +1,168 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * HireEgypt — premium hiring-as-a-service design system.
+ * Palette: warm sand + deep teal + gold. Serif display + clean sans body.
+ */
+
+@theme inline {
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-sand: var(--sand);
+  --color-sand-deep: var(--sand-deep);
+  --color-ink: var(--ink);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Sand / paper background */
+  --background: oklch(0.985 0.012 84);
+  --sand: oklch(0.965 0.02 82);
+  --sand-deep: oklch(0.92 0.03 82);
+  --foreground: oklch(0.19 0.03 200);
+  --ink: oklch(0.16 0.025 200);
+
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+
+  /* Deep teal primary */
+  --primary: oklch(0.36 0.055 205);
+  --primary-foreground: oklch(0.985 0.012 84);
+
+  --secondary: oklch(0.94 0.02 85);
+  --secondary-foreground: var(--foreground);
+
+  --muted: oklch(0.955 0.014 85);
+  --muted-foreground: oklch(0.5 0.02 210);
+
+  --accent: oklch(0.93 0.05 175);
+  --accent-foreground: oklch(0.25 0.05 205);
+
+  /* Gold accent */
+  --gold: oklch(0.78 0.14 75);
+  --gold-foreground: oklch(0.22 0.05 60);
+
+  --success: oklch(0.68 0.15 155);
+  --success-foreground: oklch(0.15 0.03 155);
+
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.98 0.01 30);
+
+  --border: oklch(0.9 0.02 85);
+  --input: oklch(0.9 0.02 85);
+  --ring: oklch(0.55 0.09 200);
+
+  --gradient-hero: linear-gradient(135deg, oklch(0.28 0.05 205) 0%, oklch(0.42 0.08 195) 55%, oklch(0.6 0.12 175) 100%);
+  --gradient-gold: linear-gradient(135deg, oklch(0.82 0.13 78) 0%, oklch(0.72 0.16 65) 100%);
+  --gradient-sand: linear-gradient(180deg, oklch(0.985 0.012 84) 0%, oklch(0.94 0.03 82) 100%);
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.08);
+  --shadow-lift: 0 4px 12px -4px rgb(0 0 0 / 0.08), 0 20px 40px -20px rgb(0 0 0 / 0.18);
+  --shadow-gold: 0 10px 30px -10px oklch(0.78 0.14 75 / 0.5);
+}
+
+.dark {
+  --background: oklch(0.16 0.02 210);
+  --sand: oklch(0.2 0.025 210);
+  --sand-deep: oklch(0.24 0.03 210);
+  --foreground: oklch(0.97 0.01 85);
+  --ink: oklch(0.97 0.01 85);
+  --card: oklch(0.2 0.025 210);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.2 0.025 210);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.72 0.12 180);
+  --primary-foreground: oklch(0.15 0.03 210);
+  --secondary: oklch(0.26 0.03 210);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.24 0.025 210);
+  --muted-foreground: oklch(0.72 0.03 200);
+  --accent: oklch(0.3 0.05 195);
+  --accent-foreground: oklch(0.95 0.02 85);
+  --gold: oklch(0.78 0.14 75);
+  --gold-foreground: oklch(0.15 0.03 60);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.6 0.08 200);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+}
+
+@utility bg-hero {
+  background: var(--gradient-hero);
+}
+@utility bg-gold-gradient {
+  background: var(--gradient-gold);
+}
+@utility bg-sand-gradient {
+  background: var(--gradient-sand);
+}
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+@utility shadow-lift {
+  box-shadow: var(--shadow-lift);
+}
+@utility shadow-gold {
+  box-shadow: var(--shadow-gold);
+}
+@utility text-balance {
+  text-wrap: balance;
+}
