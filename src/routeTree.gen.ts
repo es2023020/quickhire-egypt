@@ -16,11 +16,15 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OffersIndexRouteImport } from './routes/offers/index'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as OffersSlugIndexRouteImport } from './routes/offers/$slug/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as OffersSlugApplyRouteImport } from './routes/offers/$slug/apply'
+import { Route as AuthenticatedAdminPipelineRouteImport } from './routes/_authenticated/admin/pipeline'
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin/offers'
+import { Route as AuthenticatedAdminInterviewsRouteImport } from './routes/_authenticated/admin/interviews'
 import { Route as AuthenticatedAdminApplicantsRouteImport } from './routes/_authenticated/admin/applicants'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminApplicantsIdRouteImport } from './routes/_authenticated/admin/applicants.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -57,32 +61,55 @@ const OffersIndexRoute = OffersIndexRouteImport.update({
   path: '/offers/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const OffersSlugIndexRoute = OffersSlugIndexRouteImport.update({
   id: '/offers/$slug/',
   path: '/offers/$slug/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
 const OffersSlugApplyRoute = OffersSlugApplyRouteImport.update({
   id: '/offers/$slug/apply',
   path: '/offers/$slug/apply',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminPipelineRoute =
+  AuthenticatedAdminPipelineRouteImport.update({
+    id: '/pipeline',
+    path: '/pipeline',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminOffersRoute =
   AuthenticatedAdminOffersRouteImport.update({
-    id: '/admin/offers',
-    path: '/admin/offers',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/offers',
+    path: '/offers',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminInterviewsRoute =
+  AuthenticatedAdminInterviewsRouteImport.update({
+    id: '/interviews',
+    path: '/interviews',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminApplicantsRoute =
   AuthenticatedAdminApplicantsRouteImport.update({
-    id: '/admin/applicants',
-    path: '/admin/applicants',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/applicants',
+    path: '/applicants',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminApplicantsIdRoute =
   AuthenticatedAdminApplicantsIdRouteImport.update({
@@ -97,9 +124,13 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/offers/': typeof OffersIndexRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
+  '/admin/interviews': typeof AuthenticatedAdminInterviewsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
+  '/admin/pipeline': typeof AuthenticatedAdminPipelineRoute
   '/offers/$slug/apply': typeof OffersSlugApplyRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/offers/$slug/': typeof OffersSlugIndexRoute
@@ -112,8 +143,11 @@ export interface FileRoutesByTo {
   '/prep': typeof PrepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/offers': typeof OffersIndexRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
+  '/admin/interviews': typeof AuthenticatedAdminInterviewsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
+  '/admin/pipeline': typeof AuthenticatedAdminPipelineRoute
   '/offers/$slug/apply': typeof OffersSlugApplyRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/offers/$slug': typeof OffersSlugIndexRoute
@@ -127,9 +161,13 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/offers/': typeof OffersIndexRoute
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
+  '/_authenticated/admin/interviews': typeof AuthenticatedAdminInterviewsRoute
   '/_authenticated/admin/offers': typeof AuthenticatedAdminOffersRoute
+  '/_authenticated/admin/pipeline': typeof AuthenticatedAdminPipelineRoute
   '/offers/$slug/apply': typeof OffersSlugApplyRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/offers/$slug/': typeof OffersSlugIndexRoute
@@ -143,9 +181,13 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/prep'
     | '/sitemap.xml'
+    | '/admin'
     | '/offers/'
+    | '/admin/analytics'
     | '/admin/applicants'
+    | '/admin/interviews'
     | '/admin/offers'
+    | '/admin/pipeline'
     | '/offers/$slug/apply'
     | '/admin/'
     | '/offers/$slug/'
@@ -158,8 +200,11 @@ export interface FileRouteTypes {
     | '/prep'
     | '/sitemap.xml'
     | '/offers'
+    | '/admin/analytics'
     | '/admin/applicants'
+    | '/admin/interviews'
     | '/admin/offers'
+    | '/admin/pipeline'
     | '/offers/$slug/apply'
     | '/admin'
     | '/offers/$slug'
@@ -172,9 +217,13 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/prep'
     | '/sitemap.xml'
+    | '/_authenticated/admin'
     | '/offers/'
+    | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/applicants'
+    | '/_authenticated/admin/interviews'
     | '/_authenticated/admin/offers'
+    | '/_authenticated/admin/pipeline'
     | '/offers/$slug/apply'
     | '/_authenticated/admin/'
     | '/offers/$slug/'
@@ -244,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OffersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/offers/$slug/': {
       id: '/offers/$slug/'
       path: '/offers/$slug'
@@ -253,10 +309,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/offers/$slug/apply': {
       id: '/offers/$slug/apply'
@@ -265,19 +321,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OffersSlugApplyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/pipeline': {
+      id: '/_authenticated/admin/pipeline'
+      path: '/pipeline'
+      fullPath: '/admin/pipeline'
+      preLoaderRoute: typeof AuthenticatedAdminPipelineRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/offers': {
       id: '/_authenticated/admin/offers'
-      path: '/admin/offers'
+      path: '/offers'
       fullPath: '/admin/offers'
       preLoaderRoute: typeof AuthenticatedAdminOffersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/interviews': {
+      id: '/_authenticated/admin/interviews'
+      path: '/interviews'
+      fullPath: '/admin/interviews'
+      preLoaderRoute: typeof AuthenticatedAdminInterviewsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/applicants': {
       id: '/_authenticated/admin/applicants'
-      path: '/admin/applicants'
+      path: '/applicants'
       fullPath: '/admin/applicants'
       preLoaderRoute: typeof AuthenticatedAdminApplicantsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/applicants/$id': {
       id: '/_authenticated/admin/applicants/$id'
@@ -303,17 +380,37 @@ const AuthenticatedAdminApplicantsRouteWithChildren =
     AuthenticatedAdminApplicantsRouteChildren,
   )
 
-interface AuthenticatedRouteRouteChildren {
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminApplicantsRoute: typeof AuthenticatedAdminApplicantsRouteWithChildren
+  AuthenticatedAdminInterviewsRoute: typeof AuthenticatedAdminInterviewsRoute
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
+  AuthenticatedAdminPipelineRoute: typeof AuthenticatedAdminPipelineRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
+    AuthenticatedAdminApplicantsRoute:
+      AuthenticatedAdminApplicantsRouteWithChildren,
+    AuthenticatedAdminInterviewsRoute: AuthenticatedAdminInterviewsRoute,
+    AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
+    AuthenticatedAdminPipelineRoute: AuthenticatedAdminPipelineRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+}
+
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminApplicantsRoute:
-    AuthenticatedAdminApplicantsRouteWithChildren,
-  AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
-  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

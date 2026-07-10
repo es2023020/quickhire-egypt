@@ -13,9 +13,9 @@ const offersQO = queryOptions({
 export const Route = createFileRoute("/offers/")({
   head: () => ({
     meta: [
-      { title: "Open Jobs in Egypt — HireEgypt" },
-      { name: "description", content: "Browse call center, sales and multilingual openings across Egypt. Apply in minutes." },
-      { property: "og:title", content: "Open Jobs in Egypt — HireEgypt" },
+      { title: "Sales & Call Center Jobs in Egypt — QuickHire" },
+      { name: "description", content: "Browse sales, call center and business development openings across Egypt. Apply in minutes." },
+      { property: "og:title", content: "Sales & Call Center Jobs in Egypt — QuickHire" },
       { property: "og:description", content: "Curated live openings updated weekly." },
     ],
   }),

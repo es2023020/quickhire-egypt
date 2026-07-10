@@ -19,13 +19,13 @@ export const Route = createFileRoute("/offers/$slug/")({
     loaderData
       ? {
           meta: [
-            { title: `${loaderData.offer.title} — ${loaderData.offer.company} | HireEgypt` },
+            { title: `${loaderData.offer.title} — ${loaderData.offer.company} | QuickHire` },
             { name: "description", content: loaderData.offer.summary },
             { property: "og:title", content: `${loaderData.offer.title} — ${loaderData.offer.company}` },
             { property: "og:description", content: loaderData.offer.summary },
           ],
         }
-      : { meta: [{ title: "Job not found — HireEgypt" }, { name: "robots", content: "noindex" }] },
+      : { meta: [{ title: "Job not found — QuickHire" }, { name: "robots", content: "noindex" }] },
   component: OfferDetail,
 });
 

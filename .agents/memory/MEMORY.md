@@ -1,0 +1,2 @@
+- [TanStack Start hydration mismatch](tanstack-hydration.md) — dev-mode `data-tsd-source` attribute diffs are benign artifacts, not real errors.
+- [Admin route layout](admin-layout.md) — Admin pages use `_authenticated/admin/route.tsx` as layout wrapper with sidebar; all sub-pages are inside `_authenticated/admin/`.
