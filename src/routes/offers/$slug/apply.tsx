@@ -1,13 +1,16 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { CheckCircle2, Loader2, Upload, Info } from "lucide-react";
+import { CheckCircle2, Loader2, Upload, Info, MessageCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { getOfferBySlug } from "@/lib/offers.functions";
 import { submitApplication } from "@/lib/applications.functions";
 import { createUploadUrl } from "@/lib/uploads.functions";
 import { VoiceRecorder } from "@/components/voice-recorder";
 import { supabase } from "@/integrations/supabase/client";
+
+const QUICKHIRE_WA = "201029324783";
+const QUICKHIRE_EMAIL = "hello@quickhire.eg";
 
 const offerQO = (slug: string) =>
   queryOptions({
@@ -175,8 +178,16 @@ function ApplyPage() {
   }
 
   if (done) {
+    const waText = encodeURIComponent(
+      `Hi QuickHire! I just submitted my application for *${offer.title}* at *${offer.company}*.\nMy name is ${fullName} and my WhatsApp is ${phone}. Please confirm you received it. Thank you!`
+    );
+    const mailSubject = encodeURIComponent(`Application Confirmation — ${offer.title} at ${offer.company}`);
+    const mailBody = encodeURIComponent(
+      `Hi QuickHire,\n\nI just submitted my application for ${offer.title} at ${offer.company}.\n\nMy details:\n- Name: ${fullName}\n- Phone: ${phone}\n- Email: ${email}\n\nPlease confirm receipt.\n\nThank you!`
+    );
+
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-4 text-center">
+      <div className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-4 py-12 text-center">
         <div className="grid size-20 place-items-center rounded-full bg-success/15 text-success shadow-lift">
           <CheckCircle2 className="size-10" />
         </div>
@@ -185,9 +196,36 @@ function ApplyPage() {
           Your application for <b>{offer.title}</b> is submitted. Our AI is scoring it now —
           shortlisted candidates hear from HR within <b>24–48 hours</b> on the phone number you provided.
         </p>
-        <div className="mt-3 rounded-xl bg-primary/5 border border-primary/10 px-5 py-3 text-sm text-primary">
-          📱 Keep your WhatsApp open — HR may reach out on <b>{phone || "the number you provided"}</b>
+
+        <div className="mt-5 w-full rounded-2xl border border-primary/15 bg-primary/5 p-5 text-left">
+          <p className="text-sm font-semibold text-primary mb-3">📲 Confirm your application</p>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+            Tap below to send us a quick confirmation on WhatsApp or email — this guarantees we have your contact details correct.
+          </p>
+          <div className="flex flex-col gap-2.5 sm:flex-row">
+            <a
+              href={`https://wa.me/${QUICKHIRE_WA}?text=${waText}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-soft hover:opacity-90 transition-opacity"
+            >
+              <MessageCircle className="size-4" />
+              Confirm on WhatsApp
+            </a>
+            <a
+              href={`mailto:${QUICKHIRE_EMAIL}?subject=${mailSubject}&body=${mailBody}`}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-sand transition-colors"
+            >
+              <Mail className="size-4" />
+              Confirm by Email
+            </a>
+          </div>
         </div>
+
+        <div className="mt-4 rounded-xl bg-amber-50 border border-amber-100 px-4 py-2.5 text-xs text-amber-700 text-left w-full">
+          📱 Keep WhatsApp open on <b>{phone || "the number you provided"}</b> — HR will reach out within 24–48 hrs.
+        </div>
+
         <div className="mt-6 flex gap-3">
           <Link to="/offers" className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft">Browse more jobs</Link>
           <Link to="/prep" className="rounded-xl border border-border px-5 py-2.5 text-sm font-medium hover:bg-sand">Interview prep</Link>

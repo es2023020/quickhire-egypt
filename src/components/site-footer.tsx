@@ -22,7 +22,9 @@ export function SiteFooter() {
           <div className="mt-5 space-y-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-2"><MapPin className="size-3.5 shrink-0" /> Cairo, Egypt</div>
             <div className="flex items-center gap-2"><Mail className="size-3.5 shrink-0" /> hello@quickhire.eg</div>
-            <div className="flex items-center gap-2"><Phone className="size-3.5 shrink-0" /> +20 100 000 0000</div>
+            <a href="https://wa.me/201029324783" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <Phone className="size-3.5 shrink-0" /> +20 102 932 4783 (WhatsApp)
+            </a>
           </div>
         </div>
         <div>
