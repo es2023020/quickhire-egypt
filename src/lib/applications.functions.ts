@@ -183,13 +183,31 @@ export async function adminGetApplication({ data }: { data: { id: string } }): P
 }
 
 export async function adminUpdateApplicationStatus({ data }: {
-  data: { id: string; status?: "new" | "shortlisted" | "rejected" | "hired"; admin_notes?: string };
+  data: {
+    id: string;
+    status?: "new" | "shortlisted" | "rejected" | "hired";
+    admin_notes?: string;
+    english_score?: number;
+    comm_score?: number;
+    exp_score?: number;
+  };
 }): Promise<{ ok: boolean }> {
   const apps = getRawApplications();
   const idx = apps.findIndex((a) => a.id === data.id);
   if (idx === -1) return { ok: false };
   if (data.status) apps[idx].status = data.status;
   if (data.admin_notes !== undefined) apps[idx].admin_notes = data.admin_notes;
+  if (data.english_score !== undefined) apps[idx].english_score = data.english_score;
+  if (data.comm_score !== undefined) apps[idx].comm_score = data.comm_score;
+  if (data.exp_score !== undefined) apps[idx].exp_score = data.exp_score;
+  // Recalculate total if any score changed
+  if (data.english_score !== undefined || data.comm_score !== undefined || data.exp_score !== undefined) {
+    const eng = apps[idx].english_score ?? 0;
+    const comm = apps[idx].comm_score ?? 0;
+    const exp = apps[idx].exp_score ?? 0;
+    apps[idx].total_score = eng + comm + exp;
+    apps[idx].scoring_status = "done";
+  }
   saveApplications(apps);
   return { ok: true };
 }
