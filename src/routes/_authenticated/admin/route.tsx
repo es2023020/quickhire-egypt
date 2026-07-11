@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, Zap } from "lucide-react";
+import { Menu, BriefcaseBusiness } from "lucide-react";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import { Link } from "@tanstack/react-router";
 
@@ -34,11 +34,11 @@ function AdminLayout() {
             <Menu className="size-5" />
           </button>
           <Link to="/admin" className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-hero">
-              <Zap className="size-3.5 text-white" />
+            <div className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
+              <BriefcaseBusiness className="size-3.5 text-white" />
             </div>
             <span className="font-display text-base font-bold text-ink">
-              Quick<span className="text-primary">Hire</span>
+              Talent<span className="text-primary">Bridge</span>
             </span>
           </Link>
           <div className="ml-auto text-xs text-muted-foreground">Admin</div>

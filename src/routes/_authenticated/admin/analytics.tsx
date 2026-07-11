@@ -6,7 +6,7 @@ import { adminListOffers } from "@/lib/offers.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Analytics — Talent Bridge Egypt Admin" }, { name: "robots", content: "noindex" }] }),
   component: Analytics,
 });
 
@@ -56,8 +56,8 @@ function Analytics() {
 
   // Score distribution
   const scoreBuckets = [
-    { label: "25–30 (Excellent)", count: allApps.filter(a => (a.total_score ?? 0) >= 25).length, color: "bg-emerald-500" },
-    { label: "20–24 (Good)", count: allApps.filter(a => (a.total_score ?? 0) >= 20 && (a.total_score ?? 0) < 25).length, color: "bg-blue-500" },
+    { label: "24–30 (Excellent / Exceptional)", count: allApps.filter(a => (a.total_score ?? 0) >= 24).length, color: "bg-emerald-500" },
+    { label: "20–23 (Good)", count: allApps.filter(a => (a.total_score ?? 0) >= 20 && (a.total_score ?? 0) < 24).length, color: "bg-blue-500" },
     { label: "15–19 (Average)", count: allApps.filter(a => (a.total_score ?? 0) >= 15 && (a.total_score ?? 0) < 20).length, color: "bg-amber-500" },
     { label: "0–14 (Below avg)", count: allApps.filter(a => a.total_score != null && (a.total_score ?? 0) < 15).length, color: "bg-red-400" },
     { label: "Not scored", count: allApps.filter(a => a.total_score == null).length, color: "bg-border" },

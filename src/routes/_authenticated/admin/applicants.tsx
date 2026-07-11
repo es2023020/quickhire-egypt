@@ -2,18 +2,23 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
-  Loader2, Users, ChevronRight, Search, Filter, Download,
-  MessageCircle, Mail, Phone, Star, TrendingUp, Clock,
+  Loader2, Users, ChevronRight, Search,
+  MessageCircle, Mail, Phone, Star, TrendingUp,
   CheckCircle2, XCircle, ArrowUpDown, RefreshCw,
+  Trash2, Mic, FileText,
 } from "lucide-react";
-import { adminListApplications, adminUpdateApplicationStatus } from "@/lib/applications.functions";
+import {
+  adminListApplications,
+  adminUpdateApplicationStatus,
+  adminDeleteApplication,
+} from "@/lib/applications.functions";
 import { adminListOffers } from "@/lib/offers.functions";
 import { ScorePill } from "@/components/score-pill";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/applicants")({
-  head: () => ({ meta: [{ title: "Applicants — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Applicants — Talent Bridge Egypt Admin" }, { name: "robots", content: "noindex" }] }),
   component: Applicants,
 });
 
@@ -32,13 +37,14 @@ const STATUS_LABELS = {
 } as const;
 
 function waLink(phone: string, name: string, role: string) {
-  const msg = `Hi ${name}, this is QuickHire regarding your application for ${role}. Are you available for a quick call?`;
-  return `https://wa.me/${phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(msg)}`;
+  const normalized = phone.replace(/[^0-9+]/g, "");
+  const msg = `Hi ${name}, this is Talent Bridge Egypt regarding your application for ${role}. Are you available for a quick call?`;
+  return `https://wa.me/${normalized.startsWith("+") ? normalized.slice(1) : normalized}?text=${encodeURIComponent(msg)}`;
 }
 
 function emailLink(email: string, name: string, role: string) {
-  const subject = encodeURIComponent(`Your application for ${role} — QuickHire`);
-  const body = encodeURIComponent(`Hi ${name},\n\nThank you for applying for the ${role} role through QuickHire.\n\nWe have reviewed your application and would like to move forward.\n\nBest regards,\nQuickHire Recruitment Team`);
+  const subject = encodeURIComponent(`Your application for ${role} — Talent Bridge Egypt`);
+  const body = encodeURIComponent(`Hi ${name},\n\nThank you for applying for the ${role} role through Talent Bridge Egypt.\n\nWe have reviewed your application and would like to move forward.\n\nBest regards,\nTalent Bridge Egypt Recruitment Team`);
   return `mailto:${email}?subject=${subject}&body=${body}`;
 }
 
@@ -49,6 +55,7 @@ function Applicants() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"score" | "date" | "name">("score");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const offers = useQuery({ queryKey: ["admin", "offers"], queryFn: () => adminListOffers() });
   const apps = useQuery({
@@ -67,6 +74,18 @@ function Applicants() {
     onSuccess: () => {
       toast.success("Status updated");
       qc.invalidateQueries({ queryKey: ["admin", "applications"] });
+      qc.invalidateQueries({ queryKey: ["admin", "stats"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const deleteApp = useMutation({
+    mutationFn: (id: string) => adminDeleteApplication({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Applicant deleted");
+      qc.invalidateQueries({ queryKey: ["admin", "applications"] });
+      qc.invalidateQueries({ queryKey: ["admin", "stats"] });
+      setDeleteConfirm(null);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -99,9 +118,46 @@ function Applicants() {
 
   const total = rows.length;
   const shortlisted = (apps.data ?? []).filter(a => a.status === "shortlisted").length;
+  const hired = (apps.data ?? []).filter(a => a.status === "hired").length;
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-[1400px]">
+      {/* Delete confirmation modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-red-100">
+                <Trash2 className="size-5 text-red-600" />
+              </div>
+              <div>
+                <div className="font-semibold text-ink">Delete Applicant?</div>
+                <div className="text-xs text-muted-foreground">This action cannot be undone.</div>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground mb-5">
+              All data including scores, notes, and voice notes will be permanently removed.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => deleteApp.mutate(deleteConfirm)}
+                disabled={deleteApp.isPending}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+              >
+                {deleteApp.isPending && <Loader2 className="size-4 animate-spin" />}
+                Delete
+              </button>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-sand transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -109,7 +165,7 @@ function Applicants() {
             <Users className="size-6 text-primary md:size-7" /> Applicants
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {total} candidate{total !== 1 ? "s" : ""} · {shortlisted} shortlisted
+            {total} candidate{total !== 1 ? "s" : ""} · {shortlisted} shortlisted · {hired} hired
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -129,7 +185,7 @@ function Applicants() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email, role…"
+            placeholder="Search by name, email, phone, role…"
             className="w-full rounded-xl border border-border bg-card pl-9 pr-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
           />
         </div>
@@ -184,6 +240,7 @@ function Applicants() {
                     </button>
                   </th>
                   <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Assets</th>
                   <th className="px-4 py-3">Contact</th>
                   <th className="px-4 py-3">
                     <button onClick={() => toggleSort("date")} className="flex items-center gap-1 hover:text-foreground">
@@ -204,6 +261,7 @@ function Applicants() {
                         <div>
                           <div className="font-semibold text-ink">{a.full_name}</div>
                           <div className="text-xs text-muted-foreground">{a.email}</div>
+                          <div className="text-xs text-muted-foreground font-mono">{a.phone}</div>
                         </div>
                       </div>
                     </td>
@@ -217,8 +275,9 @@ function Applicants() {
                     <td className="px-4 py-3">
                       <span className={cn("font-display text-lg font-bold",
                         a.total_score == null ? "text-muted-foreground" :
-                        a.total_score >= 24 ? "text-emerald-600" :
-                        a.total_score >= 18 ? "text-amber-600" : "text-red-500"
+                        a.total_score >= 25 ? "text-emerald-600" :
+                        a.total_score >= 20 ? "text-blue-600" :
+                        a.total_score >= 15 ? "text-amber-600" : "text-red-500"
                       )}>
                         {a.total_score != null ? `${a.total_score}/30` : a.scoring_status === "pending" ? "…" : "—"}
                       </span>
@@ -236,6 +295,20 @@ function Applicants() {
                           <option key={s} value={s}>{STATUS_LABELS[s as keyof typeof STATUS_LABELS]}</option>
                         ))}
                       </select>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        {a.cv_path && (
+                          <span title="CV on file" className="grid size-6 place-items-center rounded-md bg-primary/10 text-primary">
+                            <FileText className="size-3.5" />
+                          </span>
+                        )}
+                        {a.voice_notes?.length > 0 && (
+                          <span title={`${a.voice_notes.length} voice note(s)`} className="grid size-6 place-items-center rounded-md bg-violet-100 text-violet-600">
+                            <Mic className="size-3.5" />
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
@@ -268,13 +341,22 @@ function Applicants() {
                       {new Date(a.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}
                     </td>
                     <td className="px-4 py-3">
-                      <Link
-                        to="/admin/applicants/$id"
-                        params={{ id: a.id }}
-                        className="inline-flex items-center gap-1 rounded-lg bg-primary/5 border border-primary/20 px-2.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors opacity-0 group-hover:opacity-100"
-                      >
-                        Open <ChevronRight className="size-3" />
-                      </Link>
+                      <div className="flex items-center gap-1.5">
+                        <Link
+                          to="/admin/applicants/$id"
+                          params={{ id: a.id }}
+                          className="inline-flex items-center gap-1 rounded-lg bg-primary/5 border border-primary/20 px-2.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+                        >
+                          Open <ChevronRight className="size-3" />
+                        </Link>
+                        <button
+                          onClick={() => setDeleteConfirm(a.id)}
+                          title="Delete applicant"
+                          className="grid size-7 place-items-center rounded-lg border border-red-200 bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

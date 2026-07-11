@@ -7,8 +7,8 @@ import { getOfferBySlug } from "@/lib/offers.functions";
 import { submitApplication } from "@/lib/applications.functions";
 import { VoiceRecorder } from "@/components/voice-recorder";
 
-const QUICKHIRE_WA = "201029324783";
-const QUICKHIRE_EMAIL = "hello@quickhire.eg";
+const TALENTBRIDGE_WA = "201029324783";
+const TALENTBRIDGE_EMAIL = "hello@talentbridge.eg";
 
 const offerQO = (slug: string) =>
   queryOptions({
@@ -169,11 +169,11 @@ function ApplyPage() {
 
   if (done) {
     const waText = encodeURIComponent(
-      `Hi QuickHire! I just submitted my application for *${offer.title}* at *${offer.company}*.\nMy name is ${fullName} and my WhatsApp is ${phone}. Please confirm you received it. Thank you!`
+      `Hi Talent Bridge Egypt! I just submitted my application for *${offer.title}* at *${offer.company}*.\nMy name is ${fullName} and my WhatsApp is ${phone}. Please confirm you received it. Thank you!`
     );
     const mailSubject = encodeURIComponent(`Application Confirmation — ${offer.title} at ${offer.company}`);
     const mailBody = encodeURIComponent(
-      `Hi QuickHire,\n\nI just submitted my application for ${offer.title} at ${offer.company}.\n\nMy details:\n- Name: ${fullName}\n- Phone: ${phone}\n- Email: ${email}\n\nPlease confirm receipt.\n\nThank you!`
+      `Hi Talent Bridge Egypt,\n\nI just submitted my application for ${offer.title} at ${offer.company}.\n\nMy details:\n- Name: ${fullName}\n- Phone: ${phone}\n- Email: ${email}\n\nPlease confirm receipt.\n\nThank you!`
     );
 
     return (
@@ -194,7 +194,7 @@ function ApplyPage() {
           </p>
           <div className="flex flex-col gap-2.5 sm:flex-row">
             <a
-              href={`https://wa.me/${QUICKHIRE_WA}?text=${waText}`}
+              href={`https://wa.me/${TALENTBRIDGE_WA}?text=${waText}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-soft hover:opacity-90 transition-opacity"
@@ -203,7 +203,7 @@ function ApplyPage() {
               Confirm on WhatsApp
             </a>
             <a
-              href={`mailto:${QUICKHIRE_EMAIL}?subject=${mailSubject}&body=${mailBody}`}
+              href={`mailto:${TALENTBRIDGE_EMAIL}?subject=${mailSubject}&body=${mailBody}`}
               className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-sand transition-colors"
             >
               <Mail className="size-4" />

@@ -1,27 +1,30 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, MessageCircle, Phone, ChevronRight, KanbanSquare } from "lucide-react";
+import { Loader2, MessageCircle, Phone, ChevronRight, KanbanSquare, Trash2, Mic, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { adminListApplications, adminUpdateApplicationStatus } from "@/lib/applications.functions";
+import { adminListApplications, adminUpdateApplicationStatus, adminDeleteApplication, normalizePhone } from "@/lib/applications.functions";
 import type { AdminApplicationRow } from "@/lib/applications.functions";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin/pipeline")({
-  head: () => ({ meta: [{ title: "Pipeline — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Pipeline — Talent Bridge Egypt Admin" }, { name: "robots", content: "noindex" }] }),
   component: Pipeline,
 });
 
 const COLUMNS = [
-  { key: "new", label: "New Applications", color: "border-blue-300 bg-blue-50", headerColor: "bg-blue-100 text-blue-700", dot: "bg-blue-400" },
-  { key: "shortlisted", label: "Shortlisted", color: "border-amber-300 bg-amber-50", headerColor: "bg-amber-100 text-amber-700", dot: "bg-amber-400" },
-  { key: "hired", label: "Hired", color: "border-emerald-300 bg-emerald-50", headerColor: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-400" },
-  { key: "rejected", label: "Rejected", color: "border-red-200 bg-red-50", headerColor: "bg-red-100 text-red-600", dot: "bg-red-400" },
+  { key: "new", label: "New Applications", color: "border-blue-300 bg-blue-50/55", headerColor: "bg-blue-100 text-blue-700", dot: "bg-blue-400" },
+  { key: "shortlisted", label: "Shortlisted", color: "border-amber-300 bg-amber-50/55", headerColor: "bg-amber-100 text-amber-700", dot: "bg-amber-400" },
+  { key: "hired", label: "Hired", color: "border-emerald-300 bg-emerald-50/55", headerColor: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-400" },
+  { key: "rejected", label: "Rejected", color: "border-red-200 bg-red-50/55", headerColor: "bg-red-100 text-red-600", dot: "bg-red-400" },
 ] as const;
 
 type Status = typeof COLUMNS[number]["key"];
 
 function Pipeline() {
   const qc = useQueryClient();
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   const apps = useQuery({
     queryKey: ["admin", "applications"],
     queryFn: () => adminListApplications({ data: {} }),
@@ -33,6 +36,18 @@ function Pipeline() {
     onSuccess: () => {
       toast.success("Status updated");
       qc.invalidateQueries({ queryKey: ["admin", "applications"] });
+      qc.invalidateQueries({ queryKey: ["admin", "stats"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const deleteApp = useMutation({
+    mutationFn: (id: string) => adminDeleteApplication({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Applicant deleted");
+      qc.invalidateQueries({ queryKey: ["admin", "applications"] });
+      qc.invalidateQueries({ queryKey: ["admin", "stats"] });
+      setDeleteConfirmId(null);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -50,6 +65,42 @@ function Pipeline() {
 
   return (
     <div className="p-4 md:p-6 lg:p-8">
+      {/* Delete confirmation modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-red-100">
+                <Trash2 className="size-5 text-red-600" />
+              </div>
+              <div>
+                <div className="font-semibold text-ink">Delete Applicant?</div>
+                <div className="text-xs text-muted-foreground">This action cannot be undone.</div>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground mb-5">
+              Permanently delete this applicant and all associated data.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => deleteApp.mutate(deleteConfirmId)}
+                disabled={deleteApp.isPending}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+              >
+                {deleteApp.isPending && <Loader2 className="size-4 animate-spin" />}
+                Delete
+              </button>
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-sand transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold text-ink flex items-center gap-2">
           <KanbanSquare className="size-7 text-primary" /> Recruitment Pipeline
@@ -91,6 +142,7 @@ function Pipeline() {
                       app={a}
                       onDragStart={onDragStart}
                       onMove={(s) => updateStatus.mutate({ id: a.id, s })}
+                      onDelete={() => setDeleteConfirmId(a.id)}
                     />
                   ))}
                 </div>
@@ -107,18 +159,22 @@ function CandidateCard({
   app,
   onDragStart,
   onMove,
+  onDelete,
 }: {
   app: AdminApplicationRow;
   onDragStart: (e: React.DragEvent, id: string) => void;
   onMove: (s: Status) => void;
+  onDelete: () => void;
 }) {
-  const waMsg = `Hi ${app.full_name}, this is QuickHire regarding your ${app.offer?.title ?? "role"} application. Are you available for a call?`;
+  const normPhone = normalizePhone(app.phone);
+  const cleanPhone = normPhone.replace(/[^0-9]/g, "");
+  const waMsg = `Hi ${app.full_name}, this is Talent Bridge Egypt regarding your ${app.offer?.title ?? "role"} application. Are you available for a call?`;
 
   return (
     <div
       draggable
       onDragStart={(e) => onDragStart(e, app.id)}
-      className="cursor-grab rounded-xl border border-border bg-card p-3.5 shadow-soft hover:shadow-lift transition-all active:cursor-grabbing group"
+      className="cursor-grab rounded-xl border border-border bg-card p-3.5 shadow-soft hover:shadow-lift transition-all active:cursor-grabbing group relative"
     >
       <div className="flex items-center gap-2.5 mb-2">
         <div className="size-8 shrink-0 flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
@@ -131,17 +187,34 @@ function CandidateCard({
         {app.total_score != null && (
           <span className={cn(
             "shrink-0 rounded-full px-1.5 py-0.5 text-xs font-bold",
-            app.total_score >= 24 ? "bg-emerald-100 text-emerald-700" :
-            app.total_score >= 18 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-600"
+            app.total_score >= 25 ? "bg-emerald-100 text-emerald-700" :
+            app.total_score >= 20 ? "bg-blue-100 text-blue-700" :
+            app.total_score >= 15 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-600"
           )}>
             {app.total_score}/30
           </span>
         )}
       </div>
 
+      <div className="flex items-center gap-1.5 mb-2.5">
+        <div className="flex gap-1">
+          {app.cv_path && (
+            <span title="CV on file" className="grid size-5 place-items-center rounded bg-primary/10 text-primary">
+              <FileText className="size-3" />
+            </span>
+          )}
+          {app.voice_notes?.length > 0 && (
+            <span title={`${app.voice_notes.length} voice note(s)`} className="grid size-5 place-items-center rounded bg-violet-100 text-violet-600">
+              <Mic className="size-3" />
+            </span>
+          )}
+        </div>
+        <span className="text-[10px] text-muted-foreground font-mono">{normPhone}</span>
+      </div>
+
       <div className="flex items-center gap-1.5">
         <a
-          href={`https://wa.me/${app.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(waMsg)}`}
+          href={`https://wa.me/${cleanPhone.startsWith("+") ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(waMsg)}`}
           target="_blank"
           rel="noreferrer"
           onClick={e => e.stopPropagation()}
@@ -151,13 +224,25 @@ function CandidateCard({
           <MessageCircle className="size-3" />
         </a>
         <a
-          href={`tel:${app.phone}`}
+          href={`tel:${normPhone}`}
           onClick={e => e.stopPropagation()}
           className="grid size-6 place-items-center rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
           title="Call"
         >
           <Phone className="size-3" />
         </a>
+        
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="grid size-6 place-items-center rounded-lg border border-red-200 bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 transition-colors"
+          title="Delete applicant"
+        >
+          <Trash2 className="size-3" />
+        </button>
+
         <Link
           to="/admin/applicants/$id"
           params={{ id: app.id }}
@@ -169,14 +254,14 @@ function CandidateCard({
       </div>
 
       {/* Move to */}
-      <div className="mt-2 flex gap-1 flex-wrap">
+      <div className="mt-2 pt-2 border-t border-border/40 flex gap-1 flex-wrap">
         {(["new", "shortlisted", "hired", "rejected"] as Status[])
           .filter(s => s !== app.status)
           .map(s => (
             <button
               key={s}
               onClick={() => onMove(s)}
-              className="rounded px-1.5 py-0.5 text-[10px] font-semibold bg-sand hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground"
+              className="rounded px-1.5 py-0.5 text-[9px] font-semibold bg-sand hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground"
             >
               → {s}
             </button>

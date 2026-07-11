@@ -68,7 +68,7 @@ const TESTIMONIALS = [
     name: "Ahmed Khaled",
     role: "Sales Representative at Vodafone",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80",
-    text: "Applied on Monday, had an interview on Wednesday, started the job the following week. QuickHire is unbelievably fast.",
+    text: "Applied on Monday, had an interview on Wednesday, started the job the following week. Talent Bridge Egypt is unbelievably fast.",
     score: "28/30",
   },
   {
@@ -210,7 +210,7 @@ function Home() {
       <section className="bg-sand-gradient">
         <div className="mx-auto max-w-7xl px-4 py-20 md:px-6">
           <div className="mb-12 text-center">
-            <h2 className="font-display text-3xl md:text-4xl">How QuickHire works</h2>
+            <h2 className="font-display text-3xl md:text-4xl">How Talent Bridge Egypt works</h2>
             <p className="mt-3 text-muted-foreground">From application to hired — in as little as 48 hours.</p>
           </div>
           <div className="grid gap-8 md:grid-cols-3">

@@ -1,8 +1,8 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Users, Briefcase, LogOut, Zap,
+  LayoutDashboard, Users, Briefcase, LogOut,
   BarChart3, CalendarDays, KanbanSquare, Globe, X,
-  ChevronRight,
+  ChevronRight, BriefcaseBusiness,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -32,13 +32,13 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
     navigate({ to: "/auth", replace: true });
   }
 
-  function isActive(item: typeof navItems[number]) {
+  function isActive(item: (typeof navItems)[number]) {
     if (item.exact) return location.pathname === item.to || location.pathname === item.to + "/";
     return location.pathname.startsWith(item.to);
   }
 
   const adminEmail =
-    (typeof window !== "undefined" && localStorage.getItem("qh_admin_email")) || "admin@quickhire.eg";
+    (typeof window !== "undefined" && localStorage.getItem("qh_admin_email")) || "admin@talentbridge.eg";
   const initials = adminEmail.slice(0, 2).toUpperCase();
 
   return (
@@ -51,14 +51,14 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
       {/* Logo area */}
       <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
         <Link to="/admin" className="flex items-center gap-2.5" onClick={onClose}>
-          <div className="flex size-9 items-center justify-center rounded-xl bg-hero shadow-soft">
-            <Zap className="size-4 text-white" />
+          <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-soft">
+            <BriefcaseBusiness className="size-4 text-white" />
           </div>
           <div>
-            <div className="font-display text-[15px] font-bold text-ink leading-tight">
-              Quick<span className="text-primary">Hire</span>
+            <div className="font-display text-[14px] font-bold text-ink leading-tight">
+              Talent<span className="text-primary">Bridge</span>
             </div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Admin Portal</div>
+            <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Egypt · Admin</div>
           </div>
         </Link>
         <button

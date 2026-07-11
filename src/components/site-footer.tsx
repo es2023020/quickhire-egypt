@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { QuickHireLogo } from "@/components/logo";
+import { TalentBridgeLogo } from "@/components/logo";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 export function SiteFooter() {
@@ -10,9 +10,9 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-4 md:px-6">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2.5">
-            <QuickHireLogo size={32} />
+            <TalentBridgeLogo size={32} />
             <div className="font-display text-xl font-bold text-ink">
-              Quick<span className="text-primary">Hire</span>
+              Talent<span className="text-primary">Bridge</span>
             </div>
           </div>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
@@ -21,7 +21,7 @@ export function SiteFooter() {
           </p>
           <div className="mt-5 space-y-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-2"><MapPin className="size-3.5 shrink-0" /> Cairo, Egypt</div>
-            <div className="flex items-center gap-2"><Mail className="size-3.5 shrink-0" /> hello@quickhire.eg</div>
+            <div className="flex items-center gap-2"><Mail className="size-3.5 shrink-0" /> hello@talentbridge.eg</div>
             <a href="https://wa.me/201029324783" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
               <Phone className="size-3.5 shrink-0" /> +20 102 932 4783 (WhatsApp)
             </a>
@@ -54,13 +54,13 @@ export function SiteFooter() {
           <div className="mt-8 rounded-xl bg-primary/5 border border-primary/10 p-4">
             <div className="text-xs font-semibold text-primary uppercase tracking-wider">100% Free</div>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              QuickHire is always free for candidates. We're paid by employers when you get placed.
+              Talent Bridge Egypt is always free for candidates. We're paid by employers when you get placed.
             </p>
           </div>
         </div>
       </div>
       <div className="border-t border-border/60 py-5 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} QuickHire. Built for Egypt's sales & call center ecosystem.
+        © {new Date().getFullYear()} Talent Bridge Egypt. Built for Egypt's sales & call center ecosystem.
       </div>
     </footer>
   );

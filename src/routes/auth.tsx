@@ -1,17 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Zap, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, BriefcaseBusiness } from "lucide-react";
 import { toast } from "sonner";
 
-const ADMIN_PASSWORD = "QuickHire2025";
+const ADMIN_PASSWORD = "TalentBridge2025";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: "Admin Portal — QuickHire" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
-  }),
   component: AuthPage,
 });
 
@@ -48,11 +42,11 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center bg-sand-gradient px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-hero shadow-lift">
-            <Zap className="size-7 text-white" />
+          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lift">
+            <BriefcaseBusiness className="size-7 text-white" />
           </div>
-          <h1 className="font-display text-2xl font-bold text-ink">QuickHire Portal</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Authorised personnel only</p>
+          <h1 className="font-display text-2xl font-bold text-ink">Talent Bridge Egypt</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Admin Portal · Authorised personnel only</p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-8 shadow-lift">
@@ -68,7 +62,7 @@ function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                placeholder="admin@quickhire.eg"
+                placeholder="admin@talentbridge.eg"
                 autoComplete="username"
               />
             </div>

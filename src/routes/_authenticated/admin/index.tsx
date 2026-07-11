@@ -11,7 +11,7 @@ import { ScorePill } from "@/components/score-pill";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
-  head: () => ({ meta: [{ title: "Dashboard — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Talent Bridge Egypt Admin" }, { name: "robots", content: "noindex" }] }),
   component: AdminDashboard,
 });
 

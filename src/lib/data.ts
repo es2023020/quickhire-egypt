@@ -462,6 +462,7 @@ export type MockApplication = {
   admin_notes: string | null;
   scoring_status: string;
   created_at: string;
+  updated_at?: string;
 };
 
 function daysAgo(n: number) {
