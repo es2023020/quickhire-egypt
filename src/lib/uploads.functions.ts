@@ -1,6 +1,5 @@
-// Server-only helper — creates an anon-restricted, one-time signed upload URL
-// so the browser can PUT files directly to storage without exposing the
-// service key.
+// File uploads are handled client-side as base64 data URLs (no external storage).
+// Supabase storage has been removed — all data is built-in via localStorage.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -13,13 +12,7 @@ export const createUploadUrl = createServerFn({ method: "POST" })
       })
       .parse(d),
   )
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const safe = data.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = `${crypto.randomUUID()}/${safe}`;
-    const { data: signed, error } = await supabaseAdmin.storage
-      .from(data.bucket)
-      .createSignedUploadUrl(path);
-    if (error || !signed) throw new Error(error?.message ?? "upload url failed");
-    return { path: signed.path, token: signed.token, url: signed.signedUrl };
+  .handler(async () => {
+    // No external storage — return empty values; client handles uploads as data URLs
+    return { path: "", token: "", url: "" };
   });
