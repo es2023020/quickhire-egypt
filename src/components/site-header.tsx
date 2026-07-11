@@ -1,7 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { QuickHireLogo } from "@/components/logo";
 
@@ -14,14 +13,12 @@ const nav = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [authed, setAuthed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setAuthed(!!s));
-    return () => sub.subscription.unsubscribe();
+    setIsAdmin(typeof window !== "undefined" && localStorage.getItem("qh_admin") === "1");
   }, []);
 
   useEffect(() => setOpen(false), [location.pathname]);
@@ -32,8 +29,8 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  const isAdmin = location.pathname.startsWith("/admin");
-  if (isAdmin) return null;
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  if (isAdminRoute) return null;
 
   return (
     <header className={cn(
@@ -49,7 +46,7 @@ export function SiteHeader() {
             <div className="font-display text-lg font-bold text-ink tracking-tight">
               Quick<span className="text-primary">Hire</span>
             </div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            <div className="hidden text-[10px] uppercase tracking-widest text-muted-foreground sm:block">
               Sales & Call Center Jobs
             </div>
           </div>
@@ -72,7 +69,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          {authed ? (
+          {isAdmin ? (
             <Link
               to="/admin"
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
@@ -106,7 +103,7 @@ export function SiteHeader() {
                 {n.label}
               </Link>
             ))}
-            {authed ? (
+            {isAdmin ? (
               <Link to="/admin" className="mt-1 rounded-lg bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground">
                 Dashboard
               </Link>

@@ -93,7 +93,7 @@ function ApplicantDetail() {
   const company = app.offer?.company ?? "QuickHire";
 
   return (
-    <div className="px-6 py-8 max-w-6xl">
+    <div className="p-4 md:p-6 lg:p-8 max-w-6xl">
       {/* Breadcrumb */}
       <Link to="/admin/applicants" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-4 group">
         <ChevronLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" /> Back to applicants

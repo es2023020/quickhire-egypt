@@ -166,7 +166,7 @@ function AdminOffers() {
   const archived = (data ?? []).filter(o => o.status === "archived").length;
 
   return (
-    <div className="px-6 py-8 max-w-7xl">
+    <div className="p-4 md:p-6 lg:p-8 max-w-7xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-bold text-ink flex items-center gap-2">

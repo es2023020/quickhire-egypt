@@ -49,7 +49,7 @@ function Pipeline() {
   }
 
   return (
-    <div className="px-6 py-8">
+    <div className="p-4 md:p-6 lg:p-8">
       <div className="mb-6">
         <h1 className="font-display text-3xl font-bold text-ink flex items-center gap-2">
           <KanbanSquare className="size-7 text-primary" /> Recruitment Pipeline

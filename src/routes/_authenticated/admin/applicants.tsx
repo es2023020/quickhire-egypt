@@ -101,12 +101,12 @@ function Applicants() {
   const shortlisted = (apps.data ?? []).filter(a => a.status === "shortlisted").length;
 
   return (
-    <div className="px-6 py-8">
+    <div className="p-4 md:p-6 lg:p-8 max-w-[1400px]">
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-ink flex items-center gap-2">
-            <Users className="size-7 text-primary" /> Applicants
+          <h1 className="font-display text-2xl font-bold text-ink flex items-center gap-2 md:text-3xl">
+            <Users className="size-6 text-primary md:size-7" /> Applicants
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {total} candidate{total !== 1 ? "s" : ""} · {shortlisted} shortlisted
