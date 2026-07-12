@@ -141,7 +141,7 @@ export async function submitApplication({ data }: {
     comm_score: comm,
     exp_score: exp,
     total_score: eng + comm + exp,
-    ai_notes: "Application received and AI-scored by Talent Bridge Egypt. Review voice notes and CV for full assessment.",
+    ai_notes: "Application received and AI-scored by QuickHire. Review voice notes and CV for full assessment.",
     status: "new",
     admin_notes: null,
     scoring_status: "done",
@@ -201,6 +201,9 @@ export async function adminUpdateApplicationStatus({ data }: {
     english_score?: number;
     comm_score?: number;
     exp_score?: number;
+    cv_review_notes?: string | null;
+    cv_review_status?: "pending" | "approved" | "rejected" | null;
+    transcripts?: Record<string, string> | null;
   };
 }): Promise<{ ok: boolean }> {
   const apps = getRawApplications();
@@ -211,6 +214,9 @@ export async function adminUpdateApplicationStatus({ data }: {
   if (data.english_score !== undefined) apps[idx].english_score = data.english_score;
   if (data.comm_score !== undefined) apps[idx].comm_score = data.comm_score;
   if (data.exp_score !== undefined) apps[idx].exp_score = data.exp_score;
+  if (data.cv_review_notes !== undefined) apps[idx].cv_review_notes = data.cv_review_notes;
+  if (data.cv_review_status !== undefined) apps[idx].cv_review_status = data.cv_review_status;
+  if (data.transcripts !== undefined) apps[idx].transcripts = data.transcripts;
   if (data.english_score !== undefined || data.comm_score !== undefined || data.exp_score !== undefined) {
     const eng = apps[idx].english_score ?? 0;
     const comm = apps[idx].comm_score ?? 0;
@@ -279,7 +285,7 @@ export async function adminRescore({ data }: { data: { id: string } }): Promise<
     apps[idx].comm_score = comm;
     apps[idx].exp_score = exp;
     apps[idx].total_score = eng + comm + exp;
-    apps[idx].ai_notes = `Re-scored by Talent Bridge AI on ${new Date().toLocaleString("en-EG")}.`;
+    apps[idx].ai_notes = `Re-scored by QuickHire AI on ${new Date().toLocaleString("en-EG")}.`;
     apps[idx].scoring_status = "done";
     apps[idx].updated_at = new Date().toISOString();
     saveApplications(apps);

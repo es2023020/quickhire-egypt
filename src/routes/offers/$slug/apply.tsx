@@ -6,9 +6,10 @@ import { toast } from "sonner";
 import { getOfferBySlug } from "@/lib/offers.functions";
 import { submitApplication } from "@/lib/applications.functions";
 import { VoiceRecorder } from "@/components/voice-recorder";
+import { saveFile } from "@/lib/db";
 
-const TALENTBRIDGE_WA = "201029324783";
-const TALENTBRIDGE_EMAIL = "hello@talentbridge.eg";
+const QUICKHIRE_WA = "201029324783";
+const QUICKHIRE_EMAIL = "hello@quickhire.eg";
 
 const offerQO = (slug: string) =>
   queryOptions({
@@ -124,6 +125,8 @@ function ApplyPage() {
     setSubmitting(true);
     try {
       const cvPath = fakePath("cvs", cvFile.name);
+      await saveFile(cvPath, cvFile);
+
       const voiceNotes: { lang: string; path: string }[] = [];
       for (const v of voiceReqs) {
         const blob = voiceBlobs[v.lang]!;
@@ -131,7 +134,9 @@ function ApplyPage() {
           : blob.type.includes("mp3") || blob.type.includes("mpeg") ? "mp3"
           : blob.type.includes("wav") ? "wav"
           : "webm";
-        voiceNotes.push({ lang: v.lang, path: fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`) });
+        const vPath = fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`);
+        await saveFile(vPath, blob);
+        voiceNotes.push({ lang: v.lang, path: vPath });
       }
 
       const answers: Record<string, string> = {
@@ -169,11 +174,11 @@ function ApplyPage() {
 
   if (done) {
     const waText = encodeURIComponent(
-      `Hi Talent Bridge Egypt! I just submitted my application for *${offer.title}* at *${offer.company}*.\nMy name is ${fullName} and my WhatsApp is ${phone}. Please confirm you received it. Thank you!`
+      `Hi QuickHire! I just submitted my application for *${offer.title}* at *${offer.company}*.\nMy name is ${fullName} and my WhatsApp is ${phone}. Please confirm you received it. Thank you!`
     );
     const mailSubject = encodeURIComponent(`Application Confirmation — ${offer.title} at ${offer.company}`);
     const mailBody = encodeURIComponent(
-      `Hi Talent Bridge Egypt,\n\nI just submitted my application for ${offer.title} at ${offer.company}.\n\nMy details:\n- Name: ${fullName}\n- Phone: ${phone}\n- Email: ${email}\n\nPlease confirm receipt.\n\nThank you!`
+      `Hi QuickHire,\n\nI just submitted my application for ${offer.title} at ${offer.company}.\n\nMy details:\n- Name: ${fullName}\n- Phone: ${phone}\n- Email: ${email}\n\nPlease confirm receipt.\n\nThank you!`
     );
 
     return (
@@ -194,7 +199,7 @@ function ApplyPage() {
           </p>
           <div className="flex flex-col gap-2.5 sm:flex-row">
             <a
-              href={`https://wa.me/${TALENTBRIDGE_WA}?text=${waText}`}
+              href={`https://wa.me/${QUICKHIRE_WA}?text=${waText}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-soft hover:opacity-90 transition-opacity"
@@ -203,7 +208,7 @@ function ApplyPage() {
               Confirm on WhatsApp
             </a>
             <a
-              href={`mailto:${TALENTBRIDGE_EMAIL}?subject=${mailSubject}&body=${mailBody}`}
+              href={`mailto:${QUICKHIRE_EMAIL}?subject=${mailSubject}&body=${mailBody}`}
               className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-sand transition-colors"
             >
               <Mail className="size-4" />
@@ -250,7 +255,7 @@ function ApplyPage() {
             <Field label="Age" type="number" value={age} onChange={setAge} placeholder="e.g. 24" />
             <Field label="City" value={location} onChange={setLocation} placeholder="Cairo, Alexandria, Giza…" />
             <Select label="Graduation status" value={gradStatus} onChange={setGradStatus}
-              options={["", "Currently enrolled", "Graduate", "Post-graduate", "Not a graduate"]} />
+              options={["", "grad", "undergrad", "dropout"]} />
             <Select label="English level" value={englishLevel} onChange={setEnglishLevel}
               options={["", "A1 – Beginner", "A2 – Elementary", "B1 – Intermediate", "B2 – Upper Intermediate", "C1 – Advanced", "C2 – Proficient / Native"]} />
             <Field label="Years of experience" type="number" value={experience} onChange={setExperience} placeholder="0" />

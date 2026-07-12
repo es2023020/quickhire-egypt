@@ -6,7 +6,7 @@ import { adminListOffers } from "@/lib/offers.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — Talent Bridge Egypt Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Analytics — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
   component: Analytics,
 });
 

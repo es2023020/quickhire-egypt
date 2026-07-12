@@ -2,7 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { TalentBridgeLogo } from "@/components/logo";
+import { QuickHireLogo } from "@/components/logo";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -41,13 +41,10 @@ export function SiteHeader() {
     )}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <TalentBridgeLogo size={36} />
+          <QuickHireLogo size={36} />
           <div className="leading-tight">
             <div className="font-display text-lg font-bold text-ink tracking-tight">
-              Talent<span className="text-primary">Bridge</span>
-            </div>
-            <div className="hidden text-[10px] uppercase tracking-widest text-muted-foreground sm:block">
-              Egypt · Sales & Call Center Jobs
+              QuickHire
             </div>
           </div>
         </Link>

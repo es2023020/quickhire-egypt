@@ -4,9 +4,9 @@ import { FileText, Mic, Sparkles, Users2, ShieldCheck, MessageCircle } from "luc
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How Talent Bridge Egypt Works — Egypt's Sales & Call Center Platform" },
-      { name: "description", content: "See how Talent Bridge Egypt matches candidates to top employers using AI-scored voice notes and CVs." },
-      { property: "og:title", content: "How Talent Bridge Egypt works" },
+      { title: "How QuickHire Works — Egypt's Sales & Call Center Platform" },
+      { name: "description", content: "See how QuickHire matches candidates to top employers using AI-scored voice notes and CVs." },
+      { property: "og:title", content: "How QuickHire works" },
       { property: "og:description", content: "One application. AI-graded shortlist. Direct HR handoff." },
     ],
   }),
@@ -28,7 +28,7 @@ function HowItWorks() {
         <div className="mx-auto max-w-4xl px-4 py-16 text-center md:px-6 md:py-20">
           <h1 className="font-display text-4xl md:text-5xl text-balance">One process. Zero ghosting.</h1>
           <p className="mt-4 text-white/80">
-            Talent Bridge Egypt is the trusted layer between talented Egyptians and the country's best call-center, sales and multilingual employers.
+            QuickHire is the trusted layer between talented Egyptians and the country's best call-center, sales and multilingual employers.
           </p>
         </div>
       </section>

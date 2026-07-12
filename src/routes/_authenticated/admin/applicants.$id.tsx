@@ -18,9 +18,10 @@ import {
   adminDeleteApplication,
 } from "@/lib/applications.functions";
 import { cn } from "@/lib/utils";
+import { getFile } from "@/lib/db";
 
 export const Route = createFileRoute("/_authenticated/admin/applicants/$id")({
-  head: () => ({ meta: [{ title: "Applicant — Talent Bridge Egypt Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Applicant — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
   component: ApplicantDetail,
 });
 
@@ -63,7 +64,7 @@ function buildCompanyShareMessage(app: {
   const grade = app.total_score != null ? totalGrade(app.total_score).label : "";
 
   const lines = [
-    `📋 *Candidate Profile — Talent Bridge Egypt*`,
+    `📋 *Candidate Profile — QuickHire*`,
     ``,
     `👤 *${app.full_name}*`,
     `📱 ${app.phone}  |  📧 ${app.email}`,
@@ -108,7 +109,7 @@ function buildCompanyShareMessage(app: {
     app.cv_path ? `📎 *CV on file ✓*` : `📎 No CV uploaded`,
     app.voice_notes?.length ? `🎙 *${app.voice_notes.length} Voice note(s) on file ✓*` : `🎙 No voice notes`,
     ``,
-    `Powered by *Talent Bridge Egypt* 🇪🇬`,
+    `Powered by *QuickHire* 🇪🇬`,
     `Egypt's Premier Talent & Recruitment Platform`,
   );
 
@@ -116,19 +117,19 @@ function buildCompanyShareMessage(app: {
 }
 
 function buildCandidateWaMsg(name: string, role: string, company: string) {
-  return `Hi ${name}! This is the Talent Bridge Egypt recruitment team. We're reaching out regarding your application for the *${role}* position at *${company}*. Are you available for a quick call today?`;
+  return `Hi ${name}! This is the QuickHire recruitment team. We're reaching out regarding your application for the *${role}* position at *${company}*. Are you available for a quick call today?`;
 }
 
 function buildInterviewMsg(name: string, role: string, company: string) {
-  return `Hi ${name}! 🎉 Great news — you've been *shortlisted* for the *${role}* role at *${company}*! We'd like to schedule an interview. Please reply with your available time slots this week. Thanks, Talent Bridge Egypt Team 🚀`;
+  return `Hi ${name}! 🎉 Great news — you've been *shortlisted* for the *${role}* role at *${company}*! We'd like to schedule an interview. Please reply with your available time slots this week. Thanks, QuickHire Team 🚀`;
 }
 
 function buildOfferMsg(name: string, role: string, company: string) {
-  return `Hi ${name}! Congratulations! 🎊 We're delighted to confirm your selection for the *${role}* position at *${company}*. Please reply to confirm your acceptance and we'll share the next steps. Welcome aboard! — Talent Bridge Egypt Team`;
+  return `Hi ${name}! Congratulations! 🎊 We're delighted to confirm your selection for the *${role}* position at *${company}*. Please reply to confirm your acceptance and we'll share the next steps. Welcome aboard! — QuickHire Team`;
 }
 
 function buildRejectionMsg(name: string, role: string) {
-  return `Hi ${name}, thank you for applying for the *${role}* role through Talent Bridge Egypt. After careful review, we're unable to move forward with your application at this time. We'll keep your profile for future opportunities. Best of luck! — Talent Bridge Egypt Team`;
+  return `Hi ${name}, thank you for applying for the *${role}* role through QuickHire. After careful review, we're unable to move forward with your application at this time. We'll keep your profile for future opportunities. Best of luck! — QuickHire Team`;
 }
 
 function waNumber(phone: string) {
@@ -156,6 +157,30 @@ function ApplicantDetail() {
     english_level: string; experience_years: string; salary_expectation: string;
   } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    let url: string | null = null;
+    
+    async function loadCv() {
+      if (!app?.cv_path) return;
+      const file = await getFile(app.cv_path);
+      if (file && active) {
+        url = URL.createObjectURL(file);
+        setCvUrl(url);
+      }
+    }
+    
+    loadCv();
+    
+    return () => {
+      active = false;
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+    };
+  }, [app?.cv_path]);
 
   useEffect(() => {
     if (app) {
@@ -439,7 +464,7 @@ function ApplicantDetail() {
                     <MessageCircle className="size-4" /> WhatsApp
                   </a>
                   <a
-                    href={`mailto:${app.email}?subject=${encodeURIComponent(`Your application for ${role} — Talent Bridge Egypt`)}&body=${encodeURIComponent(`Hi ${app.full_name},\n\nThank you for your application.\n\n`)}`}
+                    href={`mailto:${app.email}?subject=${encodeURIComponent(`Your application for ${role} — QuickHire`)}&body=${encodeURIComponent(`Hi ${app.full_name},\n\nThank you for your application.\n\n`)}`}
                     className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm"
                   >
                     <Mail className="size-4" /> Email
@@ -597,13 +622,26 @@ function ApplicantDetail() {
                 ].map(({ label, field, placeholder, type }) => (
                   <div key={field} className="rounded-xl bg-[#f8f9fb] p-3">
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">{label}</div>
-                    <input
-                      type={type ?? "text"}
-                      value={editFields[field] ?? ""}
-                      onChange={e => setEditFields(f => f ? { ...f, [field]: e.target.value } : f)}
-                      placeholder={placeholder}
-                      className="w-full rounded-lg border border-border bg-white px-2 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-primary/30"
-                    />
+                    {field === "grad_status" ? (
+                      <select
+                        value={editFields[field] ?? ""}
+                        onChange={e => setEditFields(f => f ? { ...f, [field]: e.target.value } : f)}
+                        className="w-full rounded-lg border border-border bg-white px-2 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-primary/30"
+                      >
+                        <option value="">Select option</option>
+                        <option value="grad">grad</option>
+                        <option value="undergrad">undergrad</option>
+                        <option value="dropout">dropout</option>
+                      </select>
+                    ) : (
+                      <input
+                        type={type ?? "text"}
+                        value={editFields[field] ?? ""}
+                        onChange={e => setEditFields(f => f ? { ...f, [field]: e.target.value } : f)}
+                        placeholder={placeholder}
+                        className="w-full rounded-lg border border-border bg-white px-2 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-primary/30"
+                      />
+                    )}
                   </div>
                 ))}
               </div>
@@ -649,6 +687,7 @@ function ApplicantDetail() {
           )}
 
           {/* CV Section */}
+          {/* CV Section */}
           <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5">
             <h2 className="font-display text-base font-semibold text-ink mb-3 flex items-center gap-2">
               <FileText className="size-4 text-primary" /> CV / Resume
@@ -668,7 +707,13 @@ function ApplicantDetail() {
                       <BadgeCheck className="size-3" /> On file
                     </span>
                     <a
-                      href={app.cv_path}
+                      href={cvUrl || "#"}
+                      onClick={(e) => {
+                        if (!cvUrl) {
+                          e.preventDefault();
+                          toast.info("This is a demo candidate. CV document previews are fully accessible for newly submitted applications.");
+                        }
+                      }}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
@@ -676,8 +721,14 @@ function ApplicantDetail() {
                       <ExternalLink className="size-3" /> Open
                     </a>
                     <a
-                      href={app.cv_path}
-                      download
+                      href={cvUrl || "#"}
+                      onClick={(e) => {
+                        if (!cvUrl) {
+                          e.preventDefault();
+                          toast.info("This is a demo candidate. CV document downloads are fully accessible for newly submitted applications.");
+                        }
+                      }}
+                      download={app.cv_path?.split("/").pop()}
                       className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
                     >
                       <Download className="size-3" /> Download
@@ -695,6 +746,49 @@ function ApplicantDetail() {
                     Send CV link to Company HR via WhatsApp
                   </a>
                 )}
+
+                {/* Manual CV Review */}
+                <div className="mt-4 border-t border-border/50 pt-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Manual CV Review</span>
+                    <div className="flex gap-1.5">
+                      {(["pending", "approved", "rejected"] as const).map((st) => (
+                        <button
+                          key={st}
+                          type="button"
+                          onClick={() => update.mutate({ cv_review_status: st })}
+                          className={cn(
+                            "rounded-lg px-2.5 py-1 text-xs font-semibold capitalize border transition-all",
+                            (app.cv_review_status ?? "pending") === st
+                              ? st === "approved"
+                                ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                                : st === "rejected"
+                                  ? "bg-rose-100 text-rose-700 border-rose-300"
+                                  : "bg-amber-100 text-amber-700 border-amber-300"
+                              : "bg-white text-muted-foreground border-border hover:bg-sand"
+                          )}
+                        >
+                          {st}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                      CV Assessment Notes
+                    </label>
+                    <textarea
+                      defaultValue={app.cv_review_notes ?? ""}
+                      onBlur={(e) => {
+                        if (e.target.value !== (app.cv_review_notes ?? "")) {
+                          update.mutate({ cv_review_notes: e.target.value });
+                        }
+                      }}
+                      placeholder="Write your review notes for the resume..."
+                      className="w-full rounded-xl border border-border bg-sand/30 p-2.5 text-xs text-ink outline-none focus:ring-2 focus:ring-primary/20 min-h-[60px]"
+                    />
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="rounded-xl border border-dashed border-border bg-[#f8f9fb] p-6 text-center">
@@ -732,6 +826,10 @@ function ApplicantDetail() {
                     candidateName={app.full_name}
                     role={role}
                     waNumber={waNumber}
+                    onUpdateTranscript={(lang, text) => {
+                      const newTranscripts = { ...(app.transcripts ?? {}), [lang]: text };
+                      update.mutate({ transcripts: newTranscripts });
+                    }}
                   />
                 ))}
               </div>
@@ -777,12 +875,12 @@ function ApplicantDetail() {
                 {
                   label: "Shortlist notification",
                   subject: `You've been shortlisted — ${role} at ${company}`,
-                  body: `Hi ${app.full_name},\n\nCongratulations! You've been shortlisted for the ${role} position at ${company}.\n\nOur team will be in touch shortly with the next steps.\n\nBest regards,\nTalent Bridge Egypt Recruitment Team`,
+                  body: `Hi ${app.full_name},\n\nCongratulations! You've been shortlisted for the ${role} position at ${company}.\n\nOur team will be in touch shortly with the next steps.\n\nBest regards,\nQuickHire Recruitment Team`,
                 },
                 {
                   label: "Interview scheduling",
                   subject: `Interview invitation — ${role} at ${company}`,
-                  body: `Hi ${app.full_name},\n\nWe're pleased to invite you for an interview for the ${role} role at ${company}.\n\nPlease reply with your availability this week.\n\nBest regards,\nTalent Bridge Egypt Recruitment Team`,
+                  body: `Hi ${app.full_name},\n\nWe're pleased to invite you for an interview for the ${role} role at ${company}.\n\nPlease reply with your availability this week.\n\nBest regards,\nQuickHire Recruitment Team`,
                 },
               ].map(({ label, subject, body }) => (
                 <a
@@ -819,6 +917,14 @@ function ApplicantDetail() {
               Send to Company HR via WhatsApp
             </a>
           )}
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(shareMsg)}`}
+            target="_blank" rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#20ba5a] transition-colors shadow-sm"
+          >
+            <MessageCircle className="size-4" />
+            Share Profile via WhatsApp
+          </a>
           <button
             onClick={() => copyText(shareMsg, "share-profile")}
             className={cn(
@@ -832,7 +938,7 @@ function ApplicantDetail() {
             {copied === "share-profile" ? "Copied!" : "Copy Full Profile"}
           </button>
           <a
-            href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Interview: ${app.full_name} — ${role} @ ${company}`)}&details=${encodeURIComponent(`Candidate: ${app.full_name}\nPhone: ${app.phone}\nEmail: ${app.email}\nRole: ${role}\nCompany: ${company}\nScore: ${liveTotal}/30\n\nScheduled via Talent Bridge Egypt`)}`}
+            href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Interview: ${app.full_name} — ${role} @ ${company}`)}&details=${encodeURIComponent(`Candidate: ${app.full_name}\nPhone: ${app.phone}\nEmail: ${app.email}\nRole: ${role}\nCompany: ${company}\nScore: ${liveTotal}/30\n\nScheduled via QuickHire`)}`}
             target="_blank" rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-sand transition-colors shadow-sm"
           >
@@ -907,7 +1013,7 @@ function ApplicantDetail() {
 
 /* ── VOICE NOTE CARD WITH REAL AUDIO PLAYER ── */
 function VoiceNoteCard({
-  voiceNote, index, transcript, onCopy, copied, hrPhone, candidateName, role, waNumber,
+  voiceNote, index, transcript, onCopy, copied, hrPhone, candidateName, role, waNumber, onUpdateTranscript,
 }: {
   voiceNote: { lang: string; path: string };
   index: number;
@@ -918,9 +1024,47 @@ function VoiceNoteCard({
   candidateName: string;
   role: string;
   waNumber: (phone: string) => string;
+  onUpdateTranscript?: (lang: string, text: string) => void;
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editVal, setEditVal] = useState(transcript ?? "");
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    setEditVal(transcript ?? "");
+  }, [transcript]);
+
+  useEffect(() => {
+    let active = true;
+    let url: string | null = null;
+    
+    async function loadAudio() {
+      if (!voiceNote.path) return;
+      const file = await getFile(voiceNote.path);
+      if (file && active) {
+        url = URL.createObjectURL(file);
+        setAudioUrl(url);
+      }
+    }
+    
+    loadAudio();
+    
+    return () => {
+      active = false;
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+    };
+  }, [voiceNote.path]);
+
+  function handleSave() {
+    if (onUpdateTranscript) {
+      onUpdateTranscript(voiceNote.lang, editVal);
+    }
+    setIsEditing(false);
+  }
 
   function togglePlay() {
     if (!audioRef.current) return;
@@ -928,8 +1072,13 @@ function VoiceNoteCard({
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().catch(() => {
-        toast.info("Audio file not accessible in demo mode. In production, the real file URL will play.");
+      if (!audioUrl) {
+        toast.info("This is a demo candidate. Recorded voice notes are fully playable for newly submitted applications.");
+        return;
+      }
+      audioRef.current.play().catch((err) => {
+        console.error("Audio playback error", err);
+        toast.error("Failed to play voice note audio file.");
       });
       setIsPlaying(true);
     }
@@ -967,8 +1116,14 @@ function VoiceNoteCard({
           </div>
           {voiceNote.path && (
             <a
-              href={voiceNote.path}
-              download
+              href={audioUrl || voiceNote.path}
+              onClick={(e) => {
+                if (!audioUrl) {
+                  e.preventDefault();
+                  toast.info("This is a demo candidate. Recorded voice notes are fully downloadable for newly submitted applications.");
+                }
+              }}
+              download={`voice-note-${voiceNote.lang.toLowerCase()}.webm`}
               className="grid size-7 shrink-0 place-items-center rounded-lg border border-primary/20 bg-white text-primary/60 hover:text-primary transition-colors"
               title="Download voice note"
             >
@@ -979,7 +1134,7 @@ function VoiceNoteCard({
         {voiceNote.path && (
           <audio
             ref={audioRef}
-            src={voiceNote.path}
+            src={audioUrl || voiceNote.path}
             onEnded={() => setIsPlaying(false)}
             onPause={() => setIsPlaying(false)}
             className="hidden"
@@ -988,25 +1143,66 @@ function VoiceNoteCard({
       </div>
 
       {/* Transcript */}
-      {transcript ? (
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             Transcript ({voiceNote.lang})
-          </div>
-          <blockquote className="border-l-2 border-primary/30 pl-3 text-sm text-ink leading-relaxed italic">
-            "{transcript}"
-          </blockquote>
+          </span>
           <button
-            onClick={() => onCopy(transcript, `transcript-${voiceNote.lang}`)}
-            className="mt-2 inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors"
+            type="button"
+            onClick={() => {
+              if (isEditing) handleSave();
+              else setIsEditing(true);
+            }}
+            className="text-[10px] font-bold text-primary hover:underline"
           >
-            {copied === `transcript-${voiceNote.lang}` ? <CheckCheck className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-            Copy transcript
+            {isEditing ? "Save" : "Edit Transcript"}
           </button>
         </div>
-      ) : (
-        <p className="text-xs text-muted-foreground italic">Transcript not available</p>
-      )}
+        {isEditing ? (
+          <div className="space-y-2">
+            <textarea
+              value={editVal}
+              onChange={(e) => setEditVal(e.target.value)}
+              className="w-full rounded-xl border border-border bg-white p-2.5 text-xs text-ink outline-none focus:ring-2 focus:ring-primary/20 min-h-[80px]"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSave}
+                className="rounded-lg bg-primary px-3 py-1 text-[10px] font-semibold text-white hover:opacity-90 transition-opacity"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditVal(transcript ?? "");
+                  setIsEditing(false);
+                }}
+                className="rounded-lg border border-border px-3 py-1 text-[10px] font-medium text-muted-foreground hover:bg-sand"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : transcript ? (
+          <div>
+            <blockquote className="border-l-2 border-primary/30 pl-3 text-sm text-ink leading-relaxed italic">
+              "{transcript}"
+            </blockquote>
+            <button
+              onClick={() => onCopy(transcript, `transcript-${voiceNote.lang}`)}
+              className="mt-2 inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors"
+            >
+              {copied === `transcript-${voiceNote.lang}` ? <CheckCheck className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
+              Copy transcript
+            </button>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground italic">Transcript not available</p>
+        )}
+      </div>
 
       {/* Share voice note to HR */}
       {hrPhone && (

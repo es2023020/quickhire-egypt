@@ -11,9 +11,9 @@ const studyQO = queryOptions({
 export const Route = createFileRoute("/prep")({
   head: () => ({
     meta: [
-      { title: "Interview Prep & Study Materials — Talent Bridge Egypt" },
+      { title: "Interview Prep & Study Materials — QuickHire" },
       { name: "description", content: "Free interview scripts, English fluency drills and call-center know-how curated for Egyptian candidates." },
-      { property: "og:title", content: "Interview Prep — Talent Bridge Egypt" },
+      { property: "og:title", content: "Interview Prep — QuickHire" },
       { property: "og:description", content: "Sharpen your fluency and interview answers before you apply." },
     ],
   }),

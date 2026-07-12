@@ -2,8 +2,9 @@ import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Briefcase, LogOut,
   BarChart3, CalendarDays, KanbanSquare, Globe, X,
-  ChevronRight, BriefcaseBusiness,
+  ChevronRight,
 } from "lucide-react";
+import { QuickHireLogo } from "@/components/logo";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +39,7 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   }
 
   const adminEmail =
-    (typeof window !== "undefined" && localStorage.getItem("qh_admin_email")) || "admin@talentbridge.eg";
+    (typeof window !== "undefined" && localStorage.getItem("qh_admin_email")) || "admin@quickhire.eg";
   const initials = adminEmail.slice(0, 2).toUpperCase();
 
   return (
@@ -51,14 +52,12 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
       {/* Logo area */}
       <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
         <Link to="/admin" className="flex items-center gap-2.5" onClick={onClose}>
-          <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-soft">
-            <BriefcaseBusiness className="size-4 text-white" />
-          </div>
+          <QuickHireLogo size={32} />
           <div>
             <div className="font-display text-[14px] font-bold text-ink leading-tight">
-              Talent<span className="text-primary">Bridge</span>
+              QuickHire
             </div>
-            <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Egypt · Admin</div>
+            <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Admin Portal</div>
           </div>
         </Link>
         <button

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin/pipeline")({
-  head: () => ({ meta: [{ title: "Pipeline — Talent Bridge Egypt Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Pipeline — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
   component: Pipeline,
 });
 
@@ -168,7 +168,7 @@ function CandidateCard({
 }) {
   const normPhone = normalizePhone(app.phone);
   const cleanPhone = normPhone.replace(/[^0-9]/g, "");
-  const waMsg = `Hi ${app.full_name}, this is Talent Bridge Egypt regarding your ${app.offer?.title ?? "role"} application. Are you available for a call?`;
+  const waMsg = `Hi ${app.full_name}, this is QuickHire regarding your ${app.offer?.title ?? "role"} application. Are you available for a call?`;
 
   return (
     <div

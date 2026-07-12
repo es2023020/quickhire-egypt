@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/applicants")({
-  head: () => ({ meta: [{ title: "Applicants — Talent Bridge Egypt Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Applicants — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
   component: Applicants,
 });
 
@@ -38,13 +38,13 @@ const STATUS_LABELS = {
 
 function waLink(phone: string, name: string, role: string) {
   const normalized = phone.replace(/[^0-9+]/g, "");
-  const msg = `Hi ${name}, this is Talent Bridge Egypt regarding your application for ${role}. Are you available for a quick call?`;
+  const msg = `Hi ${name}, this is QuickHire regarding your application for ${role}. Are you available for a quick call?`;
   return `https://wa.me/${normalized.startsWith("+") ? normalized.slice(1) : normalized}?text=${encodeURIComponent(msg)}`;
 }
 
 function emailLink(email: string, name: string, role: string) {
-  const subject = encodeURIComponent(`Your application for ${role} — Talent Bridge Egypt`);
-  const body = encodeURIComponent(`Hi ${name},\n\nThank you for applying for the ${role} role through Talent Bridge Egypt.\n\nWe have reviewed your application and would like to move forward.\n\nBest regards,\nTalent Bridge Egypt Recruitment Team`);
+  const subject = encodeURIComponent(`Your application for ${role} — QuickHire`);
+  const body = encodeURIComponent(`Hi ${name},\n\nThank you for applying for the ${role} role through QuickHire.\n\nWe have reviewed your application and would like to move forward.\n\nBest regards,\nQuickHire Recruitment Team`);
   return `mailto:${email}?subject=${subject}&body=${body}`;
 }
 
