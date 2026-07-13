@@ -13,7 +13,8 @@ export type AdminApplicationRow = {
   experience_years: number | null;
   salary_expectation: string | null;
   cv_path: string | null;
-  voice_notes: { lang: string; path: string }[];
+  cv_data: string | null;
+  voice_notes: { lang: string; path: string; data?: string }[];
   transcripts: Record<string, string>;
   english_score: number | null;
   comm_score: number | null;
@@ -22,6 +23,8 @@ export type AdminApplicationRow = {
   ai_notes: string | null;
   status: string;
   admin_notes: string | null;
+  cv_review_notes?: string | null;
+  cv_review_status?: "pending" | "approved" | "rejected" | null;
   scoring_status: string;
   created_at: string;
   updated_at: string;
@@ -113,7 +116,8 @@ export async function submitApplication({ data }: {
     salary_expectation?: string | null;
     answers: Record<string, unknown>;
     cv_path?: string | null;
-    voice_notes: { lang: string; path: string }[];
+    cv_data?: string | null;
+    voice_notes: { lang: string; path: string; data?: string }[];
   };
 }): Promise<{ id: string }> {
   const id = `app-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -135,6 +139,7 @@ export async function submitApplication({ data }: {
     salary_expectation: data.salary_expectation ?? null,
     answers: data.answers as Record<string, string>,
     cv_path: data.cv_path ?? null,
+    cv_data: data.cv_data ?? null,
     voice_notes: data.voice_notes,
     transcripts: {},
     english_score: eng,
@@ -144,6 +149,8 @@ export async function submitApplication({ data }: {
     ai_notes: "Application received and AI-scored by QuickHire. Review voice notes and CV for full assessment.",
     status: "new",
     admin_notes: null,
+    cv_review_notes: null,
+    cv_review_status: null,
     scoring_status: "done",
     created_at: now,
     updated_at: now,

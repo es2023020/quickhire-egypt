@@ -119,14 +119,16 @@ function ApplyPage() {
     e.preventDefault();
     if (!offer) return;
     if (!cvFile) return toast.error("Please upload your CV (PDF or DOCX)");
+    // 5MB CV limit
+    if (cvFile.size > 5 * 1024 * 1024) {
+      return toast.error("CV file is too large. Maximum size is 5MB. Please compress or re-export your CV.");
+    }
     for (const v of voiceReqs) {
       if (!voiceBlobs[v.lang]) return toast.error(`Please provide your ${v.lang} voice note (record or upload)`);
     }
     setSubmitting(true);
     try {
       const cvPath = fakePath("cvs", cvFile.name);
-      await saveFile(cvPath, cvFile);
-
       const voiceNotes: { lang: string; path: string }[] = [];
       for (const v of voiceReqs) {
         const blob = voiceBlobs[v.lang]!;
@@ -134,9 +136,7 @@ function ApplyPage() {
           : blob.type.includes("mp3") || blob.type.includes("mpeg") ? "mp3"
           : blob.type.includes("wav") ? "wav"
           : "webm";
-        const vPath = fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`);
-        await saveFile(vPath, blob);
-        voiceNotes.push({ lang: v.lang, path: vPath });
+        voiceNotes.push({ lang: v.lang, path: fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`) });
       }
 
       const answers: Record<string, string> = {
@@ -146,7 +146,8 @@ function ApplyPage() {
         ...roleAnswers,
       };
 
-      await submitApplication({
+      // Submit application to localStorage (metadata only)
+      const { id: appId } = await submitApplication({
         data: {
           offer_id: offer.id,
           full_name: fullName,
@@ -160,9 +161,19 @@ function ApplyPage() {
           salary_expectation: salaryExp || null,
           answers,
           cv_path: cvPath,
+          cv_data: null,
           voice_notes: voiceNotes,
         },
       });
+
+      // Save actual file blobs to IndexedDB keyed by appId.
+      // IndexedDB supports gigabytes of data — no localStorage size limit.
+      await saveFile(`${appId}-cv`, cvFile);
+      for (let i = 0; i < voiceReqs.length; i++) {
+        const blob = voiceBlobs[voiceReqs[i].lang]!;
+        await saveFile(`${appId}-voice-${voiceReqs[i].lang}`, blob);
+      }
+
       setDone(true);
       toast.success("Application submitted — we'll be in touch!");
     } catch (err) {

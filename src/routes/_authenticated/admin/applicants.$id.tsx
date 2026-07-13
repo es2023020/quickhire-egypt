@@ -18,7 +18,6 @@ import {
   adminDeleteApplication,
 } from "@/lib/applications.functions";
 import { cn } from "@/lib/utils";
-import { getFile } from "@/lib/db";
 
 export const Route = createFileRoute("/_authenticated/admin/applicants/$id")({
   head: () => ({ meta: [{ title: "Applicant — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
@@ -157,30 +156,10 @@ function ApplicantDetail() {
     english_level: string; experience_years: string; salary_expectation: string;
   } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [cvUrl, setCvUrl] = useState<string | null>(null);
+  // cv_data and voice_notes[].data are base64 data URLs stored directly in the application record.
+  // No IndexedDB needed — they're available immediately from localStorage.
+  const cvUrl = app?.cv_data ?? null;
 
-  useEffect(() => {
-    let active = true;
-    let url: string | null = null;
-    
-    async function loadCv() {
-      if (!app?.cv_path) return;
-      const file = await getFile(app.cv_path);
-      if (file && active) {
-        url = URL.createObjectURL(file);
-        setCvUrl(url);
-      }
-    }
-    
-    loadCv();
-    
-    return () => {
-      active = false;
-      if (url) {
-        URL.revokeObjectURL(url);
-      }
-    };
-  }, [app?.cv_path]);
 
   useEffect(() => {
     if (app) {
@@ -700,12 +679,18 @@ function ApplicantDetail() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold text-ink truncate">{app.cv_path.split("/").pop()}</div>
-                    <div className="text-xs text-muted-foreground">PDF Document · On file</div>
+                    <div className="text-xs text-muted-foreground">{cvUrl ? "PDF ready to open & download" : "Demo candidate — no actual file"}</div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                      <BadgeCheck className="size-3" /> On file
-                    </span>
+                    {cvUrl ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                        <BadgeCheck className="size-3" /> Ready
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                        Demo
+                      </span>
+                    )}
                     <a
                       href={cvUrl || "#"}
                       onClick={(e) => {
@@ -1015,7 +1000,7 @@ function ApplicantDetail() {
 function VoiceNoteCard({
   voiceNote, index, transcript, onCopy, copied, hrPhone, candidateName, role, waNumber, onUpdateTranscript,
 }: {
-  voiceNote: { lang: string; path: string };
+  voiceNote: { lang: string; path: string; data?: string };
   index: number;
   transcript: string | null;
   onCopy: (text: string, key: string) => void;
@@ -1030,34 +1015,14 @@ function VoiceNoteCard({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editVal, setEditVal] = useState(transcript ?? "");
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+  // The base64 data URL is embedded directly in the voice note record.
+  // For demo/mock candidates it will be undefined; for real submitted candidates it will be present.
+  const audioSrc = voiceNote.data ?? null;
 
   useEffect(() => {
     setEditVal(transcript ?? "");
   }, [transcript]);
-
-  useEffect(() => {
-    let active = true;
-    let url: string | null = null;
-    
-    async function loadAudio() {
-      if (!voiceNote.path) return;
-      const file = await getFile(voiceNote.path);
-      if (file && active) {
-        url = URL.createObjectURL(file);
-        setAudioUrl(url);
-      }
-    }
-    
-    loadAudio();
-    
-    return () => {
-      active = false;
-      if (url) {
-        URL.revokeObjectURL(url);
-      }
-    };
-  }, [voiceNote.path]);
 
   function handleSave() {
     if (onUpdateTranscript) {
@@ -1072,13 +1037,13 @@ function VoiceNoteCard({
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      if (!audioUrl) {
-        toast.info("This is a demo candidate. Recorded voice notes are fully playable for newly submitted applications.");
+      if (!audioSrc) {
+        toast.info("This is a demo candidate — no actual audio file. Real submitted voice notes will play here.");
         return;
       }
       audioRef.current.play().catch((err) => {
         console.error("Audio playback error", err);
-        toast.error("Failed to play voice note audio file.");
+        toast.error("Failed to play voice note. The audio file may be corrupted.");
       });
       setIsPlaying(true);
     }
@@ -1095,7 +1060,9 @@ function VoiceNoteCard({
             Voice Note {index + 1} — {voiceNote.lang}
           </span>
         </div>
-        <span className="text-[10px] text-muted-foreground">On file ✓</span>
+        <span className={`text-[10px] font-medium ${audioSrc ? "text-emerald-600" : "text-muted-foreground"}`}>
+          {audioSrc ? "Audio ready ✓" : "Demo — no audio"}
+        </span>
       </div>
 
       {/* Real Audio Player */}
@@ -1103,26 +1070,22 @@ function VoiceNoteCard({
         <div className="flex items-center gap-3">
           <button
             onClick={togglePlay}
-            className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-white hover:opacity-90 transition-opacity shadow-sm"
-            title={isPlaying ? "Pause" : "Play"}
+            className={`grid size-9 shrink-0 place-items-center rounded-full text-white hover:opacity-90 transition-opacity shadow-sm ${audioSrc ? "bg-primary" : "bg-muted-foreground/40 cursor-not-allowed"}`}
+            title={audioSrc ? (isPlaying ? "Pause" : "Play voice note") : "No audio for demo candidates"}
           >
             {isPlaying ? <Pause className="size-4" /> : <Play className="size-4 ml-0.5" />}
           </button>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold text-ink truncate mb-1">voice-note-{voiceNote.lang.toLowerCase()}.webm</div>
+            <div className="text-xs font-semibold text-ink truncate mb-1">
+              {audioSrc ? `voice-note-${voiceNote.lang.toLowerCase()}.webm` : "No audio file (demo)"}
+            </div>
             <div className="h-1.5 rounded-full bg-primary/20 overflow-hidden">
-              <div className="h-full w-0 rounded-full bg-primary/60 transition-all duration-300" />
+              <div className={`h-full rounded-full bg-primary/60 transition-all duration-300 ${isPlaying ? "w-full" : "w-0"}`} />
             </div>
           </div>
-          {voiceNote.path && (
+          {audioSrc && (
             <a
-              href={audioUrl || voiceNote.path}
-              onClick={(e) => {
-                if (!audioUrl) {
-                  e.preventDefault();
-                  toast.info("This is a demo candidate. Recorded voice notes are fully downloadable for newly submitted applications.");
-                }
-              }}
+              href={audioSrc}
               download={`voice-note-${voiceNote.lang.toLowerCase()}.webm`}
               className="grid size-7 shrink-0 place-items-center rounded-lg border border-primary/20 bg-white text-primary/60 hover:text-primary transition-colors"
               title="Download voice note"
@@ -1131,10 +1094,10 @@ function VoiceNoteCard({
             </a>
           )}
         </div>
-        {voiceNote.path && (
+        {audioSrc && (
           <audio
             ref={audioRef}
-            src={audioUrl || voiceNote.path}
+            src={audioSrc}
             onEnded={() => setIsPlaying(false)}
             onPause={() => setIsPlaying(false)}
             className="hidden"
