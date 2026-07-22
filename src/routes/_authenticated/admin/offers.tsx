@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   Briefcase, Loader2, Star, Plus, Edit2, Trash2, X, Save,
-  Eye, EyeOff, ChevronDown, ChevronUp, Search, ExternalLink,
+  Eye, EyeOff, ChevronDown, ChevronUp, Search, ExternalLink, Pause,
 } from "lucide-react";
 import { toast } from "sonner";
 import { adminListOffers, upsertOffer, deleteOffer } from "@/lib/offers.functions";
@@ -29,7 +29,7 @@ type OfferForm = {
   language: string; salary_text: string; salary_min: string;
   location: string; shift_type: string; summary: string;
   description: string; requirements: string; benefits: string;
-  hr_phone: string; status: "active" | "archived"; featured: boolean;
+  hr_phone: string; status: "active" | "archived" | "on_hold"; featured: boolean;
   voice_note_lang: string; voice_note_prompt: string;
 };
 
@@ -104,7 +104,7 @@ function AdminOffers() {
   });
 
   const toggle = useMutation({
-    mutationFn: ({ id, patch }: { id: string; patch: Partial<{ status: "active" | "archived"; featured: boolean }> }) => {
+    mutationFn: ({ id, patch }: { id: string; patch: Partial<{ status: "active" | "archived" | "on_hold"; featured: boolean }> }) => {
       const existing = data?.find((x) => x.id === id);
       if (!existing) throw new Error("Not found");
       return upsertOffer({
@@ -119,7 +119,7 @@ function AdminOffers() {
           benefits: existing.benefits ?? [],
           form_schema: existing.form_schema ?? {},
           hr_phone: existing.hr_phone,
-          status: (patch.status ?? existing.status) as "active" | "archived",
+          status: (patch.status ?? existing.status) as "active" | "archived" | "on_hold",
           featured: patch.featured ?? existing.featured,
         },
       });
@@ -143,7 +143,7 @@ function AdminOffers() {
         summary: o.summary, description: o.description,
         requirements: (o.requirements ?? []).join("\n"),
         benefits: (o.benefits ?? []).join("\n"),
-        hr_phone: o.hr_phone ?? "", status: o.status as "active" | "archived",
+        hr_phone: o.hr_phone ?? "", status: o.status as "active" | "archived" | "on_hold",
         featured: o.featured,
         voice_note_lang: vn?.lang ?? "English",
         voice_note_prompt: vn?.prompt ?? EMPTY_FORM.voice_note_prompt,
@@ -163,6 +163,7 @@ function AdminOffers() {
   });
 
   const active = (data ?? []).filter(o => o.status === "active").length;
+  const onHold = (data ?? []).filter(o => o.status === "on_hold").length;
   const archived = (data ?? []).filter(o => o.status === "archived").length;
 
   return (
@@ -173,7 +174,7 @@ function AdminOffers() {
             <Briefcase className="size-7 text-primary" /> Job Offers
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {active} active · {archived} archived
+            {active} active · {onHold} on hold · {archived} archived
           </p>
         </div>
         <button
@@ -239,16 +240,20 @@ function AdminOffers() {
                     <td className="px-4 py-3 text-xs font-semibold text-ink">{o.salary_text}</td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => toggle.mutate({ id: o.id, patch: { status: o.status === "active" ? "archived" : "active" } })}
+                        onClick={() => toggle.mutate({ id: o.id, patch: { status: o.status === "active" ? "on_hold" : o.status === "on_hold" ? "archived" : "active" } })}
                         className={cn(
                           "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-colors",
-                          o.status === "active"
-                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                            : "bg-sand text-muted-foreground hover:bg-sand-deep",
+                          o.status === "active" ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" :
+                          o.status === "on_hold" ? "bg-amber-100 text-amber-700 hover:bg-amber-200" :
+                          "bg-sand text-muted-foreground hover:bg-sand-deep"
                         )}
                       >
-                        {o.status === "active" ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
-                        {o.status === "active" ? "Active" : "Archived"}
+                        {o.status === "active" ? <Eye className="size-3" /> :
+                         o.status === "on_hold" ? <Pause className="size-3" /> :
+                         <EyeOff className="size-3" />}
+                        {o.status === "active" ? "Active" :
+                         o.status === "on_hold" ? "On Hold" :
+                         "Archived"}
                       </button>
                     </td>
                     <td className="px-4 py-3">
@@ -382,7 +387,7 @@ function AdminOffers() {
               {/* Settings */}
               <Section title="Settings">
                 <div className="grid grid-cols-2 gap-3">
-                  <FormSelect label="Status" value={editing.status} onChange={v => setEditing(p => p ? { ...p, status: v as "active" | "archived" } : p)} options={["active", "archived"]} />
+                  <FormSelect label="Status" value={editing.status} onChange={v => setEditing(p => p ? { ...p, status: v as "active" | "archived" | "on_hold" } : p)} options={["active", "archived", "on_hold"]} />
                   <label className="flex items-center gap-2 cursor-pointer mt-6">
                     <input
                       type="checkbox"

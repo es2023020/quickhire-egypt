@@ -112,6 +112,23 @@ function ApplyPage() {
   const [roleAnswers, setRoleAnswers] = useState<Record<string, string>>({});
 
   if (!offer) return null;
+  if (offer.status === "on_hold") {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-16 text-center">
+        <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 shadow-soft">
+          <h2 className="font-display text-2xl font-bold text-amber-900">Applications Paused</h2>
+          <p className="mt-4 text-sm text-amber-800 leading-relaxed">
+            Thank you for your interest! The position for <strong>{offer.title}</strong> at <strong>{offer.company}</strong> is currently on hold. We are not accepting applications at this time.
+          </p>
+          <div className="mt-6">
+            <Link to="/offers" className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-950 hover:underline">
+              ← Browse other opportunities
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const voiceReqs = offer.form_schema?.voice_notes ?? [];
   const roleQuestions = getRoleQuestions(offer.category);
 
@@ -346,7 +363,7 @@ function ApplyPage() {
               ) : (
                 <div>
                   <div className="font-semibold text-sm text-primary">Choose file or drag &amp; drop</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">PDF, DOC, DOCX — max 10MB</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">PDF, DOC, DOCX — max 5MB</div>
                 </div>
               )}
             </div>
@@ -354,7 +371,16 @@ function ApplyPage() {
             <input
               type="file"
               accept=".pdf,.doc,.docx"
-              onChange={(e) => setCvFile(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null;
+                if (file && file.size > 5 * 1024 * 1024) {
+                  toast.error("CV file is too large. Maximum size allowed is 5MB.");
+                  e.target.value = "";
+                  setCvFile(null);
+                  return;
+                }
+                setCvFile(file);
+              }}
               className="hidden"
             />
           </label>

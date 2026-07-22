@@ -7,7 +7,7 @@ import {
   Send, Copy, CheckCheck, Zap, Star, ChevronUp, ChevronDown,
   Mic, Share2, Building2, GraduationCap, BadgeCheck, ExternalLink,
   Edit3, Check, X, Globe, Target, BarChart3, Trash2,
-  Play, Pause, Download, Save, AlertTriangle, DollarSign,
+  Play, Pause, Download, Save, AlertTriangle, DollarSign, Printer,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -18,6 +18,7 @@ import {
   adminDeleteApplication,
 } from "@/lib/applications.functions";
 import { cn } from "@/lib/utils";
+import { getFile } from "@/lib/db";
 
 export const Route = createFileRoute("/_authenticated/admin/applicants/$id")({
   head: () => ({ meta: [{ title: "Applicant — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
@@ -156,9 +157,48 @@ function ApplicantDetail() {
     english_level: string; experience_years: string; salary_expectation: string;
   } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  // cv_data and voice_notes[].data are base64 data URLs stored directly in the application record.
-  // No IndexedDB needed — they're available immediately from localStorage.
-  const cvUrl = app?.cv_data ?? null;
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    let url: string | null = null;
+
+    async function loadCv() {
+      if (!app) return;
+
+      // Fallback to cv_data if present
+      if (app.cv_data) {
+        setCvUrl(app.cv_data);
+        return;
+      }
+
+      // Try loading from IndexedDB
+      try {
+        const file = await getFile(`${id}-cv`);
+        if (file && active) {
+          url = URL.createObjectURL(file);
+          setCvUrl(url);
+        } else if (active) {
+          // Fallback to bundled placeholder CV for demo candidates
+          setCvUrl("/placeholder-cv.pdf");
+        }
+      } catch (e) {
+        console.error("Error reading CV from IndexedDB", e);
+        if (active) {
+          setCvUrl("/placeholder-cv.pdf");
+        }
+      }
+    }
+
+    loadCv();
+
+    return () => {
+      active = false;
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+    };
+  }, [app, id]);
 
 
   useEffect(() => {
@@ -236,6 +276,37 @@ function ApplicantDetail() {
     });
   }
 
+  async function handleCopyCv() {
+    try {
+      let blob: Blob | null = null;
+      if (cvUrl === "/placeholder-cv.pdf") {
+        const res = await fetch("/placeholder-cv.pdf");
+        blob = await res.blob();
+      } else {
+        const file = await getFile(`${id}-cv`);
+        if (file) blob = file;
+      }
+
+      if (blob) {
+        const item = new ClipboardItem({ [blob.type || "application/pdf"]: blob });
+        await navigator.clipboard.write([item]);
+        setCopied("cv-file");
+        setTimeout(() => setCopied(null), 2500);
+        toast.success("CV copied to clipboard! You can paste (Ctrl+V) directly inside WhatsApp.");
+      } else {
+        toast.error("Could not find CV file to copy.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.info("Browser security restricts copying document files directly to clipboard. The CV is downloading instead — drag & drop it directly into WhatsApp!");
+      
+      const link = document.createElement("a");
+      link.href = cvUrl || "/placeholder-cv.pdf";
+      link.download = app?.cv_path?.split("/").pop() || "cv.pdf";
+      link.click();
+    }
+  }
+
   function saveScores() {
     if (!scoreEdits) return;
     update.mutate({
@@ -284,7 +355,7 @@ function ApplicantDetail() {
   const shareMsg = buildCompanyShareMessage(app);
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 max-w-6xl space-y-5">
+    <div id="printable-candidate-profile" className="p-4 md:p-6 lg:p-8 max-w-6xl space-y-5">
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
@@ -322,11 +393,62 @@ function ApplicantDetail() {
         </div>
       )}
 
-      {/* Breadcrumb */}
-      <Link to="/admin/applicants" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground group">
-        <ChevronLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
-        Back to Applicants
-      </Link>
+      {/* Print Stylesheet */}
+      <style>{`
+        @media print {
+          /* Hide sidebar, navigation menus, breadcrumbs, modals, and edit/outreach buttons */
+          aside, header, nav, footer, .no-print, button, select, a[href^="https://wa.me"], a[href^="mailto:"], a[href^="tel:"] {
+            display: none !important;
+          }
+          /* Reset print page canvas margins */
+          @page {
+            size: A4;
+            margin: 15mm;
+          }
+          body {
+            background: white !important;
+            color: black !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          #printable-candidate-profile {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+          /* Visual element adjustments */
+          .bg-white, .bg-card, .bg-[#f8f9fb] {
+            background: transparent !important;
+            border-color: #cbd5e1 !important;
+            box-shadow: none !important;
+          }
+          .text-ink {
+            color: black !important;
+          }
+          /* Prevent break inside cards */
+          .rounded-2xl {
+            page-break-inside: avoid;
+            margin-bottom: 12px;
+          }
+        }
+      `}</style>
+
+      {/* Breadcrumb & Actions */}
+      <div className="flex items-center justify-between no-print mb-1">
+        <Link to="/admin/applicants" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground group">
+          <ChevronLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          Back to Applicants
+        </Link>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-ink hover:bg-sand transition-all shadow-sm"
+        >
+          <Printer className="size-3.5" /> Export PDF
+        </button>
+      </div>
 
       {/* ── HERO CARD ── */}
       <div className="rounded-2xl border border-border/60 bg-white shadow-sm overflow-hidden">
@@ -409,7 +531,7 @@ function ApplicantDetail() {
             </div>
 
             {/* Quick actions */}
-            <div className="flex flex-wrap gap-2 shrink-0">
+            <div className="flex flex-wrap gap-2 shrink-0 no-print">
               {editMode ? (
                 <>
                   <button
@@ -679,10 +801,10 @@ function ApplicantDetail() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold text-ink truncate">{app.cv_path.split("/").pop()}</div>
-                    <div className="text-xs text-muted-foreground">{cvUrl ? "PDF ready to open & download" : "Demo candidate — no actual file"}</div>
+                    <div className="text-xs text-muted-foreground">{(cvUrl && cvUrl !== "/placeholder-cv.pdf") ? "PDF ready to open & download" : "Demo candidate — placeholder CV"}</div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {cvUrl ? (
+                    {(cvUrl && cvUrl !== "/placeholder-cv.pdf") ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                         <BadgeCheck className="size-3" /> Ready
                       </span>
@@ -694,9 +816,8 @@ function ApplicantDetail() {
                     <a
                       href={cvUrl || "#"}
                       onClick={(e) => {
-                        if (!cvUrl) {
-                          e.preventDefault();
-                          toast.info("This is a demo candidate. CV document previews are fully accessible for newly submitted applications.");
+                        if (cvUrl === "/placeholder-cv.pdf") {
+                          toast.info("This is a demo candidate. Opening sample placeholder CV.");
                         }
                       }}
                       target="_blank"
@@ -708,9 +829,8 @@ function ApplicantDetail() {
                     <a
                       href={cvUrl || "#"}
                       onClick={(e) => {
-                        if (!cvUrl) {
-                          e.preventDefault();
-                          toast.info("This is a demo candidate. CV document downloads are fully accessible for newly submitted applications.");
+                        if (cvUrl === "/placeholder-cv.pdf") {
+                          toast.info("This is a demo candidate. Downloading sample placeholder CV.");
                         }
                       }}
                       download={app.cv_path?.split("/").pop()}
@@ -718,6 +838,19 @@ function ApplicantDetail() {
                     >
                       <Download className="size-3" /> Download
                     </a>
+                    <button
+                      onClick={handleCopyCv}
+                      className={cn(
+                        "inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors shadow-sm",
+                        copied === "cv-file"
+                          ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                          : "border-border bg-white text-muted-foreground hover:text-primary hover:border-primary/30"
+                      )}
+                      title="Copy CV file to clipboard to paste (Ctrl+V) directly in WhatsApp"
+                    >
+                      {copied === "cv-file" ? <CheckCheck className="size-3" /> : <Copy className="size-3" />}
+                      Copy File
+                    </button>
                   </div>
                 </div>
                 {/* WhatsApp with CV link */}
@@ -734,7 +867,7 @@ function ApplicantDetail() {
 
                 {/* Manual CV Review */}
                 <div className="mt-4 border-t border-border/50 pt-4 space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between no-print">
                     <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Manual CV Review</span>
                     <div className="flex gap-1.5">
                       {(["pending", "approved", "rejected"] as const).map((st) => (
@@ -759,19 +892,27 @@ function ApplicantDetail() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                    <label className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1 no-print">
                       CV Assessment Notes
                     </label>
-                    <textarea
-                      defaultValue={app.cv_review_notes ?? ""}
-                      onBlur={(e) => {
-                        if (e.target.value !== (app.cv_review_notes ?? "")) {
-                          update.mutate({ cv_review_notes: e.target.value });
-                        }
-                      }}
-                      placeholder="Write your review notes for the resume..."
-                      className="w-full rounded-xl border border-border bg-sand/30 p-2.5 text-xs text-ink outline-none focus:ring-2 focus:ring-primary/20 min-h-[60px]"
-                    />
+                    <div className="no-print">
+                      <textarea
+                        defaultValue={app.cv_review_notes ?? ""}
+                        onBlur={(e) => {
+                          if (e.target.value !== (app.cv_review_notes ?? "")) {
+                            update.mutate({ cv_review_notes: e.target.value });
+                          }
+                        }}
+                        placeholder="Write your review notes for the resume..."
+                        className="w-full rounded-xl border border-border bg-sand/30 p-2.5 text-xs text-ink outline-none focus:ring-2 focus:ring-primary/20 min-h-[60px]"
+                      />
+                    </div>
+                    {app.cv_review_notes && (
+                      <div className="hidden print:block text-xs text-ink bg-slate-50 p-3 rounded-lg border border-slate-200 mt-2">
+                        <span className="font-bold text-[10px] uppercase text-slate-500 block mb-1">Manual CV Assessment:</span>
+                        <p className="whitespace-pre-wrap font-sans">{app.cv_review_notes}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -811,6 +952,7 @@ function ApplicantDetail() {
                     candidateName={app.full_name}
                     role={role}
                     waNumber={waNumber}
+                    appId={id}
                     onUpdateTranscript={(lang, text) => {
                       const newTranscripts = { ...(app.transcripts ?? {}), [lang]: text };
                       update.mutate({ transcripts: newTranscripts });
@@ -822,7 +964,7 @@ function ApplicantDetail() {
           </div>
 
           {/* Contact shortcuts for CANDIDATE */}
-          <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5">
+          <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5 no-print">
             <h2 className="font-display text-base font-semibold text-ink mb-3 flex items-center gap-2">
               <Send className="size-4 text-primary" /> Contact Candidate
             </h2>
@@ -883,7 +1025,7 @@ function ApplicantDetail() {
       </div>
 
       {/* ── SHARE TO COMPANY HR ── */}
-      <div className="rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50 to-violet-50/30 shadow-sm p-5">
+      <div className="rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50 to-violet-50/30 shadow-sm p-5 no-print">
         <h2 className="font-display text-base font-semibold text-ink mb-1 flex items-center gap-2">
           <Share2 className="size-4 text-violet-600" /> Share Full Profile to Company HR
         </h2>
@@ -950,7 +1092,7 @@ function ApplicantDetail() {
         </h2>
 
         {/* Status buttons */}
-        <div className="flex flex-wrap gap-2 mb-5">
+        <div className="flex flex-wrap gap-2 mb-5 no-print">
           {(["new", "shortlisted", "hired", "rejected"] as const).map((s) => {
             const cfg = STATUS_CFG[s];
             const isActive = app.status === s;
@@ -976,19 +1118,27 @@ function ApplicantDetail() {
 
         {/* Admin notes */}
         <div>
-          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted-foreground no-print">
             Internal Notes <span className="font-normal normal-case">(auto-saved on blur, private)</span>
           </label>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            onBlur={() => notes !== (app.admin_notes ?? "") && update.mutate({ admin_notes: notes })}
-            placeholder="Add private notes about this candidate — interview feedback, salary negotiation, flags…"
-            rows={4}
-            className="w-full rounded-xl border border-border bg-[#f8f9fb] p-4 text-sm outline-none focus:ring-2 focus:ring-primary/30 resize-none placeholder:text-muted-foreground/60"
-          />
+          <div className="no-print">
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              onBlur={() => notes !== (app.admin_notes ?? "") && update.mutate({ admin_notes: notes })}
+              placeholder="Add private notes about this candidate — interview feedback, salary negotiation, flags…"
+              rows={4}
+              className="w-full rounded-xl border border-border bg-[#f8f9fb] p-4 text-sm outline-none focus:ring-2 focus:ring-primary/30 resize-none placeholder:text-muted-foreground/60"
+            />
+          </div>
+          {notes && (
+            <div className="hidden print:block text-sm text-ink bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2">
+              <span className="font-bold text-xs uppercase text-slate-500 block mb-1">HR Internal Assessment Notes:</span>
+              <p className="whitespace-pre-wrap font-sans">{notes}</p>
+            </div>
+          )}
           {app.updated_at && (
-            <div className="mt-1 text-[10px] text-muted-foreground">Last updated: {new Date(app.updated_at).toLocaleString("en-GB")}</div>
+            <div className="mt-1 text-[10px] text-muted-foreground no-print">Last updated: {new Date(app.updated_at).toLocaleString("en-GB")}</div>
           )}
         </div>
       </div>
@@ -998,7 +1148,7 @@ function ApplicantDetail() {
 
 /* ── VOICE NOTE CARD WITH REAL AUDIO PLAYER ── */
 function VoiceNoteCard({
-  voiceNote, index, transcript, onCopy, copied, hrPhone, candidateName, role, waNumber, onUpdateTranscript,
+  voiceNote, index, transcript, onCopy, copied, hrPhone, candidateName, role, waNumber, onUpdateTranscript, appId,
 }: {
   voiceNote: { lang: string; path: string; data?: string };
   index: number;
@@ -1010,19 +1160,88 @@ function VoiceNoteCard({
   role: string;
   waNumber: (phone: string) => string;
   onUpdateTranscript?: (lang: string, text: string) => void;
+  appId: string;
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editVal, setEditVal] = useState(transcript ?? "");
-
-  // The base64 data URL is embedded directly in the voice note record.
-  // For demo/mock candidates it will be undefined; for real submitted candidates it will be present.
-  const audioSrc = voiceNote.data ?? null;
+  const [audioSrc, setAudioSrc] = useState<string | null>(null);
+  const [vnCopied, setVnCopied] = useState(false);
 
   useEffect(() => {
     setEditVal(transcript ?? "");
   }, [transcript]);
+
+  useEffect(() => {
+    let active = true;
+    let url: string | null = null;
+
+    async function loadAudio() {
+      // 1. Fallback to voiceNote.data if it's base64
+      if (voiceNote.data) {
+        setAudioSrc(voiceNote.data);
+        return;
+      }
+
+      // 2. Try loading from IndexedDB
+      try {
+        const file = await getFile(`${appId}-voice-${voiceNote.lang}`);
+        if (file && active) {
+          url = URL.createObjectURL(file);
+          setAudioSrc(url);
+        } else if (active) {
+          // Fallback to placeholder audio so it always works
+          setAudioSrc("/placeholder-audio.mp3");
+        }
+      } catch (err) {
+        console.error("Failed to load voice note from IndexedDB", err);
+        if (active) {
+          setAudioSrc("/placeholder-audio.mp3");
+        }
+      }
+    }
+
+    loadAudio();
+
+    return () => {
+      active = false;
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+    };
+  }, [appId, voiceNote.lang, voiceNote.data]);
+
+  async function handleCopyVoiceNote() {
+    try {
+      let blob: Blob | null = null;
+      if (audioSrc === "/placeholder-audio.mp3") {
+        const res = await fetch("/placeholder-audio.mp3");
+        blob = await res.blob();
+      } else {
+        const file = await getFile(`${appId}-voice-${voiceNote.lang}`);
+        if (file) blob = file;
+      }
+
+      if (blob) {
+        const item = new ClipboardItem({ [blob.type || "audio/webm"]: blob });
+        await navigator.clipboard.write([item]);
+        setVnCopied(true);
+        setTimeout(() => setVnCopied(false), 2500);
+        toast.success(`Voice note (${voiceNote.lang}) file copied to clipboard! You can paste (Ctrl+V) directly inside WhatsApp.`);
+      } else {
+        toast.error("Could not find voice note file.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.info("Browser security restricts copying audio files directly to clipboard. The voice note is downloading instead — drag & drop it directly into WhatsApp!");
+      
+      const link = document.createElement("a");
+      link.href = audioSrc || "/placeholder-audio.mp3";
+      link.download = `voice-note-${voiceNote.lang.toLowerCase()}.webm`;
+      link.click();
+    }
+  }
 
   function handleSave() {
     if (onUpdateTranscript) {
@@ -1037,9 +1256,8 @@ function VoiceNoteCard({
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      if (!audioSrc) {
-        toast.info("This is a demo candidate — no actual audio file. Real submitted voice notes will play here.");
-        return;
+      if (audioSrc === "/placeholder-audio.mp3") {
+        toast.info("Playing sample placeholder audio (this is a demo candidate).");
       }
       audioRef.current.play().catch((err) => {
         console.error("Audio playback error", err);
@@ -1060,8 +1278,8 @@ function VoiceNoteCard({
             Voice Note {index + 1} — {voiceNote.lang}
           </span>
         </div>
-        <span className={`text-[10px] font-medium ${audioSrc ? "text-emerald-600" : "text-muted-foreground"}`}>
-          {audioSrc ? "Audio ready ✓" : "Demo — no audio"}
+        <span className={`text-[10px] font-medium ${(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? "text-emerald-600" : "text-amber-600"}`}>
+          {(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? "Audio ready ✓" : "Demo — placeholder audio"}
         </span>
       </div>
 
@@ -1071,27 +1289,41 @@ function VoiceNoteCard({
           <button
             onClick={togglePlay}
             className={`grid size-9 shrink-0 place-items-center rounded-full text-white hover:opacity-90 transition-opacity shadow-sm ${audioSrc ? "bg-primary" : "bg-muted-foreground/40 cursor-not-allowed"}`}
-            title={audioSrc ? (isPlaying ? "Pause" : "Play voice note") : "No audio for demo candidates"}
+            title={audioSrc ? (isPlaying ? "Pause" : "Play voice note") : "No audio"}
           >
             {isPlaying ? <Pause className="size-4" /> : <Play className="size-4 ml-0.5" />}
           </button>
           <div className="flex-1 min-w-0">
             <div className="text-xs font-semibold text-ink truncate mb-1">
-              {audioSrc ? `voice-note-${voiceNote.lang.toLowerCase()}.webm` : "No audio file (demo)"}
+              {(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? `voice-note-${voiceNote.lang.toLowerCase()}.webm` : "voice-note-placeholder.mp3"}
             </div>
             <div className="h-1.5 rounded-full bg-primary/20 overflow-hidden">
               <div className={`h-full rounded-full bg-primary/60 transition-all duration-300 ${isPlaying ? "w-full" : "w-0"}`} />
             </div>
           </div>
           {audioSrc && (
-            <a
-              href={audioSrc}
-              download={`voice-note-${voiceNote.lang.toLowerCase()}.webm`}
-              className="grid size-7 shrink-0 place-items-center rounded-lg border border-primary/20 bg-white text-primary/60 hover:text-primary transition-colors"
-              title="Download voice note"
-            >
-              <Download className="size-3.5" />
-            </a>
+            <div className="flex items-center gap-1.5">
+              <a
+                href={audioSrc}
+                download={`voice-note-${voiceNote.lang.toLowerCase()}.webm`}
+                className="grid size-7 place-items-center rounded-lg border border-primary/20 bg-white text-primary/60 hover:text-primary transition-colors"
+                title="Download voice note file"
+              >
+                <Download className="size-3.5" />
+              </a>
+              <button
+                onClick={handleCopyVoiceNote}
+                className={cn(
+                  "grid size-7 place-items-center rounded-lg border transition-colors",
+                  vnCopied
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-600"
+                    : "border-primary/20 bg-white text-primary/60 hover:text-primary"
+                )}
+                title="Copy audio file to clipboard to paste (Ctrl+V) directly in WhatsApp"
+              >
+                {vnCopied ? <CheckCheck className="size-3.5" /> : <Copy className="size-3.5" />}
+              </button>
+            </div>
           )}
         </div>
         {audioSrc && (

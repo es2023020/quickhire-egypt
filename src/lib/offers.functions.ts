@@ -4,9 +4,9 @@ import { BUILT_IN_OFFERS } from "./data";
 function getStoredOffers(): OfferWithPhone[] {
   if (typeof window === "undefined") return [...BUILT_IN_OFFERS];
   try {
-    const raw = localStorage.getItem("qh_offers");
+    const raw = localStorage.getItem("qh_offers_v2");
     if (!raw) {
-      localStorage.setItem("qh_offers", JSON.stringify(BUILT_IN_OFFERS));
+      localStorage.setItem("qh_offers_v2", JSON.stringify(BUILT_IN_OFFERS));
       return [...BUILT_IN_OFFERS];
     }
     return JSON.parse(raw) as OfferWithPhone[];
@@ -17,20 +17,20 @@ function getStoredOffers(): OfferWithPhone[] {
 
 function saveOffers(offers: OfferWithPhone[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem("qh_offers", JSON.stringify(offers));
+  localStorage.setItem("qh_offers_v2", JSON.stringify(offers));
 }
 
 export async function listOffers(): Promise<Offer[]> {
   const offers = getStoredOffers();
   return offers
-    .filter((o) => o.status === "active")
+    .filter((o) => o.status === "active" || o.status === "on_hold")
     .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
     .map(({ hr_phone: _hp, ...o }) => o);
 }
 
 export async function getOfferBySlug({ data }: { data: { slug: string } }): Promise<Offer | null> {
   const offers = getStoredOffers();
-  const offer = offers.find((o) => o.slug === data.slug && o.status === "active");
+  const offer = offers.find((o) => o.slug === data.slug && (o.status === "active" || o.status === "on_hold"));
   if (!offer) return null;
   const { hr_phone: _hp, ...rest } = offer;
   return rest;

@@ -25,6 +25,7 @@ import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminInterviewsRouteImport } from './routes/_authenticated/admin/interviews'
 import { Route as AuthenticatedAdminApplicantsRouteImport } from './routes/_authenticated/admin/applicants'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
+import { Route as AuthenticatedAdminApplicantsIndexRouteImport } from './routes/_authenticated/admin/applicants.index'
 import { Route as AuthenticatedAdminApplicantsIdRouteImport } from './routes/_authenticated/admin/applicants.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -111,6 +112,12 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminApplicantsIndexRoute =
+  AuthenticatedAdminApplicantsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminApplicantsRoute,
+  } as any)
 const AuthenticatedAdminApplicantsIdRoute =
   AuthenticatedAdminApplicantsIdRouteImport.update({
     id: '/$id',
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/offers/$slug/': typeof OffersSlugIndexRoute
   '/admin/applicants/$id': typeof AuthenticatedAdminApplicantsIdRoute
+  '/admin/applicants/': typeof AuthenticatedAdminApplicantsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -144,7 +152,6 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/offers': typeof OffersIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
-  '/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
   '/admin/interviews': typeof AuthenticatedAdminInterviewsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/pipeline': typeof AuthenticatedAdminPipelineRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/offers/$slug': typeof OffersSlugIndexRoute
   '/admin/applicants/$id': typeof AuthenticatedAdminApplicantsIdRoute
+  '/admin/applicants': typeof AuthenticatedAdminApplicantsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/offers/$slug/': typeof OffersSlugIndexRoute
   '/_authenticated/admin/applicants/$id': typeof AuthenticatedAdminApplicantsIdRoute
+  '/_authenticated/admin/applicants/': typeof AuthenticatedAdminApplicantsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/offers/$slug/'
     | '/admin/applicants/$id'
+    | '/admin/applicants/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -201,7 +211,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/offers'
     | '/admin/analytics'
-    | '/admin/applicants'
     | '/admin/interviews'
     | '/admin/offers'
     | '/admin/pipeline'
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/offers/$slug'
     | '/admin/applicants/$id'
+    | '/admin/applicants'
   id:
     | '__root__'
     | '/'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/offers/$slug/'
     | '/_authenticated/admin/applicants/$id'
+    | '/_authenticated/admin/applicants/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -356,6 +367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/applicants/': {
+      id: '/_authenticated/admin/applicants/'
+      path: '/'
+      fullPath: '/admin/applicants/'
+      preLoaderRoute: typeof AuthenticatedAdminApplicantsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminApplicantsRoute
+    }
     '/_authenticated/admin/applicants/$id': {
       id: '/_authenticated/admin/applicants/$id'
       path: '/$id'
@@ -368,11 +386,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminApplicantsRouteChildren {
   AuthenticatedAdminApplicantsIdRoute: typeof AuthenticatedAdminApplicantsIdRoute
+  AuthenticatedAdminApplicantsIndexRoute: typeof AuthenticatedAdminApplicantsIndexRoute
 }
 
 const AuthenticatedAdminApplicantsRouteChildren: AuthenticatedAdminApplicantsRouteChildren =
   {
     AuthenticatedAdminApplicantsIdRoute: AuthenticatedAdminApplicantsIdRoute,
+    AuthenticatedAdminApplicantsIndexRoute:
+      AuthenticatedAdminApplicantsIndexRoute,
   }
 
 const AuthenticatedAdminApplicantsRouteWithChildren =

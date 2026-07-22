@@ -82,7 +82,7 @@ function saveApplications(apps: MockApplication[]) {
 function getOffers() {
   if (typeof window !== "undefined") {
     try {
-      const raw = localStorage.getItem("qh_offers");
+      const raw = localStorage.getItem("qh_offers_v2");
       return raw ? JSON.parse(raw) : BUILT_IN_OFFERS;
     } catch {
       return BUILT_IN_OFFERS;

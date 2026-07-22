@@ -64,15 +64,23 @@ function OfferDetail() {
           {offer.language && <span className="inline-flex items-center gap-1.5 rounded-full bg-sand px-3 py-1"><Languages className="size-3.5" />{offer.language}</span>}
         </div>
 
-        <div className="mt-6">
-          <Link
-            to="/offers/$slug/apply"
-            params={{ slug: offer.slug }}
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lift hover:opacity-90"
-          >
-            Apply now <ArrowRight className="size-4" />
-          </Link>
-        </div>
+        {offer.status === "on_hold" ? (
+          <div className="mt-6">
+            <div className="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5 text-sm font-semibold text-amber-850 shadow-soft">
+              ⚠️ This position is currently on hold. Applications are temporarily paused.
+            </div>
+          </div>
+        ) : (
+          <div className="mt-6">
+            <Link
+              to="/offers/$slug/apply"
+              params={{ slug: offer.slug }}
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lift hover:opacity-90"
+            >
+              Apply now <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        )}
       </header>
 
       <div className="mt-8 grid gap-8 md:grid-cols-3">
