@@ -1,17 +1,31 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Briefcase, Sparkles } from "lucide-react";
 import type { Offer } from "@/lib/offers.types";
+import { cn } from "@/lib/utils";
 
-export function OfferCard({ offer }: { offer: Offer }) {
+export function OfferCard({ offer, matchScore }: { offer: Offer; matchScore?: number }) {
+  const isHighMatch = matchScore && matchScore >= 80;
+  const isOnHold = offer.status === "on_hold";
   return (
     <Link
       to="/offers/$slug"
       params={{ slug: offer.slug }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-soft transition-all hover:-translate-y-1 hover:shadow-lift"
+      className={cn(
+        "group relative flex flex-col overflow-hidden rounded-2xl border bg-card p-6 shadow-soft transition-all",
+        isOnHold
+          ? "border-amber-200 bg-amber-50/10 opacity-80"
+          : isHighMatch
+          ? "border-violet-300 ring-1 ring-violet-100 bg-gradient-to-b from-card to-violet-50/10 hover:-translate-y-1 hover:shadow-lift"
+          : "border-border hover:-translate-y-1 hover:shadow-lift"
+      )}
     >
-      {offer.status === "on_hold" ? (
-        <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-300 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
+      {isOnHold ? (
+        <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 border border-amber-300 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-850 shadow-soft">
           On Hold
+        </span>
+      ) : matchScore ? (
+        <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft animate-pulse">
+          ⭐ {matchScore}% Match
         </span>
       ) : offer.featured ? (
         <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gold-gradient px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-gold-foreground shadow-gold">
@@ -21,7 +35,10 @@ export function OfferCard({ offer }: { offer: Offer }) {
       <div className="mb-1 text-xs font-medium uppercase tracking-wider text-primary/80">
         {offer.category}{offer.language ? ` · ${offer.language}` : ""}
       </div>
-      <h3 className="font-display text-xl leading-snug text-ink group-hover:text-primary">
+      <h3 className={cn(
+        "font-display text-xl leading-snug text-ink",
+        !isOnHold && "group-hover:text-primary"
+      )}>
         {offer.title}
       </h3>
       <div className="mt-1 text-sm text-muted-foreground">{offer.company}</div>
@@ -40,8 +57,8 @@ export function OfferCard({ offer }: { offer: Offer }) {
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Package</div>
           <div className="font-display text-lg font-semibold text-primary">{offer.salary_text}</div>
         </div>
-        {offer.status === "on_hold" ? (
-          <span className="rounded-full border border-border bg-sand px-3 py-1 text-xs font-medium text-muted-foreground">
+        {isOnHold ? (
+          <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
             On Hold
           </span>
         ) : (

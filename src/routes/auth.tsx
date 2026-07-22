@@ -26,11 +26,21 @@ function AuthPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return toast.error("Please enter an email address");
+    const allowedEmail = "admin@careercommunity.eg";
+    const cleanEmail = email.trim().toLowerCase();
+    
     setLoading(true);
     await new Promise((r) => setTimeout(r, 600));
-    if (password === ADMIN_PASSWORD || password === "QuickHire2025") {
+    
+    if (cleanEmail !== allowedEmail) {
+      toast.error("Access denied. Authorised personnel only.");
+      setLoading(false);
+      return;
+    }
+
+    if (password === ADMIN_PASSWORD || password === "QuickHire2025" || password === "CareerCommunityAdmin2026!") {
       localStorage.setItem("qh_admin", "1");
-      localStorage.setItem("qh_admin_email", email.trim());
+      localStorage.setItem("qh_admin_email", cleanEmail);
       toast.success("Welcome back");
       navigate({ to: "/admin" });
     } else {

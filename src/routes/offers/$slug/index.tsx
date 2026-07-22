@@ -7,6 +7,7 @@ const offerQO = (slug: string) =>
   queryOptions({
     queryKey: ["offer", slug],
     queryFn: () => getOfferBySlug({ data: { slug } }),
+    staleTime: 0,
   });
 
 export const Route = createFileRoute("/offers/$slug/")({

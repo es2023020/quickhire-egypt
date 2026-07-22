@@ -66,21 +66,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          {isAdmin ? (
-            <Link
-              to="/admin"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <Link
-              to="/offers"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
-            >
-              Browse Jobs →
-            </Link>
-          )}
+          <Link
+            to="/offers"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
+          >
+            Browse Jobs →
+          </Link>
         </div>
 
         <button
@@ -100,15 +91,9 @@ export function SiteHeader() {
                 {n.label}
               </Link>
             ))}
-            {isAdmin ? (
-              <Link to="/admin" className="mt-1 rounded-lg bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground">
-                Dashboard
-              </Link>
-            ) : (
-              <Link to="/offers" className="mt-1 rounded-lg bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground">
-                Browse Jobs →
-              </Link>
-            )}
+            <Link to="/offers" className="mt-1 rounded-lg bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground">
+              Browse Jobs →
+            </Link>
           </nav>
         </div>
       )}

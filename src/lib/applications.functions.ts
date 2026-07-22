@@ -60,12 +60,29 @@ export function normalizePhone(phone: string): string {
   return phone;
 }
 
-function getRawApplications(): MockApplication[] {
+async function getRawApplications(): Promise<MockApplication[]> {
   if (typeof window === "undefined") return [...MOCK_APPLICATIONS];
+
+  // 1. Dev mode: read from Vite server API
+  if (import.meta.env.DEV) {
+    try {
+      const res = await fetch(`/api/db/applications?_t=${Date.now()}`);
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem("qh_applications_v2", JSON.stringify(data));
+        return data as MockApplication[];
+      }
+    } catch (e) {
+      console.warn("Local DB API fetch failed, falling back to localStorage", e);
+    }
+    return [...MOCK_APPLICATIONS];
+  }
+
+  // 2. Prod mode: fallback to localStorage
   try {
-    const raw = localStorage.getItem("qh_applications");
+    const raw = localStorage.getItem("qh_applications_v2");
     if (!raw) {
-      localStorage.setItem("qh_applications", JSON.stringify(MOCK_APPLICATIONS));
+      localStorage.setItem("qh_applications_v2", JSON.stringify(MOCK_APPLICATIONS));
       return [...MOCK_APPLICATIONS];
     }
     return JSON.parse(raw) as MockApplication[];
@@ -74,9 +91,24 @@ function getRawApplications(): MockApplication[] {
   }
 }
 
-function saveApplications(apps: MockApplication[]) {
+async function saveApplications(apps: MockApplication[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem("qh_applications", JSON.stringify(apps));
+  localStorage.setItem("qh_applications_v2", JSON.stringify(apps));
+
+  // Save to Vite server file in dev
+  if (import.meta.env.DEV) {
+    try {
+      await fetch("/api/db/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apps),
+      });
+    } catch (e) {
+      console.warn("Local DB API save failed", e);
+    }
+  }
 }
 
 function getOffers() {
@@ -155,23 +187,23 @@ export async function submitApplication({ data }: {
     created_at: now,
     updated_at: now,
   };
-  const apps = getRawApplications();
+  const apps = await getRawApplications();
   apps.unshift(newApp);
-  saveApplications(apps);
+  await saveApplications(apps);
   return { id };
 }
 
 export async function adminListApplications({ data }: {
   data: { offer_id?: string | null; status?: string | null };
 }): Promise<AdminApplicationRow[]> {
-  let apps = getRawApplications();
+  let apps = await getRawApplications();
   if (data.offer_id) apps = apps.filter((a) => a.offer_id === data.offer_id);
   if (data.status) apps = apps.filter((a) => a.status === data.status);
   return apps.map(enrichWithOffer);
 }
 
 export async function adminGetApplication({ data }: { data: { id: string } }): Promise<AdminApplicationDetail | null> {
-  const apps = getRawApplications();
+  const apps = await getRawApplications();
   const app = apps.find((a) => a.id === data.id);
   if (!app) return null;
 
@@ -213,7 +245,7 @@ export async function adminUpdateApplicationStatus({ data }: {
     transcripts?: Record<string, string> | null;
   };
 }): Promise<{ ok: boolean }> {
-  const apps = getRawApplications();
+  const apps = await getRawApplications();
   const idx = apps.findIndex((a) => a.id === data.id);
   if (idx === -1) return { ok: false };
   if (data.status) apps[idx].status = data.status;
@@ -232,7 +264,7 @@ export async function adminUpdateApplicationStatus({ data }: {
     apps[idx].scoring_status = "done";
   }
   apps[idx].updated_at = new Date().toISOString();
-  saveApplications(apps);
+  await saveApplications(apps);
   return { ok: true };
 }
 
@@ -250,7 +282,7 @@ export async function adminUpdateApplicant({ data }: {
     salary_expectation?: string | null;
   };
 }): Promise<{ ok: boolean }> {
-  const apps = getRawApplications();
+  const apps = await getRawApplications();
   const idx = apps.findIndex((a) => a.id === data.id);
   if (idx === -1) return { ok: false };
   if (data.full_name !== undefined) apps[idx].full_name = data.full_name;
@@ -263,15 +295,15 @@ export async function adminUpdateApplicant({ data }: {
   if (data.experience_years !== undefined) apps[idx].experience_years = data.experience_years;
   if (data.salary_expectation !== undefined) apps[idx].salary_expectation = data.salary_expectation;
   apps[idx].updated_at = new Date().toISOString();
-  saveApplications(apps);
+  await saveApplications(apps);
   return { ok: true };
 }
 
 export async function adminDeleteApplication({ data }: { data: { id: string } }): Promise<{ ok: boolean }> {
-  const apps = getRawApplications();
+  const apps = await getRawApplications();
   const filtered = apps.filter((a) => a.id !== data.id);
   if (filtered.length === apps.length) return { ok: false };
-  saveApplications(filtered);
+  await saveApplications(filtered);
   return { ok: true };
 }
 
@@ -282,7 +314,7 @@ export async function adminGetSignedUrl(_args: {
 }
 
 export async function adminRescore({ data }: { data: { id: string } }): Promise<{ ok: boolean }> {
-  const apps = getRawApplications();
+  const apps = await getRawApplications();
   const idx = apps.findIndex((a) => a.id === data.id);
   if (idx !== -1) {
     const eng = Math.floor(Math.random() * 3) + 7;   // 7–9
@@ -295,7 +327,7 @@ export async function adminRescore({ data }: { data: { id: string } }): Promise<
     apps[idx].ai_notes = `Re-scored by QuickHire AI on ${new Date().toLocaleString("en-EG")}.`;
     apps[idx].scoring_status = "done";
     apps[idx].updated_at = new Date().toISOString();
-    saveApplications(apps);
+    await saveApplications(apps);
   }
   return { ok: true };
 }
@@ -306,7 +338,7 @@ export async function adminStats(): Promise<{
   shortlisted: number;
   activeOffers: number;
 }> {
-  const apps = getRawApplications();
+  const apps = await getRawApplications();
   const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
   const offers = getOffers();
   return {
