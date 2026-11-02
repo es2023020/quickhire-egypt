@@ -1,131 +1,259 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, Loader2, TrendingUp, Users, Star, Briefcase } from "lucide-react";
+import {
+  BarChart3,
+  Loader2,
+  TrendingUp,
+  Users,
+  Star,
+  CheckCircle2,
+  Layers,
+  ArrowRight,
+  ShieldCheck,
+  AlertTriangle,
+} from "lucide-react";
 import { adminListApplications } from "@/lib/applications.functions";
 import { adminListOffers } from "@/lib/offers.functions";
+import { PIPELINE_STAGES } from "./applicants.index";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [
+      { title: "Analytics & Funnel — QuickHire Admin" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: Analytics,
 });
 
 function Analytics() {
-  const apps = useQuery({ queryKey: ["admin", "applications"], queryFn: () => adminListApplications({ data: {} }) });
-  const offers = useQuery({ queryKey: ["admin", "offers"], queryFn: () => adminListOffers() });
+  const apps = useQuery({
+    queryKey: ["admin", "applications"],
+    queryFn: () => adminListApplications({ data: {} }),
+  });
+  const offers = useQuery({
+    queryKey: ["admin", "offers"],
+    queryFn: () => adminListOffers(),
+  });
 
   const allApps = apps.data ?? [];
   const allOffers = offers.data ?? [];
 
   if (apps.isLoading || offers.isLoading) {
-    return <div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   const total = allApps.length;
-  const shortlisted = allApps.filter(a => a.status === "shortlisted").length;
-  const hired = allApps.filter(a => a.status === "hired").length;
-  const rejected = allApps.filter(a => a.status === "rejected").length;
+  const shortlisted = allApps.filter((a) => a.status === "shortlisted").length;
+  const hired = allApps.filter(
+    (a) => a.status === "hired" || a.pipeline_stage === "accepted"
+  ).length;
   const conversionRate = total > 0 ? Math.round((hired / total) * 100) : 0;
   const shortlistRate = total > 0 ? Math.round((shortlisted / total) * 100) : 0;
 
-  const avgScore = allApps.filter(a => a.total_score != null).length > 0
-    ? (allApps.reduce((s, a) => s + (a.total_score ?? 0), 0) / allApps.filter(a => a.total_score != null).length).toFixed(1)
-    : "—";
+  const avgScore =
+    allApps.filter((a) => a.total_score != null).length > 0
+      ? (
+          allApps.reduce((s, a) => s + (a.total_score ?? 0), 0) /
+          allApps.filter((a) => a.total_score != null).length
+        ).toFixed(1)
+      : "—";
 
-  // By offer breakdown
-  const byOffer = allOffers.map(o => ({
-    title: o.title,
-    company: o.company,
-    count: allApps.filter(a => a.offer_id === o.id).length,
-    shortlisted: allApps.filter(a => a.offer_id === o.id && a.status === "shortlisted").length,
-    avgScore: (() => {
-      const relevant = allApps.filter(a => a.offer_id === o.id && a.total_score != null);
-      if (!relevant.length) return null;
-      return (relevant.reduce((s, a) => s + (a.total_score ?? 0), 0) / relevant.length).toFixed(1);
-    })(),
-  })).filter(o => o.count > 0).sort((a, b) => b.count - a.count);
+  // 10-Stage Funnel Calculation
+  const funnelStages = [
+    { key: "applied", label: "1. Sourced / Applied", color: "bg-blue-500" },
+    { key: "test_invited", label: "2. Assessment Sent", color: "bg-amber-500" },
+    { key: "test_completed", label: "3. Test Completed", color: "bg-orange-500" },
+    { key: "interview_scheduled", label: "4. Wave Scheduled", color: "bg-violet-500" },
+    { key: "interview_done", label: "5. Interview Evaluated", color: "bg-indigo-500" },
+    { key: "offer_pending", label: "6. Offer Approval", color: "bg-yellow-500" },
+    { key: "offer_extended", label: "7. Offer Extended", color: "bg-teal-500" },
+    { key: "accepted", label: "8. Signed / Placed", color: "bg-emerald-500" },
+  ];
 
-  // By category
-  const byCategory: Record<string, number> = {};
-  allApps.forEach(a => {
-    const cat = a.offer?.title ?? "Unknown";
-    byCategory[cat] = (byCategory[cat] ?? 0) + 1;
+  // Stage count tally
+  const stageCounts: Record<string, number> = {};
+  PIPELINE_STAGES.forEach((s) => {
+    stageCounts[s.key] = allApps.filter((a) => (a.pipeline_stage || "applied") === s.key).length;
   });
-  const categories = Object.entries(byCategory).sort((a, b) => b[1] - a[1]).slice(0, 6);
-  const maxCat = categories[0]?.[1] ?? 1;
+
+  // Calculate cumulative or direct counts
+  const funnelMetrics = funnelStages.map((st) => {
+    const directCount = stageCounts[st.key] || 0;
+    const pct = total > 0 ? Math.round((directCount / total) * 100) : 0;
+    return { ...st, count: directCount, pct };
+  });
+
+  const maxFunnelCount = Math.max(...funnelMetrics.map((f) => f.count), 1);
 
   // Score distribution
   const scoreBuckets = [
-    { label: "24–30 (Excellent / Exceptional)", count: allApps.filter(a => (a.total_score ?? 0) >= 24).length, color: "bg-emerald-500" },
-    { label: "20–23 (Good)", count: allApps.filter(a => (a.total_score ?? 0) >= 20 && (a.total_score ?? 0) < 24).length, color: "bg-blue-500" },
-    { label: "15–19 (Average)", count: allApps.filter(a => (a.total_score ?? 0) >= 15 && (a.total_score ?? 0) < 20).length, color: "bg-amber-500" },
-    { label: "0–14 (Below avg)", count: allApps.filter(a => a.total_score != null && (a.total_score ?? 0) < 15).length, color: "bg-red-400" },
-    { label: "Not scored", count: allApps.filter(a => a.total_score == null).length, color: "bg-border" },
+    {
+      label: "24–30 (Exceptional)",
+      count: allApps.filter((a) => (a.total_score ?? 0) >= 24).length,
+      color: "bg-emerald-500",
+    },
+    {
+      label: "20–23 (Good / Qualified)",
+      count: allApps.filter(
+        (a) => (a.total_score ?? 0) >= 20 && (a.total_score ?? 0) < 24
+      ).length,
+      color: "bg-blue-500",
+    },
+    {
+      label: "15–19 (Average / Bench)",
+      count: allApps.filter(
+        (a) => (a.total_score ?? 0) >= 15 && (a.total_score ?? 0) < 20
+      ).length,
+      color: "bg-amber-500",
+    },
+    {
+      label: "0–14 (Needs Training)",
+      count: allApps.filter(
+        (a) => a.total_score != null && (a.total_score ?? 0) < 15
+      ).length,
+      color: "bg-red-400",
+    },
   ];
-  const maxScore = Math.max(...scoreBuckets.map(b => b.count), 1);
-
-  // Recent applications by day
-  const last7 = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (6 - i));
-    const key = d.toISOString().split("T")[0];
-    const label = d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric" });
-    return {
-      label,
-      count: allApps.filter(a => a.created_at.startsWith(key)).length,
-    };
-  });
-  const maxDay = Math.max(...last7.map(d => d.count), 1);
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 max-w-7xl">
-      <div className="mb-6">
-        <h1 className="font-display text-3xl font-bold text-ink flex items-center gap-2">
-          <BarChart3 className="size-7 text-primary" /> Analytics
+    <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+      {/* Page Header */}
+      <div>
+        <h1 className="font-display text-2xl font-bold text-ink md:text-3xl flex items-center gap-2.5">
+          <BarChart3 className="size-7 text-primary" /> Recruitment Funnel &amp; Analytics
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Platform performance and recruitment metrics</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Real-time BPO operational throughput, conversion rates, and stage drop-offs.
+        </p>
       </div>
 
-      {/* KPI cards */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard icon={Users} label="Total Applications" value={total} color="text-primary" />
-        <KpiCard icon={Star} label="Shortlist Rate" value={`${shortlistRate}%`} color="text-amber-600" sub={`${shortlisted} candidates`} />
-        <KpiCard icon={TrendingUp} label="Hire Rate" value={`${conversionRate}%`} color="text-emerald-600" sub={`${hired} placed`} />
-        <KpiCard icon={BarChart3} label="Avg AI Score" value={avgScore} color="text-blue-600" sub="out of 30" />
+      {/* KPI Overview Cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard
+          icon={Users}
+          label="Total Candidates"
+          value={total}
+          color="text-primary"
+          sub="Registered in database"
+        />
+        <KpiCard
+          icon={Star}
+          label="Shortlist Conversion"
+          value={`${shortlistRate}%`}
+          color="text-amber-600"
+          sub={`${shortlisted} candidates approved`}
+        />
+        <KpiCard
+          icon={TrendingUp}
+          label="Placement Rate"
+          value={`${conversionRate}%`}
+          color="text-emerald-600"
+          sub={`${hired} candidates placed`}
+        />
+        <KpiCard
+          icon={BarChart3}
+          label="Mean AI Fluency Score"
+          value={avgScore}
+          color="text-blue-600"
+          sub="out of 30 total points"
+        />
       </div>
 
+      {/* ── 10-STAGE BPO RECRUITMENT FUNNEL ── */}
+      <div className="rounded-2xl border border-border bg-white shadow-soft p-6 space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-4">
+          <div>
+            <h2 className="font-display text-lg font-bold text-ink flex items-center gap-2">
+              <Layers className="size-5 text-violet-600" /> End-to-End Pipeline Funnel
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Candidate distribution across the 8 forward hiring stages
+            </p>
+          </div>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-sand text-ink border border-border">
+            Total active pool: {total}
+          </span>
+        </div>
+
+        <div className="space-y-4">
+          {funnelMetrics.map((stage, idx) => {
+            const widthPct = Math.max((stage.count / maxFunnelCount) * 100, 3);
+            return (
+              <div key={stage.key} className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 font-semibold text-ink">
+                    <span className="size-2 rounded-full" style={{ backgroundColor: stage.color }} />
+                    {stage.label}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono font-bold text-ink">{stage.count} candidates</span>
+                    <span className="text-[11px] text-muted-foreground w-12 text-right">
+                      {stage.pct}%
+                    </span>
+                  </div>
+                </div>
+
+                <div className="h-3 w-full bg-sand/60 rounded-full overflow-hidden border border-border/40">
+                  <div
+                    className={cn("h-full rounded-full transition-all duration-500", stage.color)}
+                    style={{ width: `${widthPct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Funnel Drop-off / Outcome Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-border/60">
+          <div className="rounded-xl border border-border bg-sand/20 p-3.5">
+            <span className="text-xs text-muted-foreground font-semibold block">Accepted Offers</span>
+            <span className="text-xl font-bold text-emerald-700 font-display">
+              {stageCounts["accepted"] || 0}
+            </span>
+            <span className="text-[11px] text-muted-foreground block mt-0.5">Signed corporate contracts</span>
+          </div>
+          <div className="rounded-xl border border-border bg-sand/20 p-3.5">
+            <span className="text-xs text-muted-foreground font-semibold block">Offers Extended</span>
+            <span className="text-xl font-bold text-violet-700 font-display">
+              {stageCounts["offer_extended"] || 0}
+            </span>
+            <span className="text-[11px] text-muted-foreground block mt-0.5">Awaiting candidate sign-off</span>
+          </div>
+          <div className="rounded-xl border border-border bg-sand/20 p-3.5">
+            <span className="text-xs text-muted-foreground font-semibold block">Archived / Withdrawn</span>
+            <span className="text-xl font-bold text-slate-700 font-display">
+              {(stageCounts["rejected"] || 0) + (stageCounts["withdrawn"] || 0)}
+            </span>
+            <span className="text-[11px] text-muted-foreground block mt-0.5">Cooldown or dropped out</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid: AI Score Distribution & Roles Breakdown */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Applications over 7 days */}
-        <div className="rounded-2xl border border-border bg-card shadow-soft p-5">
-          <h2 className="font-display text-lg mb-4">Applications — Last 7 Days</h2>
-          <div className="flex items-end gap-2 h-32">
-            {last7.map(({ label, count }) => (
-              <div key={label} className="flex flex-1 flex-col items-center gap-1">
-                <div className="text-xs font-bold text-primary">{count > 0 ? count : ""}</div>
-                <div
-                  className="w-full rounded-t-lg bg-primary/80 transition-all"
-                  style={{ height: `${(count / maxDay) * 100}%`, minHeight: count > 0 ? "4px" : "0" }}
-                />
-                <div className="text-[10px] text-muted-foreground text-center">{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Score distribution */}
-        <div className="rounded-2xl border border-border bg-card shadow-soft p-5">
-          <h2 className="font-display text-lg mb-4">AI Score Distribution</h2>
-          <div className="space-y-3">
+        {/* Score Distribution */}
+        <div className="rounded-2xl border border-border bg-white shadow-soft p-5">
+          <h2 className="font-display text-base font-bold text-ink mb-4">
+            AI Assessment Fluency Tiers
+          </h2>
+          <div className="space-y-3.5">
             {scoreBuckets.map(({ label, count, color }) => (
-              <div key={label}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-muted-foreground">{label}</span>
-                  <span className="text-xs font-bold text-ink">{count}</span>
+              <div key={label} className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground font-medium">{label}</span>
+                  <span className="font-bold text-ink">{count}</span>
                 </div>
-                <div className="h-2 rounded-full bg-border overflow-hidden">
+                <div className="h-2 rounded-full bg-sand overflow-hidden border border-border/40">
                   <div
-                    className={`h-full rounded-full ${color} transition-all`}
-                    style={{ width: `${(count / maxScore) * 100}%` }}
+                    className={cn("h-full rounded-full transition-all", color)}
+                    style={{ width: `${total > 0 ? (count / total) * 100 : 0}%` }}
                   />
                 </div>
               </div>
@@ -133,48 +261,26 @@ function Analytics() {
           </div>
         </div>
 
-        {/* By offer */}
-        <div className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
-          <div className="border-b border-border px-5 py-4">
-            <h2 className="font-display text-lg">Applications by Role</h2>
-          </div>
-          <div className="divide-y divide-border">
-            {byOffer.length === 0 ? (
-              <div className="p-8 text-center text-sm text-muted-foreground">No data yet</div>
-            ) : byOffer.map(o => (
-              <div key={o.title} className="flex items-center gap-4 px-5 py-3">
-                <div className="flex-1 min-w-0">
-                  <div className="truncate text-sm font-semibold text-ink">{o.title}</div>
-                  <div className="truncate text-xs text-muted-foreground">{o.company}</div>
-                </div>
-                <div className="flex items-center gap-3 shrink-0 text-xs">
-                  <span className="text-muted-foreground">{o.count} apps</span>
-                  <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 font-semibold">{o.shortlisted} shortlisted</span>
-                  {o.avgScore && <span className="rounded-full bg-primary/10 text-primary px-2 py-0.5 font-bold">avg {o.avgScore}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* By category bar chart */}
-        <div className="rounded-2xl border border-border bg-card shadow-soft p-5">
-          <h2 className="font-display text-lg mb-4">Top Roles Applied To</h2>
+        {/* Applications by Role */}
+        <div className="rounded-2xl border border-border bg-white shadow-soft p-5">
+          <h2 className="font-display text-base font-bold text-ink mb-4">
+            Talent Demand by Corporate Account
+          </h2>
           <div className="space-y-3">
-            {categories.map(([cat, count]) => (
-              <div key={cat}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-muted-foreground truncate max-w-[200px]">{cat}</span>
-                  <span className="text-xs font-bold text-ink shrink-0 ml-2">{count}</span>
+            {allOffers.map((o) => {
+              const count = allApps.filter((a) => a.offer_id === o.id).length;
+              return (
+                <div key={o.id} className="flex items-center justify-between gap-3 text-xs border-b border-border/40 pb-2.5 last:border-0 last:pb-0">
+                  <div className="min-w-0 flex-1">
+                    <span className="font-semibold text-ink block truncate">{o.title}</span>
+                    <span className="text-[11px] text-muted-foreground font-mono">{o.company}</span>
+                  </div>
+                  <span className="font-bold font-mono px-2 py-0.5 rounded-full bg-sand text-ink shrink-0">
+                    {count} apps
+                  </span>
                 </div>
-                <div className="h-2 rounded-full bg-border overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all"
-                    style={{ width: `${(count / maxCat) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -182,19 +288,31 @@ function Analytics() {
   );
 }
 
-function KpiCard({ icon: Icon, label, value, color, sub }: {
-  icon: React.ElementType; label: string; value: string | number; color: string; sub?: string;
+function KpiCard({
+  icon: Icon,
+  label,
+  value,
+  color,
+  sub,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string | number;
+  color: string;
+  sub?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className={`grid size-8 place-items-center rounded-lg bg-current/10 ${color}`}>
-          <Icon className={`size-4 ${color}`} />
+    <div className="rounded-2xl border border-border bg-white p-5 shadow-soft space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </span>
+        <div className={cn("grid size-8 place-items-center rounded-xl bg-sand", color)}>
+          <Icon className="size-4" />
         </div>
       </div>
-      <div className={`font-display text-3xl font-bold ${color}`}>{value}</div>
-      {sub && <div className="mt-0.5 text-xs text-muted-foreground">{sub}</div>}
+      <div className={cn("font-display text-3xl font-bold", color)}>{value}</div>
+      {sub && <div className="text-[11px] text-muted-foreground">{sub}</div>}
     </div>
   );
 }

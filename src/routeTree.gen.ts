@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrackRouteImport } from './routes/track'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrepRouteImport } from './routes/prep'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
@@ -16,6 +17,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OffersIndexRouteImport } from './routes/offers/index'
+import { Route as WaveWaveTagRouteImport } from './routes/wave.$waveTag'
+import { Route as CIdRouteImport } from './routes/c.$id'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as OffersSlugIndexRouteImport } from './routes/offers/$slug/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -23,11 +26,17 @@ import { Route as OffersSlugApplyRouteImport } from './routes/offers/$slug/apply
 import { Route as AuthenticatedAdminPipelineRouteImport } from './routes/_authenticated/admin/pipeline'
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin/offers'
 import { Route as AuthenticatedAdminInterviewsRouteImport } from './routes/_authenticated/admin/interviews'
+import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
 import { Route as AuthenticatedAdminApplicantsRouteImport } from './routes/_authenticated/admin/applicants'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminApplicantsIndexRouteImport } from './routes/_authenticated/admin/applicants.index'
 import { Route as AuthenticatedAdminApplicantsIdRouteImport } from './routes/_authenticated/admin/applicants.$id'
 
+const TrackRoute = TrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -60,6 +69,16 @@ const IndexRoute = IndexRouteImport.update({
 const OffersIndexRoute = OffersIndexRouteImport.update({
   id: '/offers/',
   path: '/offers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WaveWaveTagRoute = WaveWaveTagRouteImport.update({
+  id: '/wave/$waveTag',
+  path: '/wave/$waveTag',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CIdRoute = CIdRouteImport.update({
+  id: '/c/$id',
+  path: '/c/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -100,6 +119,12 @@ const AuthenticatedAdminInterviewsRoute =
     path: '/interviews',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminBillingRoute =
+  AuthenticatedAdminBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminApplicantsRoute =
   AuthenticatedAdminApplicantsRouteImport.update({
     id: '/applicants',
@@ -131,10 +156,14 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/c/$id': typeof CIdRoute
+  '/wave/$waveTag': typeof WaveWaveTagRoute
   '/offers/': typeof OffersIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/interviews': typeof AuthenticatedAdminInterviewsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/pipeline': typeof AuthenticatedAdminPipelineRoute
@@ -150,8 +179,12 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/track': typeof TrackRoute
+  '/c/$id': typeof CIdRoute
+  '/wave/$waveTag': typeof WaveWaveTagRoute
   '/offers': typeof OffersIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/interviews': typeof AuthenticatedAdminInterviewsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/pipeline': typeof AuthenticatedAdminPipelineRoute
@@ -169,10 +202,14 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/track': typeof TrackRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/c/$id': typeof CIdRoute
+  '/wave/$waveTag': typeof WaveWaveTagRoute
   '/offers/': typeof OffersIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/applicants': typeof AuthenticatedAdminApplicantsRouteWithChildren
+  '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/admin/interviews': typeof AuthenticatedAdminInterviewsRoute
   '/_authenticated/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/_authenticated/admin/pipeline': typeof AuthenticatedAdminPipelineRoute
@@ -190,10 +227,14 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/prep'
     | '/sitemap.xml'
+    | '/track'
     | '/admin'
+    | '/c/$id'
+    | '/wave/$waveTag'
     | '/offers/'
     | '/admin/analytics'
     | '/admin/applicants'
+    | '/admin/billing'
     | '/admin/interviews'
     | '/admin/offers'
     | '/admin/pipeline'
@@ -209,8 +250,12 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/prep'
     | '/sitemap.xml'
+    | '/track'
+    | '/c/$id'
+    | '/wave/$waveTag'
     | '/offers'
     | '/admin/analytics'
+    | '/admin/billing'
     | '/admin/interviews'
     | '/admin/offers'
     | '/admin/pipeline'
@@ -227,10 +272,14 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/prep'
     | '/sitemap.xml'
+    | '/track'
     | '/_authenticated/admin'
+    | '/c/$id'
+    | '/wave/$waveTag'
     | '/offers/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/applicants'
+    | '/_authenticated/admin/billing'
     | '/_authenticated/admin/interviews'
     | '/_authenticated/admin/offers'
     | '/_authenticated/admin/pipeline'
@@ -248,6 +297,9 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   PrepRoute: typeof PrepRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TrackRoute: typeof TrackRoute
+  CIdRoute: typeof CIdRoute
+  WaveWaveTagRoute: typeof WaveWaveTagRoute
   OffersIndexRoute: typeof OffersIndexRoute
   OffersSlugApplyRoute: typeof OffersSlugApplyRoute
   OffersSlugIndexRoute: typeof OffersSlugIndexRoute
@@ -255,6 +307,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/track': {
+      id: '/track'
+      path: '/track'
+      fullPath: '/track'
+      preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -304,6 +363,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OffersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wave/$waveTag': {
+      id: '/wave/$waveTag'
+      path: '/wave/$waveTag'
+      fullPath: '/wave/$waveTag'
+      preLoaderRoute: typeof WaveWaveTagRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$id': {
+      id: '/c/$id'
+      path: '/c/$id'
+      fullPath: '/c/$id'
+      preLoaderRoute: typeof CIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -351,6 +424,13 @@ declare module '@tanstack/react-router' {
       path: '/interviews'
       fullPath: '/admin/interviews'
       preLoaderRoute: typeof AuthenticatedAdminInterviewsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/billing': {
+      id: '/_authenticated/admin/billing'
+      path: '/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AuthenticatedAdminBillingRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/applicants': {
@@ -404,6 +484,7 @@ const AuthenticatedAdminApplicantsRouteWithChildren =
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminApplicantsRoute: typeof AuthenticatedAdminApplicantsRouteWithChildren
+  AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminInterviewsRoute: typeof AuthenticatedAdminInterviewsRoute
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
   AuthenticatedAdminPipelineRoute: typeof AuthenticatedAdminPipelineRoute
@@ -415,6 +496,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminApplicantsRoute:
       AuthenticatedAdminApplicantsRouteWithChildren,
+    AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
     AuthenticatedAdminInterviewsRoute: AuthenticatedAdminInterviewsRoute,
     AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
     AuthenticatedAdminPipelineRoute: AuthenticatedAdminPipelineRoute,
@@ -444,6 +526,9 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   PrepRoute: PrepRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TrackRoute: TrackRoute,
+  CIdRoute: CIdRoute,
+  WaveWaveTagRoute: WaveWaveTagRoute,
   OffersIndexRoute: OffersIndexRoute,
   OffersSlugApplyRoute: OffersSlugApplyRoute,
   OffersSlugIndexRoute: OffersSlugIndexRoute,

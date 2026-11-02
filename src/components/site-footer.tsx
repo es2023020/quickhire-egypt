@@ -4,7 +4,7 @@ import { Phone, Mail, MapPin } from "lucide-react";
 
 export function SiteFooter() {
   const location = useLocation();
-  if (location.pathname.startsWith("/admin")) return null;
+  if (location.pathname.startsWith("/admin") || location.pathname.startsWith("/wave") || location.pathname.startsWith("/c/")) return null;
   return (
     <footer className="border-t border-border/50 bg-sand">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-4 md:px-6">

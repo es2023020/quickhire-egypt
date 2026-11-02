@@ -1,12 +1,13 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { CheckCircle2, Loader2, Upload, Info, MessageCircle, Mail } from "lucide-react";
+import { CheckCircle2, Loader2, Upload, Info, MessageCircle, Mail, Sparkles, ArrowRight, Gift, Copy, Check, Share2 } from "lucide-react";
 import { toast } from "sonner";
-import { getOfferBySlug } from "@/lib/offers.functions";
+import { getOfferBySlug, listOffers } from "@/lib/offers.functions";
 import { submitApplication } from "@/lib/applications.functions";
 import { VoiceRecorder } from "@/components/voice-recorder";
 import { saveFile } from "@/lib/db";
+import { LANGUAGE_BOUNTIES, buildCandidateReferralShareMessage, buildCandidateShareUrl } from "@/lib/referral-engine";
 
 const QUICKHIRE_WA = "201029324783";
 const QUICKHIRE_EMAIL = "hello@quickhire.eg";
@@ -93,6 +94,11 @@ function ApplyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
+  const allOffersQuery = useQuery({
+    queryKey: ["offers", "all-active"],
+    queryFn: () => listOffers(),
+  });
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -110,6 +116,17 @@ function ApplyPage() {
   const [hasContract, setHasContract] = useState("");
   const [contactedHR, setContactedHR] = useState("");
   const [roleAnswers, setRoleAnswers] = useState<Record<string, string>>({});
+
+  // Referral states
+  const [referralInput, setReferralInput] = useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("ref") || params.get("referred_by") || "";
+    }
+    return "";
+  });
+  const [generatedRefCode, setGeneratedRefCode] = useState<string>("");
+  const [copiedLink, setCopiedLink] = useState(false);
 
   if (!offer) return null;
   if (offer.status === "on_hold") {
@@ -164,7 +181,7 @@ function ApplyPage() {
       };
 
       // Submit application to localStorage (metadata only)
-      const { id: appId } = await submitApplication({
+      const { id: appId, referral_code } = await submitApplication({
         data: {
           offer_id: offer.id,
           full_name: fullName,
@@ -180,8 +197,10 @@ function ApplyPage() {
           cv_path: cvPath,
           cv_data: null,
           voice_notes: voiceNotes,
+          referred_by: referralInput.trim() || null,
         },
       });
+      if (referral_code) setGeneratedRefCode(referral_code);
 
       // Save actual file blobs to IndexedDB keyed by appId.
       // IndexedDB supports gigabytes of data — no localStorage size limit.
@@ -249,7 +268,133 @@ function ApplyPage() {
           📱 Keep WhatsApp open on <b>{phone || "the number you provided"}</b> — HR will reach out within 24–48 hrs.
         </div>
 
-        <div className="mt-6 flex gap-3">
+        {/* Viral Ambassador & Foreign Language Referral Program */}
+        <div className="mt-5 w-full rounded-2xl border border-violet-300 bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 p-5 text-left shadow-soft">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 px-3 py-1 text-xs font-bold text-white shadow-soft">
+              <Gift className="size-3.5" /> QuickHire Ambassador Program
+            </div>
+            <span className="text-[11px] font-bold text-violet-800 bg-violet-100 px-2.5 py-0.5 rounded-full border border-violet-200">
+              Up to 3,500 EGP / Hire 💰
+            </span>
+          </div>
+
+          <h3 className="font-display text-lg font-bold text-ink">
+            رشح صحابك واكسب كاش على فودافون كاش أو إنستاباي!
+          </h3>
+          <p className="text-xs text-muted-foreground mt-1 mb-3 leading-relaxed">
+            عندك معارف بيتكلموا لغات (ألماني، فرنساوي، إيطالي، هولندي) أو إنجليزي فلوينت؟ شارك كودك واكسب مكافأة فورية أول ما يتعينوا:
+          </p>
+
+          {/* Bounty Rates */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+            {LANGUAGE_BOUNTIES.slice(0, 4).map((b) => (
+              <div key={b.language} className="rounded-xl border border-violet-200 bg-white/90 p-2.5 text-center shadow-xs">
+                <div className="text-base">{b.flag}</div>
+                <div className="text-xs font-bold text-ink truncate">{b.language}</div>
+                <div className="text-xs font-extrabold text-violet-700 mt-0.5">+{b.bountyEgp.toLocaleString()} EGP</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5 font-mono">{b.avgSalaryText.split("–")[0]}</div>
+              </div>
+            ))}
+            <div className="rounded-xl border border-violet-200 bg-white/90 p-2.5 text-center col-span-2 sm:col-span-1 shadow-xs">
+              <div className="text-base">🇬🇧</div>
+              <div className="text-xs font-bold text-ink">English C1 / Sales</div>
+              <div className="text-xs font-extrabold text-violet-700 mt-0.5">+1,000 EGP</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5 font-mono">16k – 26k</div>
+            </div>
+          </div>
+
+          {/* Referral Link & Actions */}
+          <div className="rounded-xl border border-violet-200 bg-white p-3 space-y-2.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground font-medium">Your Ambassador Code:</span>
+              <span className="font-mono font-bold text-violet-700 bg-violet-100 px-2 py-0.5 rounded">
+                {generatedRefCode || "QUICKHIRE"}
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  buildCandidateReferralShareMessage({
+                    referrerName: fullName,
+                    code: generatedRefCode || "QUICKHIRE",
+                    offerTitle: offer.title,
+                    company: offer.company,
+                    shareUrl: buildCandidateShareUrl(generatedRefCode || "QUICKHIRE", offer.slug),
+                  })
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white shadow-soft hover:opacity-95 transition-opacity"
+              >
+                <Share2 className="size-3.5" /> Share on WhatsApp
+              </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const url = buildCandidateShareUrl(generatedRefCode || "QUICKHIRE", offer.slug);
+                  navigator.clipboard.writeText(url);
+                  setCopiedLink(true);
+                  toast.success("Referral link copied to clipboard!");
+                  setTimeout(() => setCopiedLink(false), 2500);
+                }}
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-violet-300 bg-violet-50 px-4 py-2.5 text-xs font-semibold text-violet-700 hover:bg-violet-100 transition-colors"
+              >
+                {copiedLink ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
+                {copiedLink ? "Link Copied!" : "Copy Link"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Smart Account Pooling Recommendations */}
+        {allOffersQuery.data && (
+          <div className="mt-5 w-full rounded-2xl border border-indigo-200/80 bg-indigo-50/50 p-4 text-left">
+            <div className="flex items-center gap-1.5 mb-1.5 text-xs font-bold text-indigo-900">
+              <Sparkles className="size-3.5 text-indigo-600" />
+              <span>Matching Waves Starting This Week</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
+              Based on your language level & location, our matching system also identified these open waves:
+            </p>
+            <div className="space-y-2">
+              {allOffersQuery.data
+                .filter((o) => o.id !== offer.id && o.status !== "on_hold")
+                .slice(0, 2)
+                .map((alt) => (
+                  <Link
+                    key={alt.id}
+                    to="/offers/$slug"
+                    params={{ slug: alt.slug }}
+                    className="flex items-center justify-between rounded-xl border border-border/80 bg-white p-3 hover:border-indigo-300 transition-all group"
+                  >
+                    <div>
+                      <div className="text-xs font-semibold text-ink group-hover:text-primary transition-colors">
+                        {alt.title}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">
+                        {alt.salary_text} · {alt.location}
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary shrink-0">
+                      View <ArrowRight className="size-3" />
+                    </span>
+                  </Link>
+                ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link
+            to="/track"
+            search={{ phone }}
+            className="rounded-xl border border-primary/30 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/15 transition-colors shadow-soft"
+          >
+            Track Application Live
+          </Link>
           <Link to="/offers" className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft">Browse more jobs</Link>
           <Link to="/prep" className="rounded-xl border border-border px-5 py-2.5 text-sm font-medium hover:bg-sand">Interview prep</Link>
         </div>
@@ -406,6 +551,24 @@ function ApplyPage() {
             ))}
           </section>
         )}
+
+        {/* Optional Referral Code */}
+        <section className="rounded-2xl border border-violet-200/80 bg-violet-50/40 p-5 shadow-soft">
+          <div className="flex items-center gap-2 mb-1.5 text-ink font-semibold text-sm">
+            <Gift className="size-4 text-violet-600" />
+            <span>Have a friend's referral code? (Optional)</span>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+            If a friend or ambassador referred you, enter their code here so they get credited their referral reward when you are hired.
+          </p>
+          <input
+            type="text"
+            value={referralInput}
+            onChange={(e) => setReferralInput(e.target.value.toUpperCase())}
+            placeholder="e.g. REF-AHMED-1234"
+            className="w-full rounded-xl border border-border bg-white px-4 py-2.5 text-sm uppercase tracking-wider font-mono outline-none focus:ring-2 focus:ring-violet-400"
+          />
+        </section>
 
         {/* Submit */}
         <div className="space-y-3">

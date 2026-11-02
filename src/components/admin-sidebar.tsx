@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Briefcase, LogOut,
   BarChart3, CalendarDays, KanbanSquare, Globe, X,
-  ChevronRight,
+  ChevronRight, Banknote,
 } from "lucide-react";
 import { QuickHireLogo } from "@/components/logo";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ const navItems = [
   { to: "/admin/pipeline", label: "Pipeline", icon: KanbanSquare },
   { to: "/admin/offers", label: "Job Offers", icon: Briefcase },
   { to: "/admin/interviews", label: "Interviews", icon: CalendarDays },
+  { to: "/admin/billing", label: "Billing & Bounties", icon: Banknote },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
 ] as const;
 

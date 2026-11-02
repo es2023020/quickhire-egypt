@@ -1,1 +1,1007 @@
-[]
+[
+  {
+    "id": "app-001",
+    "offer_id": "o1",
+    "full_name": "Mohamed Ahmed",
+    "email": "m.ahmed@gmail.com",
+    "phone": "01012345678",
+    "age": 26,
+    "location": "Cairo – Maadi",
+    "grad_status": "Graduate",
+    "english_level": "C1 – Advanced",
+    "experience_years": 3,
+    "salary_expectation": "16000",
+    "cv_path": "cvs/app-001-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-001-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hi, my name is Mohamed Ahmed. I have three years of B2B sales experience with Concentrix and I'm known for strong pipeline management. My biggest win was closing a 400K EGP software contract for a logistics firm. I love the challenge of consultative selling."
+    },
+    "english_score": 9,
+    "comm_score": 9,
+    "exp_score": 8,
+    "total_score": 26,
+    "ai_notes": "Strong English delivery, natural pace, confident tone. Good experience narrative. Recommended for shortlist.",
+    "answers": {
+      "worked_before_at_company": "Yes – full time",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "hired",
+    "admin_notes": "Passed client assessment with flying colors. Signed offer.",
+    "scoring_status": "done",
+    "created_at": "2026-10-31T13:18:18.793Z",
+    "interview_date": "2026-07-28",
+    "interview_time": "10:30 AM",
+    "interview_site": "Concentrix — Smart Village Building B12",
+    "interview_address": "KM 28 Cairo-Alex Desert Road, Smart Village",
+    "interview_maps_link": "https://maps.google.com/?q=Smart+Village+Cairo",
+    "interview_bus_point": "Lebanon Square (Mohandeseen)",
+    "interview_bus_time": "09:30 AM",
+    "interview_attendance": "attended",
+    "wave_tag": "Wave-3-Concentrix",
+    "outcome_code": "passed_offer",
+    "outcome_notes": "Excellent B2B sales pitch, clear C1 accent, immediate hire.",
+    "referral_code": "REF-MOH-941",
+    "referred_by": "AMB-KARIM-88"
+  },
+  {
+    "id": "app-002",
+    "offer_id": "o2",
+    "full_name": "Sara Hassan",
+    "email": "sara.hassan@hotmail.com",
+    "phone": "01098765432",
+    "age": 24,
+    "location": "Cairo – Nasr City",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 2,
+    "salary_expectation": "18000",
+    "cv_path": "cvs/app-002-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "French",
+        "path": "voice-notes/app-002-fr.webm"
+      }
+    ],
+    "transcripts": {
+      "French": "Bonjour, je m'appelle Sara Hassan. J'ai deux ans d'expérience en service client en français pour une compagnie d'assurance. Je suis capable de gérer des situations complexes avec calme et professionnalisme."
+    },
+    "english_score": 8,
+    "comm_score": 9,
+    "exp_score": 7,
+    "total_score": 24,
+    "ai_notes": "Native-level French accent, excellent vocabulary, empathetic tone. Solid customer service background.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "I'm in my notice period",
+      "contacted_hr_before": "No"
+    },
+    "status": "shortlisted",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-30T13:18:18.795Z",
+    "interview_date": "2026-07-29",
+    "interview_time": "11:00 AM",
+    "interview_site": "Sutherland — Maadi Degla Plaza",
+    "interview_address": "Street 216, Maadi Degla, Cairo",
+    "interview_maps_link": "https://maps.google.com/?q=Maadi+Degla",
+    "interview_bus_point": "Maadi Metro Station (Exit 2)",
+    "interview_bus_time": "10:15 AM",
+    "interview_attendance": "confirmed",
+    "wave_tag": "Wave-1-Sutherland",
+    "outcome_code": "passed_backup",
+    "outcome_notes": "Strong French B2+, placed on priority wave bench for August cohort.",
+    "referral_code": "REF-SAR-102",
+    "referred_by": "AMB-YOUSSEF-14"
+  },
+  {
+    "id": "app-003",
+    "offer_id": "o1",
+    "full_name": "Omar Ibrahim",
+    "email": "omar.ibr@yahoo.com",
+    "phone": "01155544433",
+    "age": 28,
+    "location": "Cairo – Heliopolis",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 2,
+    "salary_expectation": "15000",
+    "cv_path": "cvs/app-003-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-003-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hello, I am Omar Ibrahim. I have been in sales for two years, mostly in the financial services sector. I believe I have the right attitude and skills to succeed at Concentrix."
+    },
+    "english_score": 7,
+    "comm_score": 8,
+    "exp_score": 7,
+    "total_score": 22,
+    "ai_notes": "Clear English with slight accent. Good communication skills. Average experience level. Consider for interview.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "rejected",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-29T13:18:18.795Z",
+    "interview_date": "2026-07-28",
+    "interview_time": "11:30 AM",
+    "interview_site": "Concentrix — Smart Village Building B12",
+    "interview_attendance": "attended",
+    "wave_tag": "Wave-3-Concentrix",
+    "outcome_code": "failed_va",
+    "outcome_notes": "Mother tongue influence on vowels; recommended to pool to domestic or tech chat account.",
+    "referral_code": "REF-OMA-331"
+  },
+  {
+    "id": "app-004",
+    "offer_id": "o3",
+    "full_name": "Nadia Khaled",
+    "email": "nadia.k@gmail.com",
+    "phone": "01201234567",
+    "age": 32,
+    "location": "Giza – Mohandeseen",
+    "grad_status": "Post-graduate",
+    "english_level": "C1 – Advanced",
+    "experience_years": 6,
+    "salary_expectation": "26000",
+    "cv_path": "cvs/app-004-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "Arabic",
+        "path": "voice-notes/app-004-ar.webm"
+      }
+    ],
+    "transcripts": {
+      "Arabic": "أنا ناديا خالد ولدي خمس سنوات خبرة في مبيعات الاتصالات منها سنتين كقائدة فريق. نجحت في رفع أداء فريقي بنسبة ٤٠٪ في عام واحد من خلال برامج تدريبية مخصصة."
+    },
+    "english_score": 9,
+    "comm_score": 10,
+    "exp_score": 9,
+    "total_score": 28,
+    "ai_notes": "Outstanding Arabic delivery. Exceptional team leadership experience. Strong metrics-driven track record. Top candidate.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "I'm in my notice period",
+      "contacted_hr_before": "Yes – they reached out to me"
+    },
+    "status": "hired",
+    "admin_notes": "Excellent candidate. Signed offer 5 July 2026.",
+    "scoring_status": "done",
+    "created_at": "2026-10-23T13:18:18.796Z"
+  },
+  {
+    "id": "app-005",
+    "offer_id": "o4",
+    "full_name": "Youssef Ali",
+    "email": "youssef.ali@gmail.com",
+    "phone": "01067891234",
+    "age": 22,
+    "location": "Cairo – Downtown",
+    "grad_status": "Currently enrolled",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 0,
+    "salary_expectation": "12000",
+    "cv_path": "cvs/app-005-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-005-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hi, I am Youssef, a final-year business student. I do not have formal work experience but I have run the sales committee for my university and I understand prospecting through my own freelance work."
+    },
+    "english_score": 7,
+    "comm_score": 6,
+    "exp_score": 6,
+    "total_score": 19,
+    "ai_notes": "Enthusiastic delivery. Limited experience but shows initiative. English is solid with room to improve. Good entry-level potential.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-11-01T13:18:18.796Z"
+  },
+  {
+    "id": "app-006",
+    "offer_id": "o6",
+    "full_name": "Mariam Tawfik",
+    "email": "mariam.tawfik@gmail.com",
+    "phone": "01187654321",
+    "age": 27,
+    "location": "Cairo – Heliopolis",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 3,
+    "salary_expectation": "20000",
+    "cv_path": "cvs/app-006-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "German",
+        "path": "voice-notes/app-006-de.webm"
+      }
+    ],
+    "transcripts": {
+      "German": "Guten Tag, ich heiße Mariam Tawfik. Ich habe drei Jahre Erfahrung im deutschen Kundendienst für einen österreichischen Online-Händler. Ich bin sehr kommunikativ und löse Probleme gerne effizient."
+    },
+    "english_score": 8,
+    "comm_score": 9,
+    "exp_score": 8,
+    "total_score": 25,
+    "ai_notes": "Very good German fluency, clear articulation. Strong customer service background. Recommended shortlist.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "hired",
+    "admin_notes": "Accepted offer. German Tier 1 placement.",
+    "scoring_status": "done",
+    "created_at": "2026-10-28T13:18:18.796Z",
+    "outcome_code": "passed_offer",
+    "outcome_notes": "Passed German native assessor test with C1 rating.",
+    "referral_code": "REF-MAR-771",
+    "referred_by": "AMB-OMAR-21"
+  },
+  {
+    "id": "app-007",
+    "offer_id": "o7",
+    "full_name": "Karim Mostafa",
+    "email": "karim.m@outlook.com",
+    "phone": "01234567890",
+    "age": 23,
+    "location": "Cairo – New Cairo",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 1,
+    "salary_expectation": "13000",
+    "cv_path": "cvs/app-007-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-007-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hello, I am Karim. I spent one year in a B2B software sales role and learned to prospect on LinkedIn and via cold email. I am excited about the opportunity at Amazon."
+    },
+    "english_score": 6,
+    "comm_score": 6,
+    "exp_score": 5,
+    "total_score": 17,
+    "ai_notes": "Average English fluency. Some hesitation in delivery. Limited prospecting experience. Borderline for interview.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-31T13:18:18.796Z"
+  },
+  {
+    "id": "app-008",
+    "offer_id": "o1",
+    "full_name": "Randa Adel",
+    "email": "randa.adel@gmail.com",
+    "phone": "01011223344",
+    "age": 25,
+    "location": "Cairo – Zamalek",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 2,
+    "salary_expectation": "15000",
+    "cv_path": "cvs/app-008-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-008-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hi, my name is Randa Adel. I have two years of inbound sales experience, primarily in e-commerce. I am known for high conversion rates on inbound calls and I adapt quickly to new products."
+    },
+    "english_score": 7,
+    "comm_score": 8,
+    "exp_score": 6,
+    "total_score": 21,
+    "ai_notes": "Good English fluency, warm tone. Relevant inbound experience. Slightly weak on complex objection handling in the note.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "I was recently made redundant",
+      "contacted_hr_before": "No"
+    },
+    "status": "shortlisted",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-11-01T13:18:18.796Z",
+    "interview_date": "2026-07-28",
+    "interview_time": "12:00 PM",
+    "interview_site": "Concentrix — Smart Village Building B12",
+    "interview_address": "KM 28 Cairo-Alex Desert Road, Smart Village",
+    "interview_attendance": "confirmed",
+    "wave_tag": "Wave-3-Concentrix",
+    "outcome_code": null,
+    "referral_code": "REF-RAN-552"
+  },
+  {
+    "id": "app-009",
+    "offer_id": "o2",
+    "full_name": "Hassan Farouk",
+    "email": "hassan.farouk@gmail.com",
+    "phone": "01556677889",
+    "age": 29,
+    "location": "Cairo – Nasr City",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 5,
+    "salary_expectation": "19000",
+    "cv_path": "cvs/app-009-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "French",
+        "path": "voice-notes/app-009-fr.webm"
+      },
+      {
+        "lang": "English",
+        "path": "voice-notes/app-009-en.webm"
+      }
+    ],
+    "transcripts": {
+      "French": "Bonjour. Hassan Farouk à l'appareil. J'ai cinq ans d'expérience dans un centre d'appels francophone et j'ai été nommé meilleur agent de l'année deux fois. Je suis passionné par la satisfaction client.",
+      "English": "In English, I have worked for five years in French-language customer support and I am comfortable handling escalations and quality monitoring."
+    },
+    "english_score": 10,
+    "comm_score": 10,
+    "exp_score": 9,
+    "total_score": 29,
+    "ai_notes": "Near-native French. Outstanding communication scores. Top 1% of candidates reviewed. Immediate hire recommended.",
+    "answers": {
+      "worked_before_at_company": "Yes – full time",
+      "has_contract_or_resigned": "I'm in my notice period",
+      "contacted_hr_before": "Yes – they reached out to me"
+    },
+    "status": "hired",
+    "admin_notes": "Star candidate. Hired. Start date 15 July.",
+    "scoring_status": "done",
+    "created_at": "2026-10-21T13:18:18.796Z",
+    "outcome_code": "passed_offer",
+    "outcome_notes": "Accepted offer. French Tier 1 Customer Care.",
+    "referral_code": "REF-HAS-442",
+    "referred_by": "AMB-KARIM-88"
+  },
+  {
+    "id": "app-010",
+    "offer_id": "o8",
+    "full_name": "Dina Walid",
+    "email": "dina.w@gmail.com",
+    "phone": "01099887766",
+    "age": 30,
+    "location": "New Cairo – 5th Settlement",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 4,
+    "salary_expectation": "14000",
+    "cv_path": "cvs/app-010-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "Arabic",
+        "path": "voice-notes/app-010-ar.webm"
+      }
+    ],
+    "transcripts": {
+      "Arabic": "مرحباً أنا دينا وليد. عملت في مبيعات العقارات السكنية لمدة ٤ سنوات في المتحدة للتطوير. أتميز ببناء علاقات طويلة مع العملاء وإتمام الصفقات بنسبة إغلاق ٣٥٪."
+    },
+    "english_score": 8,
+    "comm_score": 8,
+    "exp_score": 7,
+    "total_score": 23,
+    "ai_notes": "Clear Arabic, good pace. Solid property sales background with strong closing record. Worth interviewing.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "shortlisted",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-27T13:18:18.796Z"
+  },
+  {
+    "id": "app-011",
+    "offer_id": "o4",
+    "full_name": "Amr Talaat",
+    "email": "amr.talaat@gmail.com",
+    "phone": "01144332211",
+    "age": 24,
+    "location": "Cairo – Shubra",
+    "grad_status": "Graduate",
+    "english_level": "B1 – Intermediate",
+    "experience_years": 1,
+    "salary_expectation": "11000",
+    "cv_path": "cvs/app-011-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-011-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hello my name is Amr. I have one year experience in... uh... customer service. I want to work in sales because I think it is a good career. I am willing to learn."
+    },
+    "english_score": 5,
+    "comm_score": 5,
+    "exp_score": 5,
+    "total_score": 15,
+    "ai_notes": "Hesitant delivery, multiple pauses. English B1 level insufficient for SDR role requiring C1 written outreach. Not recommended.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "rejected",
+    "admin_notes": "English level below requirement.",
+    "scoring_status": "done",
+    "created_at": "2026-10-25T13:18:18.796Z"
+  },
+  {
+    "id": "app-012",
+    "offer_id": "o3",
+    "full_name": "Heba Saad",
+    "email": "heba.saad@gmail.com",
+    "phone": "01266554433",
+    "age": 35,
+    "location": "Giza – 6th of October",
+    "grad_status": "Graduate",
+    "english_level": "C1 – Advanced",
+    "experience_years": 8,
+    "salary_expectation": "27000",
+    "cv_path": "cvs/app-012-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "Arabic",
+        "path": "voice-notes/app-012-ar.webm"
+      }
+    ],
+    "transcripts": {
+      "Arabic": "أنا هبة سعد ولدي ٨ سنوات خبرة في قطاع الاتصالات. شغلت منصب تيم ليدر لمدة ٣ سنوات وحققت أعلى معدل رضا عملاء في قسمنا لعامين متتاليين."
+    },
+    "english_score": 9,
+    "comm_score": 9,
+    "exp_score": 9,
+    "total_score": 27,
+    "ai_notes": "Commanding presence, excellent structure. 8 years Vodafone-sector experience. Strong team leadership metrics. Top hire.",
+    "answers": {
+      "worked_before_at_company": "Yes – full time",
+      "has_contract_or_resigned": "I'm in my notice period",
+      "contacted_hr_before": "Yes – they reached out to me"
+    },
+    "status": "hired",
+    "admin_notes": "Hired as Senior Team Lead. Start 1 Aug.",
+    "scoring_status": "done",
+    "created_at": "2026-10-19T13:18:18.796Z"
+  },
+  {
+    "id": "app-013",
+    "offer_id": "o1",
+    "full_name": "Sherif Mansour",
+    "email": "sherif.m@gmail.com",
+    "phone": "01022334455",
+    "age": 27,
+    "location": "Cairo – Dokki",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 3,
+    "salary_expectation": "14000",
+    "cv_path": "cvs/app-013-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-013-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "My name is Sherif Mansour. I have three years in financial products telesales. I am a consistent quota attainer and I focus on quality conversations rather than just volume."
+    },
+    "english_score": 7,
+    "comm_score": 7,
+    "exp_score": 6,
+    "total_score": 20,
+    "ai_notes": "Steady English delivery. Relevant telesales background. Quota mention is positive. Mid-tier candidate.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-30T13:18:18.796Z"
+  },
+  {
+    "id": "app-014",
+    "offer_id": "o9",
+    "full_name": "Noha Ragab",
+    "email": "noha.ragab@gmail.com",
+    "phone": "01377665544",
+    "age": 21,
+    "location": "Alexandria – Sidi Gaber",
+    "grad_status": "Currently enrolled",
+    "english_level": "B1 – Intermediate",
+    "experience_years": 0,
+    "salary_expectation": "9000",
+    "cv_path": "cvs/app-014-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-014-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hello, I am Noha from Alexandria. I am a second year student. I think this role suits me because I am a very patient and helpful person and I like talking to people."
+    },
+    "english_score": 6,
+    "comm_score": 6,
+    "exp_score": 6,
+    "total_score": 18,
+    "ai_notes": "Friendly tone. English sufficient for B1 role. No experience but attitude is positive. Entry-level appropriate.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-11-01T13:18:18.796Z"
+  },
+  {
+    "id": "app-015",
+    "offer_id": "o5",
+    "full_name": "Tarek Fouad",
+    "email": "tarek.fouad@gmail.com",
+    "phone": "01488776655",
+    "age": 34,
+    "location": "Cairo – Mohandeseen",
+    "grad_status": "Post-graduate",
+    "english_level": "C1 – Advanced",
+    "experience_years": 7,
+    "salary_expectation": "24000",
+    "cv_path": "cvs/app-015-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-015-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "I am Tarek Fouad, seven years in enterprise IT solutions sales. My largest single deal was 1.2 million EGP with a Cairo hospital group. I manage relationships at C-suite level and understand complex procurement cycles."
+    },
+    "english_score": 9,
+    "comm_score": 8,
+    "exp_score": 7,
+    "total_score": 24,
+    "ai_notes": "Polished English, strong enterprise background. Deal size relevant. Confident at executive level. Strong shortlist candidate.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "I'm in my notice period",
+      "contacted_hr_before": "No"
+    },
+    "status": "shortlisted",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-26T13:18:18.796Z"
+  },
+  {
+    "id": "app-016",
+    "offer_id": "o2",
+    "full_name": "Iman Gamal",
+    "email": "iman.gamal@gmail.com",
+    "phone": "01599887766",
+    "age": 26,
+    "location": "Cairo – Madinaty",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 2,
+    "salary_expectation": "17000",
+    "cv_path": "cvs/app-016-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "French",
+        "path": "voice-notes/app-016-fr.webm"
+      }
+    ],
+    "transcripts": {
+      "French": "Bonjour je suis Iman Gamal. J'ai travaillé dans un call center pendant deux ans pour un client français spécialisé dans l'énergie. Je maîtrise les outils CRM et j'ai de bonnes compétences d'écoute."
+    },
+    "english_score": 7,
+    "comm_score": 8,
+    "exp_score": 7,
+    "total_score": 22,
+    "ai_notes": "Good French, slight Egyptian accent audible but not distracting. Solid CS background. Interview-worthy.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-31T13:18:18.796Z"
+  },
+  {
+    "id": "app-017",
+    "offer_id": "o10",
+    "full_name": "Mahmoud Ashraf",
+    "email": "m.ashraf@gmail.com",
+    "phone": "01611223344",
+    "age": 28,
+    "location": "Cairo – Zamalek",
+    "grad_status": "Graduate",
+    "english_level": "C1 – Advanced",
+    "experience_years": 4,
+    "salary_expectation": "19000",
+    "cv_path": "cvs/app-017-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-017-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hi, I am Mahmoud Ashraf. I have spent four years in SaaS sales, the last two at an HR-tech company. I know how to demo, I know how to discover pain, and I know how to close SME decision makers."
+    },
+    "english_score": 9,
+    "comm_score": 9,
+    "exp_score": 8,
+    "total_score": 26,
+    "ai_notes": "Excellent SaaS vocabulary and confident delivery. Direct HR-tech experience highly relevant. Prioritise for interview.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "shortlisted",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-29T13:18:18.796Z"
+  },
+  {
+    "id": "app-018",
+    "offer_id": "o8",
+    "full_name": "Yasmin Samir",
+    "email": "yasmin.s@gmail.com",
+    "phone": "01722334455",
+    "age": 27,
+    "location": "New Cairo – 5th Settlement",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 2,
+    "salary_expectation": "13000",
+    "cv_path": "cvs/app-018-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "Arabic",
+        "path": "voice-notes/app-018-ar.webm"
+      }
+    ],
+    "transcripts": {
+      "Arabic": "أنا ياسمين سمير ولدي سنتان في مجال المبيعات العقارية. أعمل بشكل جيد مع العملاء ذوي الميزانيات الكبيرة وأقدر على شرح خطط السداد بطريقة واضحة."
+    },
+    "english_score": 7,
+    "comm_score": 7,
+    "exp_score": 7,
+    "total_score": 21,
+    "ai_notes": "Clear Arabic, calm tone. Relevant property experience. Communicates payment plans confidently. Mid-tier candidate.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-28T13:18:18.796Z"
+  },
+  {
+    "id": "app-019",
+    "offer_id": "o7",
+    "full_name": "Bassem Abdel",
+    "email": "bassem.a@gmail.com",
+    "phone": "01833445566",
+    "age": 23,
+    "location": "Cairo – Ain Shams",
+    "grad_status": "Graduate",
+    "english_level": "B1 – Intermediate",
+    "experience_years": 0,
+    "salary_expectation": "10000",
+    "cv_path": "cvs/app-019-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-019-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hello I am Bassem. I graduated six months ago. I want to work at Amazon because it is a big company. I am a hard worker and I will learn fast."
+    },
+    "english_score": 4,
+    "comm_score": 5,
+    "exp_score": 4,
+    "total_score": 13,
+    "ai_notes": "Very limited English for a role requiring high-volume cold outreach. Weak pitch structure. Not recommended at this time.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "rejected",
+    "admin_notes": "English too weak for BDR cold outreach.",
+    "scoring_status": "done",
+    "created_at": "2026-10-24T13:18:18.796Z"
+  },
+  {
+    "id": "app-020",
+    "offer_id": "o1",
+    "full_name": "Nora Shafik",
+    "email": "nora.shafik@gmail.com",
+    "phone": "01944556677",
+    "age": 29,
+    "location": "Cairo – Maadi",
+    "grad_status": "Graduate",
+    "english_level": "C1 – Advanced",
+    "experience_years": 4,
+    "salary_expectation": "17000",
+    "cv_path": "cvs/app-020-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-020-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Good morning. I am Nora Shafik. Over four years I have sold enterprise software and managed a book of business worth over 2 million EGP annually. I have a coaching mindset and I mentor two junior reps in my current role."
+    },
+    "english_score": 9,
+    "comm_score": 8,
+    "exp_score": 8,
+    "total_score": 25,
+    "ai_notes": "Professional and structured. Strong revenue context. Mentoring experience suggests leadership upside. Excellent shortlist candidate.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "I'm in my notice period",
+      "contacted_hr_before": "No"
+    },
+    "status": "shortlisted",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-27T13:18:18.796Z"
+  },
+  {
+    "id": "app-021",
+    "offer_id": "o4",
+    "full_name": "Ahmed Sayed",
+    "email": "ahmed.sayed@gmail.com",
+    "phone": "01055667788",
+    "age": 23,
+    "location": "Cairo – Downtown",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 1,
+    "salary_expectation": "12000",
+    "cv_path": "cvs/app-021-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-021-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hi I am Ahmed Sayed. I spent the last year doing outbound sales for a digital marketing agency. I reached decision makers via LinkedIn and cold calls. I understand the prospecting funnel."
+    },
+    "english_score": 8,
+    "comm_score": 7,
+    "exp_score": 8,
+    "total_score": 23,
+    "ai_notes": "Competent English, relevant prospecting experience. Shows understanding of outbound process. Solid junior SDR candidate.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-31T13:18:18.796Z"
+  },
+  {
+    "id": "app-022",
+    "offer_id": "o6",
+    "full_name": "Laila Ramzy",
+    "email": "laila.ramzy@gmail.com",
+    "phone": "01166778899",
+    "age": 31,
+    "location": "Cairo – Heliopolis",
+    "grad_status": "Post-graduate",
+    "english_level": "C2 – Proficient / Native",
+    "experience_years": 5,
+    "salary_expectation": "21000",
+    "cv_path": "cvs/app-022-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "German",
+        "path": "voice-notes/app-022-de.webm"
+      }
+    ],
+    "transcripts": {
+      "German": "Guten Morgen. Ich bin Laila Ramzy und habe fünf Jahre Erfahrung im deutschsprachigen Kundendienst für einen Schweizer Retailer. Ich bin bekannt für meine Fähigkeit, schwierige Situationen ruhig und lösungsorientiert zu handhaben."
+    },
+    "english_score": 9,
+    "comm_score": 9,
+    "exp_score": 9,
+    "total_score": 27,
+    "ai_notes": "Outstanding German — near-native Swiss-influenced accent. Excellent de-escalation language. Top candidate for Majorel. Shortlist immediately.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "shortlisted",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-25T13:18:18.796Z"
+  },
+  {
+    "id": "app-023",
+    "offer_id": "o10",
+    "full_name": "Ibrahim Hany",
+    "email": "ibrahim.hany@gmail.com",
+    "phone": "01277889900",
+    "age": 26,
+    "location": "Cairo – Mohandeseen",
+    "grad_status": "Graduate",
+    "english_level": "B2 – Upper Intermediate",
+    "experience_years": 2,
+    "salary_expectation": "15000",
+    "cv_path": "cvs/app-023-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-023-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hi I am Ibrahim Hany. I worked two years selling ERP software to SMEs. I know how to run a product demo and I am comfortable working a longer sales cycle with multiple stakeholders."
+    },
+    "english_score": 7,
+    "comm_score": 6,
+    "exp_score": 6,
+    "total_score": 19,
+    "ai_notes": "Adequate English. ERP experience is relevant to SaaS but lacks HR-tech specifically. Average delivery. Consider for interview.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-10-30T13:18:18.796Z"
+  },
+  {
+    "id": "app-024",
+    "offer_id": "o9",
+    "full_name": "Mona Adly",
+    "email": "mona.adly@gmail.com",
+    "phone": "01388990011",
+    "age": 20,
+    "location": "Alexandria – Borg El Arab",
+    "grad_status": "Currently enrolled",
+    "english_level": "B1 – Intermediate",
+    "experience_years": 0,
+    "salary_expectation": "9000",
+    "cv_path": "cvs/app-024-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "English",
+        "path": "voice-notes/app-024-en.webm"
+      }
+    ],
+    "transcripts": {
+      "English": "Hi my name is Mona. I am a student in English department. I practice English every day and I like to help people. I think I can do this job very good."
+    },
+    "english_score": 5,
+    "comm_score": 6,
+    "exp_score": 5,
+    "total_score": 16,
+    "ai_notes": "Warm personality but English still developing. Grammar errors in call simulation. Below threshold for this role currently.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "rejected",
+    "admin_notes": "English below B2 threshold.",
+    "scoring_status": "done",
+    "created_at": "2026-10-22T13:18:18.796Z"
+  },
+  {
+    "id": "app-025",
+    "offer_id": "o3",
+    "full_name": "Sameh Khalil",
+    "email": "sameh.k@gmail.com",
+    "phone": "01499001122",
+    "age": 33,
+    "location": "Giza – Dokki",
+    "grad_status": "Graduate",
+    "english_level": "C1 – Advanced",
+    "experience_years": 5,
+    "salary_expectation": "22000",
+    "cv_path": "cvs/app-025-cv.pdf",
+    "cv_data": null,
+    "voice_notes": [
+      {
+        "lang": "Arabic",
+        "path": "voice-notes/app-025-ar.webm"
+      }
+    ],
+    "transcripts": {
+      "Arabic": "أنا سامح خليل. عملت ٥ سنوات في مبيعات التليفون في إيتيدا وأوراسكوم. أجيد إدارة الفرق الصغيرة وأحقق أهدافي باستمرار. أبحث عن فرصة أكبر مع شركة بحجم فودافون."
+    },
+    "english_score": 8,
+    "comm_score": 7,
+    "exp_score": 7,
+    "total_score": 22,
+    "ai_notes": "Confident Arabic. Solid telecom background. Leadership interest noted but experience is team member not lead. Good candidate.",
+    "answers": {
+      "worked_before_at_company": "No",
+      "has_contract_or_resigned": "No – I'm currently free to join",
+      "contacted_hr_before": "No"
+    },
+    "status": "new",
+    "admin_notes": null,
+    "scoring_status": "done",
+    "created_at": "2026-11-01T13:18:18.796Z"
+  }
+]

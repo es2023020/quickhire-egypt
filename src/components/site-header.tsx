@@ -7,6 +7,7 @@ import { QuickHireLogo } from "@/components/logo";
 const nav = [
   { to: "/", label: "Home" },
   { to: "/offers", label: "Jobs" },
+  { to: "/track", label: "Track Application" },
   { to: "/prep", label: "Resources" },
   { to: "/how-it-works", label: "How it works" },
 ] as const;
@@ -29,8 +30,8 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  const isAdminRoute = location.pathname.startsWith("/admin");
-  if (isAdminRoute) return null;
+  const isCustomLayoutRoute = location.pathname.startsWith("/admin") || location.pathname.startsWith("/wave") || location.pathname.startsWith("/c/");
+  if (isCustomLayoutRoute) return null;
 
   return (
     <header className={cn(

@@ -33,6 +33,33 @@ export type MockApplication = {
   cv_review_notes?: string | null;
   cv_review_status?: "pending" | "approved" | "rejected" | null;
   scoring_status: string;
+  interview_date?: string | null;
+  interview_time?: string | null;
+  interview_site?: string | null;
+  interview_address?: string | null;
+  interview_maps_link?: string | null;
+  interview_bus_point?: string | null;
+  interview_bus_time?: string | null;
+  interview_notes?: string | null;
+  interview_attendance?: "pending" | "confirmed" | "attended" | "no_show" | null;
+  wave_tag?: string | null;
+  referred_by?: string | null;
+  referral_code?: string | null;
+  outcome_code?: string | null;
+  outcome_notes?: string | null;
+  pipeline_stage?: string | null;
+  pipeline_history?: Array<{
+    stage: string;
+    changed_by: string;
+    role: "admin" | "client_hr";
+    comment: string | null;
+    timestamp: string;
+  }> | null;
+  billing_status?: "pending_guarantee" | "invoiced" | "collected" | null;
+  bounty_status?: "pending_review" | "ready_to_pay" | "paid" | null;
+  bounty_payment_method?: "vodafone_cash" | "instapay" | "orange_money" | "bank_transfer" | null;
+  bounty_transaction_ref?: string | null;
+  bounty_paid_at?: string | null;
   created_at: string;
   updated_at?: string;
 };
@@ -50,7 +77,20 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     transcripts: { English: "Hi, my name is Mohamed Ahmed. I have three years of B2B sales experience with Concentrix and I'm known for strong pipeline management. My biggest win was closing a 400K EGP software contract for a logistics firm. I love the challenge of consultative selling." },
     english_score: 9, comm_score: 9, exp_score: 8, total_score: 26,
     ai_notes: "Strong English delivery, natural pace, confident tone. Good experience narrative. Recommended for shortlist.", answers: { worked_before_at_company: "Yes – full time", has_contract_or_resigned: "No – I'm currently free to join", contacted_hr_before: "No" },
-    status: "shortlisted", admin_notes: null, scoring_status: "done", created_at: daysAgo(2),
+    status: "hired", admin_notes: "Passed client assessment with flying colors. Signed offer.", scoring_status: "done", created_at: daysAgo(2),
+    interview_date: "2026-07-28", interview_time: "10:30 AM", interview_site: "Concentrix — Smart Village Building B12",
+    interview_address: "KM 28 Cairo-Alex Desert Road, Smart Village", interview_maps_link: "https://maps.google.com/?q=Smart+Village+Cairo",
+    interview_bus_point: "Lebanon Square (Mohandeseen)", interview_bus_time: "09:30 AM",
+    interview_attendance: "attended", wave_tag: "Wave-3-Concentrix", outcome_code: "passed_offer", outcome_notes: "Excellent B2B sales pitch, clear C1 accent, immediate hire.",
+    pipeline_stage: "accepted",
+    pipeline_history: [
+      { stage: "applied", changed_by: "System", role: "admin", comment: "Initial application received", timestamp: daysAgo(5) },
+      { stage: "interview_scheduled", changed_by: "QuickHire Admin", role: "admin", comment: "Booked for Concentrix Smart Village", timestamp: daysAgo(3) },
+      { stage: "interview_done", changed_by: "Concentrix HR - Mona Tarek", role: "client_hr", comment: "Candidate scored high in B2B roleplay", timestamp: daysAgo(2) },
+      { stage: "offer_extended", changed_by: "Concentrix HR - Mona Tarek", role: "client_hr", comment: "Offered 16k gross + commission package", timestamp: daysAgo(1) },
+      { stage: "accepted", changed_by: "QuickHire Admin", role: "admin", comment: "Candidate signed formal offer letter", timestamp: daysAgo(0) },
+    ],
+    referral_code: "REF-MOH-941", referred_by: "AMB-KARIM-88",
   },
   {
     id: "app-002", offer_id: "o2", full_name: "Sara Hassan", email: "sara.hassan@hotmail.com", phone: "01098765432",
@@ -61,6 +101,16 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     english_score: 8, comm_score: 9, exp_score: 7, total_score: 24,
     ai_notes: "Native-level French accent, excellent vocabulary, empathetic tone. Solid customer service background.", answers: { worked_before_at_company: "No", has_contract_or_resigned: "I'm in my notice period", contacted_hr_before: "No" },
     status: "shortlisted", admin_notes: null, scoring_status: "done", created_at: daysAgo(3),
+    interview_date: "2026-07-29", interview_time: "11:00 AM", interview_site: "Sutherland — Maadi Degla Plaza",
+    interview_address: "Street 216, Maadi Degla, Cairo", interview_maps_link: "https://maps.google.com/?q=Maadi+Degla",
+    interview_bus_point: "Maadi Metro Station (Exit 2)", interview_bus_time: "10:15 AM",
+    interview_attendance: "confirmed", wave_tag: "Wave-1-Sutherland", outcome_code: "passed_backup", outcome_notes: "Strong French B2+, placed on priority wave bench for August cohort.",
+    pipeline_stage: "interview_scheduled",
+    pipeline_history: [
+      { stage: "applied", changed_by: "System", role: "admin", comment: null, timestamp: daysAgo(3) },
+      { stage: "interview_scheduled", changed_by: "QuickHire Admin", role: "admin", comment: "Scheduled for Wave 1 Sutherland", timestamp: daysAgo(1) },
+    ],
+    referral_code: "REF-SAR-102", referred_by: "AMB-YOUSSEF-14",
   },
   {
     id: "app-003", offer_id: "o1", full_name: "Omar Ibrahim", email: "omar.ibr@yahoo.com", phone: "01155544433",
@@ -70,7 +120,18 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     transcripts: { English: "Hello, I am Omar Ibrahim. I have been in sales for two years, mostly in the financial services sector. I believe I have the right attitude and skills to succeed at Concentrix." },
     english_score: 7, comm_score: 8, exp_score: 7, total_score: 22,
     ai_notes: "Clear English with slight accent. Good communication skills. Average experience level. Consider for interview.", answers: { worked_before_at_company: "No", has_contract_or_resigned: "No – I'm currently free to join", contacted_hr_before: "No" },
-    status: "new", admin_notes: null, scoring_status: "done", created_at: daysAgo(4),
+    status: "rejected", admin_notes: null, scoring_status: "done", created_at: daysAgo(4),
+    interview_date: "2026-07-28", interview_time: "11:30 AM", interview_site: "Concentrix — Smart Village Building B12",
+    interview_attendance: "attended", wave_tag: "Wave-3-Concentrix", outcome_code: "failed_va",
+    outcome_notes: "Mother tongue influence on vowels; recommended to pool to domestic or tech chat account.",
+    pipeline_stage: "rejected",
+    pipeline_history: [
+      { stage: "applied", changed_by: "System", role: "admin", comment: null, timestamp: daysAgo(4) },
+      { stage: "interview_scheduled", changed_by: "QuickHire Admin", role: "admin", comment: "Wave 3 Concentrix slot", timestamp: daysAgo(3) },
+      { stage: "interview_done", changed_by: "Concentrix HR", role: "client_hr", comment: "Attended on site", timestamp: daysAgo(2) },
+      { stage: "rejected", changed_by: "Concentrix HR", role: "client_hr", comment: "Failed V&A assessment", timestamp: daysAgo(1) },
+    ],
+    referral_code: "REF-OMA-331",
   },
   {
     id: "app-004", offer_id: "o3", full_name: "Nadia Khaled", email: "nadia.k@gmail.com", phone: "01201234567",
@@ -100,7 +161,9 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     transcripts: { German: "Guten Tag, ich heiße Mariam Tawfik. Ich habe drei Jahre Erfahrung im deutschen Kundendienst für einen österreichischen Online-Händler. Ich bin sehr kommunikativ und löse Probleme gerne effizient." },
     english_score: 8, comm_score: 9, exp_score: 8, total_score: 25,
     ai_notes: "Very good German fluency, clear articulation. Strong customer service background. Recommended shortlist.", answers: { worked_before_at_company: "No", has_contract_or_resigned: "No – I'm currently free to join", contacted_hr_before: "No" },
-    status: "shortlisted", admin_notes: null, scoring_status: "done", created_at: daysAgo(5),
+    status: "hired", admin_notes: "Accepted offer. German Tier 1 placement.", scoring_status: "done", created_at: daysAgo(5),
+    outcome_code: "passed_offer", outcome_notes: "Passed German native assessor test with C1 rating.",
+    referral_code: "REF-MAR-771", referred_by: "AMB-OMAR-21",
   },
   {
     id: "app-007", offer_id: "o7", full_name: "Karim Mostafa", email: "karim.m@outlook.com", phone: "01234567890",
@@ -120,7 +183,11 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     transcripts: { English: "Hi, my name is Randa Adel. I have two years of inbound sales experience, primarily in e-commerce. I am known for high conversion rates on inbound calls and I adapt quickly to new products." },
     english_score: 7, comm_score: 8, exp_score: 6, total_score: 21,
     ai_notes: "Good English fluency, warm tone. Relevant inbound experience. Slightly weak on complex objection handling in the note.", answers: { worked_before_at_company: "No", has_contract_or_resigned: "I was recently made redundant", contacted_hr_before: "No" },
-    status: "new", admin_notes: null, scoring_status: "done", created_at: daysAgo(1),
+    status: "shortlisted", admin_notes: null, scoring_status: "done", created_at: daysAgo(1),
+    interview_date: "2026-07-28", interview_time: "12:00 PM", interview_site: "Concentrix — Smart Village Building B12",
+    interview_address: "KM 28 Cairo-Alex Desert Road, Smart Village",
+    interview_attendance: "confirmed", wave_tag: "Wave-3-Concentrix", outcome_code: null,
+    referral_code: "REF-RAN-552",
   },
   {
     id: "app-009", offer_id: "o2", full_name: "Hassan Farouk", email: "hassan.farouk@gmail.com", phone: "01556677889",
@@ -134,6 +201,8 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     english_score: 10, comm_score: 10, exp_score: 9, total_score: 29,
     ai_notes: "Near-native French. Outstanding communication scores. Top 1% of candidates reviewed. Immediate hire recommended.", answers: { worked_before_at_company: "Yes – full time", has_contract_or_resigned: "I'm in my notice period", contacted_hr_before: "Yes – they reached out to me" },
     status: "hired", admin_notes: "Star candidate. Hired. Start date 15 July.", scoring_status: "done", created_at: daysAgo(12),
+    outcome_code: "passed_offer", outcome_notes: "Accepted offer. French Tier 1 Customer Care.",
+    referral_code: "REF-HAS-442", referred_by: "AMB-KARIM-88",
   },
   {
     id: "app-010", offer_id: "o8", full_name: "Dina Walid", email: "dina.w@gmail.com", phone: "01099887766",

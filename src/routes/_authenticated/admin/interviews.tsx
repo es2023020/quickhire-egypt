@@ -28,15 +28,34 @@ type InterviewEntry = {
 
 function Interviews() {
   const apps = useQuery({
-    queryKey: ["admin", "applications", "all", "shortlisted"],
-    queryFn: () => adminListApplications({ data: { status: "shortlisted" } }),
+    queryKey: ["admin", "applications"],
+    queryFn: () => adminListApplications({ data: {} }),
   });
 
   const [interviews, setInterviews] = useState<InterviewEntry[]>([]);
   const [form, setForm] = useState<Partial<InterviewEntry> | null>(null);
   const [selectedApp, setSelectedApp] = useState<string>("");
 
-  const shortlisted = apps.data ?? [];
+  const allApps = apps.data ?? [];
+  const shortlisted = allApps.filter(a => a.status === "shortlisted" || a.status === "new");
+
+  // Merge database scheduled interviews with local state
+  const dbInterviews: InterviewEntry[] = allApps
+    .filter(a => !!a.interview_date)
+    .map(a => ({
+      appId: a.id,
+      candidateName: a.full_name,
+      email: a.email,
+      phone: a.phone,
+      role: a.offer?.title ?? "—",
+      company: a.offer?.company ?? "—",
+      date: a.interview_date!,
+      time: a.interview_time || "11:30 AM",
+      type: "in-person",
+      notes: a.interview_site ? `Hub: ${a.interview_site}${a.wave_tag ? ` (${a.wave_tag})` : ""}` : (a.interview_notes ?? ""),
+    }));
+
+  const allScheduled = [...dbInterviews, ...interviews.filter(i => !dbInterviews.some(d => d.appId === i.appId))];
 
   function scheduleInterview() {
     if (!form?.appId || !form.date || !form.time) return;
@@ -74,8 +93,14 @@ function Interviews() {
     return `Hi ${i.candidateName}! This is QuickHire. Your interview for the ${i.role} position at ${i.company} is scheduled for ${new Date(i.date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })} at ${i.time}. Type: ${i.type}. Please confirm receipt. 🎯`;
   }
 
-  const upcoming = interviews.filter(i => new Date(`${i.date}T${i.time}`) >= new Date()).sort((a, b) => new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime());
-  const past = interviews.filter(i => new Date(`${i.date}T${i.time}`) < new Date());
+  const upcoming = allScheduled.filter(i => {
+    try {
+      return new Date(`${i.date}T${i.time || "12:00"}`) >= new Date(Date.now() - 86400000 * 2);
+    } catch {
+      return true;
+    }
+  }).sort((a, b) => new Date(`${a.date}T${a.time || "12:00"}`).getTime() - new Date(`${b.date}T${b.time || "12:00"}`).getTime());
+  const past = allScheduled.filter(i => !upcoming.includes(i));
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-6xl">

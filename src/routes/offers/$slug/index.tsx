@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { MapPin, Briefcase, Languages, Check, ArrowRight, Sparkles } from "lucide-react";
+import { MapPin, Briefcase, Languages, Check, ArrowRight, Sparkles, Gift, Share2 } from "lucide-react";
 import { getOfferBySlug } from "@/lib/offers.functions";
 
 const offerQO = (slug: string) =>
@@ -132,6 +132,29 @@ function OfferDetail() {
             <p className="mt-1 text-sm">
               Record your voice note in a quiet room. Speak naturally for 45–60 seconds — clarity matters more than perfect grammar.
             </p>
+          </div>
+
+          <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-purple-50 p-5 shadow-soft text-left">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-violet-800 mb-1.5">
+              <Gift className="size-3.5 text-violet-600" />
+              <span>Know someone qualified?</span>
+            </div>
+            <h4 className="font-display text-sm font-bold text-ink">
+              Earn 1,000 – 3,500 EGP Referral Bounty
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1 mb-3 leading-relaxed">
+              Share this opening with your network on WhatsApp. When your friend is hired, your bounty is sent straight to your wallet.
+            </p>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                `🔥 فرصة عمل ممتازة: *${offer.title}* في *${offer.company}*.\nالمرتب: ${offer.salary_text} (${offer.location}).\nالتقديم وتسجيل الفويس أونلاين في 3 دقايق:\n${typeof window !== "undefined" ? window.location.href : "https://quickhire.eg"}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white shadow-soft hover:opacity-90 transition-opacity"
+            >
+              <Share2 className="size-3.5" /> Share on WhatsApp
+            </a>
           </div>
         </aside>
       </div>
