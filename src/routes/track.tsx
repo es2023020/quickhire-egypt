@@ -20,7 +20,6 @@ import {
   Award,
 } from "lucide-react";
 import { trackApplicationByPhone } from "@/lib/applications.functions";
-import { buildCandidateReferralShareMessage, buildCandidateShareUrl, LANGUAGE_BOUNTIES } from "@/lib/referral-engine";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -43,19 +42,19 @@ const CANDIDATE_MILESTONES = [
   {
     key: "applied",
     label: "Application Received",
-    desc: "Profile & voice recording scored by AI engine",
+    desc: "CV & voice note scored by AI engine",
     activeStages: ["applied"],
   },
   {
     key: "assessment",
-    label: "Assessment & Testing",
-    desc: "Language fluency & behavioral benchmarks",
+    label: "Assessment & Scoring",
+    desc: "Language fluency benchmark validated",
     activeStages: ["test_invited", "test_completed"],
   },
   {
     key: "interview",
     label: "Wave Interview",
-    desc: "On-site assessment center gate pass active",
+    desc: "Assessment center gate pass activated",
     activeStages: ["interview_scheduled", "interview_done"],
   },
   {
@@ -67,7 +66,7 @@ const CANDIDATE_MILESTONES = [
   {
     key: "placed",
     label: "Offer Accepted",
-    desc: "Welcome to your new career cohort!",
+    desc: "Onboarding cohort confirmed",
     activeStages: ["accepted"],
   },
 ] as const;
@@ -83,53 +82,53 @@ function getMilestoneIndex(stage: string | null | undefined, hasInterview: boole
 
 const STAGE_FRIENDLY_LABELS: Record<string, { label: string; badgeCls: string; description: string }> = {
   applied: {
-    label: "Application Under Review",
-    badgeCls: "bg-blue-100 text-blue-800 border-blue-200",
-    description: "Your application is currently being evaluated by our team against active corporate requirements.",
+    label: "Under AI Review",
+    badgeCls: "bg-surface-3 text-zinc-200 border-white/10",
+    description: "Your application and voice recording are being evaluated by our assessment engine.",
   },
   test_invited: {
     label: "Assessment Invited",
-    badgeCls: "bg-amber-100 text-amber-800 border-amber-200",
-    description: "You have been invited to complete a language or skills assessment test. Check your WhatsApp for links.",
+    badgeCls: "bg-amber-500/10 text-amber-300 border-amber-500/30",
+    description: "You have been invited for a language verification test. Check your WhatsApp for direct links.",
   },
   test_completed: {
-    label: "Assessment Scored",
-    badgeCls: "bg-orange-100 text-orange-800 border-orange-200",
-    description: "Your test results are in and are being finalized for interview wave matching.",
+    label: "Assessment Complete",
+    badgeCls: "bg-primary/10 text-primary border-primary/30",
+    description: "Your scores have qualified you for upcoming interview cohort waves.",
   },
   interview_scheduled: {
     label: "Interview Wave Confirmed",
-    badgeCls: "bg-violet-100 text-violet-800 border-violet-200",
-    description: "Your on-site interview is scheduled. Your gate pass details and shuttle point are provided below.",
+    badgeCls: "bg-primary/20 text-primary border-primary/40 shadow-[0_0_12px_rgba(182,255,46,0.2)]",
+    description: "Your on-site interview slot is reserved. Your gate pass details and shuttle point are provided below.",
   },
   interview_done: {
-    label: "Interview Complete / Under Scoring",
-    badgeCls: "bg-indigo-100 text-indigo-800 border-indigo-200",
-    description: "Client hiring managers are reviewing your on-site roleplay and language assessment.",
+    label: "Interview Under Client Review",
+    badgeCls: "bg-surface-3 text-zinc-100 border-white/20",
+    description: "Hiring managers are finalizing on-site feedback and roleplay scoring.",
   },
   offer_pending: {
-    label: "Offer in Final Approval",
-    badgeCls: "bg-yellow-100 text-yellow-900 border-yellow-300",
-    description: "The hiring team has selected you! Internal compensation approvals are finalizing.",
+    label: "Offer in Preparation",
+    badgeCls: "bg-amber-400/15 text-amber-300 border-amber-400/40",
+    description: "You have been selected! Formal compensation packages are being drafted.",
   },
   offer_extended: {
     label: "Official Offer Extended",
-    badgeCls: "bg-emerald-100 text-emerald-800 border-emerald-300",
-    description: "Congratulations! Your formal offer has been sent. Check your WhatsApp/Email to review details.",
+    badgeCls: "bg-primary text-primary-foreground font-bold border-transparent shadow-[0_0_15px_rgba(182,255,46,0.35)]",
+    description: "Congratulations! Your offer is extended. Review salary package details on WhatsApp/Email.",
   },
   accepted: {
-    label: "Offer Accepted & Cohort Confirmed",
-    badgeCls: "bg-green-100 text-green-900 border-green-300",
+    label: "Offer Accepted & Cohort Set",
+    badgeCls: "bg-primary text-primary-foreground font-bold border-transparent shadow-[0_0_15px_rgba(182,255,46,0.35)]",
     description: "Welcome to the team! Onboarding logistics and start date orientation are being prepared.",
   },
   rejected: {
-    label: "Application Archived",
-    badgeCls: "bg-slate-100 text-slate-700 border-slate-300",
-    description: "We are keeping your profile active in our Smart Pool for matching corporate openings that fit your profile.",
+    label: "Archived to Smart Pool",
+    badgeCls: "bg-white/5 text-zinc-400 border-white/10",
+    description: "We are keeping your profile active in our Smart Pool for other matching corporate accounts.",
   },
   withdrawn: {
     label: "Withdrawn",
-    badgeCls: "bg-slate-100 text-slate-700 border-slate-300",
+    badgeCls: "bg-white/5 text-zinc-400 border-white/10",
     description: "Application withdrawn per candidate preference.",
   },
 };
@@ -162,66 +161,68 @@ function TrackApplicationPage() {
   }
 
   return (
-    <div className="min-h-[85vh] bg-sand/30 py-8 md:py-14 px-4">
-      <div className="mx-auto max-w-3xl">
+    <div className="min-h-[85vh] bg-background text-foreground py-16 md:py-24 px-6 md:px-8">
+      <div className="mx-auto max-w-3xl space-y-10">
         {/* Hero Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary mb-3">
-            <Sparkles className="size-3.5" /> Self-Service Candidate Portal
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-surface-1 px-4 py-1.5 text-xs font-semibold text-zinc-300">
+            <Sparkles className="size-3.5 text-primary" />
+            <span>Candidate Self-Service Status</span>
           </div>
-          <h1 className="font-display text-3xl font-bold text-ink md:text-4xl tracking-tight">
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-white tracking-tight">
             Track Your Recruitment Status &amp; Gate Pass
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-            Check your live candidate pipeline stage, interview location, shuttle bus schedules, and offer updates.
+          <p className="text-base text-muted-foreground max-w-md mx-auto leading-relaxed">
+            Check your live candidate pipeline stage, assessment gate pass, shuttle pick-up point, and offer milestones.
           </p>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mt-6 flex flex-col sm:flex-row items-center gap-2 max-w-lg mx-auto">
+          <form onSubmit={handleSearch} className="mt-8 flex flex-col sm:flex-row items-center gap-3 max-w-lg mx-auto">
             <div className="relative flex-1 w-full">
-              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <input
                 type="text"
                 value={queryInput}
                 onChange={(e) => setQueryInput(e.target.value)}
                 placeholder="Enter mobile number (e.g. 01012345678)"
-                className="w-full rounded-2xl border border-border bg-white pl-10 pr-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-primary shadow-soft"
+                className="w-full rounded-xl border border-white/10 bg-surface-1 pl-11 pr-4 py-3.5 text-sm text-white placeholder:text-muted-foreground outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 focus:shadow-[0_0_15px_rgba(182,255,46,0.2)] transition-all shadow-xl"
               />
             </div>
             <button
               type="submit"
               disabled={tracker.isFetching}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lift hover:opacity-90 transition-opacity disabled:opacity-60"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_0_12px_rgba(182,255,46,0.3)] hover:shadow-[0_0_20px_rgba(182,255,46,0.6)] hover:bg-[#c2ff47] active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
             >
               <Search className="size-4" />
-              {tracker.isFetching ? "Checking…" : "Track Status"}
+              <span>{tracker.isFetching ? "Checking…" : "Track Status"}</span>
             </button>
           </form>
         </div>
 
         {/* Results Section */}
         {submittedQuery.trim().length >= 4 && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {tracker.isLoading ? (
-              <div className="rounded-3xl border border-border bg-white p-12 text-center shadow-soft">
+              <div className="rounded-3xl border border-white/[0.08] bg-surface-1 p-16 text-center shadow-xl">
                 <div className="size-8 mx-auto animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                <p className="mt-3 text-sm text-muted-foreground">Checking application records…</p>
+                <p className="mt-4 text-sm text-muted-foreground">Checking live recruitment records…</p>
               </div>
             ) : applications.length === 0 ? (
-              <div className="rounded-3xl border border-border bg-white p-10 text-center shadow-soft">
-                <div className="size-12 mx-auto rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+              <div className="rounded-3xl border border-white/[0.08] bg-surface-1 p-12 text-center shadow-xl space-y-4">
+                <div className="size-12 mx-auto rounded-full bg-amber-500/10 text-amber-300 flex items-center justify-center">
                   <AlertCircle className="size-6" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-ink">No Application Found</h3>
-                <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-                  We couldn't find an application registered with <b>{submittedQuery}</b>. Please check your phone number or submit an application.
+                <h3 className="font-display text-xl font-bold text-white">No Application Found</h3>
+                <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                  We could not find an active submission registered with <b>{submittedQuery}</b>. Please verify the phone number or explore new openings.
                 </p>
-                <div className="mt-6 flex justify-center gap-3">
+                <div className="pt-2">
                   <Link
                     to="/offers"
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-soft"
+                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-xs font-bold text-primary-foreground shadow-[0_0_12px_rgba(182,255,46,0.25)] hover:shadow-[0_0_18px_rgba(182,255,46,0.5)]"
                   >
-                    Browse Open Jobs <ArrowRight className="size-3.5" />
+                    <span>Browse Open Positions</span>
+                    <ArrowRight className="size-3.5" />
                   </Link>
                 </div>
               </div>
@@ -233,18 +234,18 @@ function TrackApplicationPage() {
                 const activeMilestoneIndex = getMilestoneIndex(app.pipeline_stage, hasInterview, app.status);
 
                 return (
-                  <div key={app.id} className="rounded-3xl border border-border/80 bg-white shadow-soft overflow-hidden">
+                  <div key={app.id} className="rounded-3xl border border-white/[0.08] bg-surface-1 shadow-2xl overflow-hidden">
                     {/* Header Banner */}
-                    <div className="bg-gradient-to-r from-ink/95 via-ink to-ink/90 text-white p-6">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary-foreground/70 mb-1">
-                            <Building2 className="size-3.5 text-primary" /> {app.offer?.company || "BPO Partner"}
+                    <div className="border-b border-white/[0.08] bg-surface-2 p-7">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                            <Building2 className="size-4" /> {app.offer?.company || "Hiring Partner"}
                           </div>
-                          <h2 className="font-display text-2xl font-bold tracking-tight">
+                          <h2 className="font-display text-2xl font-bold text-white">
                             {app.offer?.title || "Customer Service & Sales"}
                           </h2>
-                          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-white/80">
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                             <span>
                               Applied:{" "}
                               {new Date(app.created_at).toLocaleDateString("en-GB", {
@@ -254,12 +255,12 @@ function TrackApplicationPage() {
                               })}
                             </span>
                             <span>•</span>
-                            <span className="font-mono text-white/60">ID: {app.id}</span>
+                            <span className="font-mono text-zinc-400">ID: {app.id}</span>
                           </div>
                         </div>
 
                         <div>
-                          <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold border", stageMeta.badgeCls)}>
+                          <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold border", stageMeta.badgeCls)}>
                             <CheckCircle2 className="size-3.5" />
                             {stageMeta.label}
                           </span>
@@ -267,23 +268,23 @@ function TrackApplicationPage() {
                       </div>
                     </div>
 
-                    <div className="p-6 space-y-6">
+                    <div className="p-7 space-y-8">
                       {/* Active Status Explanation Box */}
-                      <div className="rounded-2xl border border-border/80 bg-sand/30 p-4 space-y-1">
-                        <div className="text-xs font-bold text-ink uppercase tracking-wider">
-                          Current Stage Status
+                      <div className="rounded-2xl border border-white/10 bg-surface-2 p-5 space-y-1.5">
+                        <div className="text-xs font-bold uppercase tracking-wider text-primary">
+                          Stage Update
                         </div>
-                        <p className="text-sm text-ink/90">
+                        <p className="text-sm leading-relaxed text-[#E4E4E7]/90 font-normal">
                           {stageMeta.description}
                         </p>
                       </div>
 
                       {/* 5 Milestone Funnel Stepper */}
-                      <div>
-                        <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-                          Hiring Process Progress
+                      <div className="space-y-3">
+                        <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          Recruitment Progress
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                           {CANDIDATE_MILESTONES.map((m, idx) => {
                             const isDone = idx <= activeMilestoneIndex;
                             const isCurrent = idx === activeMilestoneIndex;
@@ -292,24 +293,24 @@ function TrackApplicationPage() {
                               <div
                                 key={m.key}
                                 className={cn(
-                                  "rounded-2xl border p-3 transition-all",
+                                  "rounded-xl border p-3.5 transition-all",
                                   isCurrent
-                                    ? "border-primary bg-primary/5 shadow-xs ring-1 ring-primary/20"
+                                    ? "border-primary bg-primary/10 shadow-[0_0_12px_rgba(182,255,46,0.15)] ring-1 ring-primary/30"
                                     : isDone
-                                    ? "border-emerald-200 bg-emerald-50/50"
-                                    : "border-border/60 bg-sand/20 opacity-50"
+                                    ? "border-white/20 bg-surface-2"
+                                    : "border-white/5 bg-surface-1/50 opacity-40"
                                 )}
                               >
-                                <div className="flex items-center gap-1.5 mb-1">
+                                <div className="flex items-center gap-2 mb-1.5">
                                   <div
                                     className={cn(
                                       "size-5 rounded-full flex items-center justify-center text-[10px] font-bold",
-                                      isDone ? "bg-emerald-600 text-white" : "bg-muted-foreground/20 text-muted-foreground"
+                                      isDone ? "bg-primary text-black font-extrabold" : "bg-white/10 text-zinc-400"
                                     )}
                                   >
                                     {isDone ? "✓" : idx + 1}
                                   </div>
-                                  <span className="text-xs font-bold text-ink truncate">{m.label}</span>
+                                  <span className="text-xs font-bold text-white truncate">{m.label}</span>
                                 </div>
                                 <div className="text-[10px] text-muted-foreground leading-tight">{m.desc}</div>
                               </div>
@@ -320,77 +321,77 @@ function TrackApplicationPage() {
 
                       {/* GATE PASS CARD (if wave scheduled) */}
                       {hasInterview && (
-                        <div className="rounded-2xl border-2 border-violet-300 bg-gradient-to-br from-violet-50/80 via-white to-purple-50/60 p-5 shadow-xs">
-                          <div className="flex items-center justify-between gap-2 mb-3">
-                            <div className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 px-3 py-1 text-xs font-bold text-white shadow-soft">
-                              <ShieldCheck className="size-3.5" /> Official Assessment Center Gate Pass
+                        <div className="rounded-2xl border border-primary/30 bg-surface-2 p-6 shadow-xl space-y-5">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary shadow-[0_0_10px_rgba(182,255,46,0.2)]">
+                              <ShieldCheck className="size-4" /> Assessment Center Gate Pass
                             </div>
                             <span
                               className={cn(
-                                "text-[11px] font-bold px-2.5 py-0.5 rounded-full border",
+                                "text-[11px] font-bold px-3 py-1 rounded-full border",
                                 app.interview_attendance === "confirmed"
-                                  ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                                  : "bg-amber-100 text-amber-800 border-amber-300"
+                                  ? "bg-primary/15 text-primary border-primary/30"
+                                  : "bg-amber-400/15 text-amber-300 border-amber-400/30"
                               )}
                             >
-                              {app.interview_attendance === "confirmed" ? "Attendance Confirmed ✓" : "Pending Arrival"}
+                              {app.interview_attendance === "confirmed" ? "Arrival Confirmed ✓" : "Pending Arrival"}
                             </span>
                           </div>
 
-                          <div className="grid gap-3 sm:grid-cols-2 mb-4">
-                            <div className="rounded-xl border border-violet-100 bg-white p-3 space-y-1">
-                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold">
-                                <Calendar className="size-3.5 text-violet-600" /> Assessment Date &amp; Time
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="rounded-xl border border-white/10 bg-surface-1 p-4 space-y-1">
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground font-semibold">
+                                <Calendar className="size-4 text-primary" /> Interview Schedule
                               </div>
-                              <div className="text-base font-bold text-ink">{app.interview_date}</div>
-                              <div className="text-xs font-mono text-violet-700 flex items-center gap-1">
+                              <div className="text-base font-bold text-white">{app.interview_date}</div>
+                              <div className="text-xs text-primary font-mono flex items-center gap-1">
                                 <Clock className="size-3" /> Slot: {app.interview_time || "11:30 AM"}
                               </div>
                             </div>
 
-                            <div className="rounded-xl border border-violet-100 bg-white p-3 space-y-1">
-                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold">
-                                <MapPin className="size-3.5 text-violet-600" /> Assessment Center / Hub
+                            <div className="rounded-xl border border-white/10 bg-surface-1 p-4 space-y-1">
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground font-semibold">
+                                <MapPin className="size-4 text-primary" /> Assessment Location
                               </div>
-                              <div className="text-sm font-bold text-ink">{app.interview_site || "Concentrix Smart Village"}</div>
+                              <div className="text-sm font-bold text-white">{app.interview_site || "Concentrix Smart Village"}</div>
                               <div className="text-xs text-muted-foreground truncate">{app.interview_address || "Smart Village B12"}</div>
                             </div>
                           </div>
 
                           {app.interview_bus_point && (
-                            <div className="rounded-xl border border-violet-100 bg-white p-3 mb-3 flex items-center gap-3">
-                              <div className="size-8 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+                            <div className="rounded-xl border border-white/10 bg-surface-1 p-4 flex items-center gap-3.5">
+                              <div className="size-9 rounded-lg bg-surface-3 text-primary flex items-center justify-center shrink-0">
                                 <Bus className="size-4" />
                               </div>
                               <div>
-                                <span className="text-xs font-semibold text-ink block">Shuttle Bus Pickup Point</span>
-                                <span className="text-xs text-violet-800 font-bold">
-                                  {app.interview_bus_point} · {app.interview_bus_time || "09:30 AM"}
+                                <span className="text-xs font-semibold text-muted-foreground block">Shuttle Bus Station</span>
+                                <span className="text-xs text-white font-bold">
+                                  {app.interview_bus_point} · Departure: {app.interview_bus_time || "09:30 AM"}
                                 </span>
                               </div>
                             </div>
                           )}
 
-                          <div className="flex flex-wrap gap-2 pt-1">
+                          <div className="flex flex-wrap gap-3 pt-2">
                             {app.interview_maps_link && (
                               <a
                                 href={app.interview_maps_link}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2 text-xs font-bold text-white hover:bg-violet-700 transition-colors"
+                                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-[0_0_12px_rgba(182,255,46,0.3)] hover:shadow-[0_0_18px_rgba(182,255,46,0.55)] hover:bg-[#c2ff47] transition-all"
                               >
                                 <Navigation className="size-3.5" /> Open Google Maps Direction
                               </a>
                             )}
                             <a
-                              href={`https://wa.me/201012345678?text=${encodeURIComponent(
+                              href={`https://wa.me/201029324783?text=${encodeURIComponent(
                                 `Hi QuickHire, I'm ${app.full_name} regarding my interview on ${app.interview_date} for ${app.offer?.title || "role"}. I have a question about my gate pass.`
                               )}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-4 py-2 text-xs font-bold text-ink hover:bg-sand transition-colors"
+                              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-surface-1 px-5 py-2.5 text-xs font-bold text-white hover:bg-surface-3 transition-colors"
                             >
-                              <MessageCircle className="size-3.5 text-emerald-600" /> WhatsApp Coordinator
+                              <MessageCircle className="size-3.5 text-primary" /> WhatsApp Coordinator
                             </a>
                           </div>
                         </div>

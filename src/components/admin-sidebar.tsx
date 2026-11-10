@@ -46,95 +46,99 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-white border-r border-border/60 shadow-xl transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:shadow-none lg:z-auto",
+        "fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-surface-1 border-r border-white/[0.08] shadow-2xl transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:shadow-none lg:z-auto",
         open ? "translate-x-0" : "-translate-x-full",
       )}
     >
       {/* Logo area */}
-      <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
-        <Link to="/admin" className="flex items-center gap-2.5" onClick={onClose}>
-          <QuickHireLogo size={32} />
+      <div className="flex items-center justify-between border-b border-white/[0.08] px-6 py-5">
+        <Link to="/admin" className="flex items-center gap-3" onClick={onClose}>
+          <QuickHireLogo size={34} className="rounded-xl ring-1 ring-white/10" />
           <div>
-            <div className="font-display text-[14px] font-bold text-ink leading-tight">
-              QuickHire
+            <div className="font-display text-base font-bold text-white tracking-tight leading-tight">
+              Quick<span className="text-primary">Hire</span>
             </div>
-            <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Admin Portal</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Admin Engine</div>
           </div>
         </Link>
         <button
           onClick={onClose}
-          className="rounded-lg p-1.5 text-muted-foreground hover:bg-sand hover:text-foreground lg:hidden"
+          className="rounded-xl p-2 text-muted-foreground hover:bg-surface-2 hover:text-white lg:hidden transition-colors"
         >
           <X className="size-4" />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
-        <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-          Navigation
-        </p>
-        <ul className="space-y-0.5">
-          {navItems.map((item) => {
-            const active = isActive(item);
-            return (
-              <li key={item.to}>
-                <Link
-                  to={item.to}
-                  onClick={onClose}
-                  className={cn(
-                    "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150",
-                    active
-                      ? "bg-primary text-primary-foreground shadow-soft"
-                      : "text-muted-foreground hover:bg-sand hover:text-ink",
-                  )}
-                >
-                  <item.icon className={cn("size-4 shrink-0", active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary")} />
-                  <span>{item.label}</span>
-                  {!active && (
-                    <ChevronRight className="ml-auto size-3 opacity-0 transition-opacity group-hover:opacity-30" />
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+      <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+        <div>
+          <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            Management
+          </p>
+          <ul className="space-y-1">
+            {navItems.map((item) => {
+              const active = isActive(item);
+              return (
+                <li key={item.to}>
+                  <Link
+                    to={item.to}
+                    onClick={onClose}
+                    className={cn(
+                      "group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition-all duration-200",
+                      active
+                        ? "bg-primary text-primary-foreground shadow-[0_0_12px_rgba(182,255,46,0.3)]"
+                        : "text-zinc-400 hover:bg-white/[0.06] hover:text-white",
+                    )}
+                  >
+                    <item.icon className={cn("size-4 shrink-0 transition-colors", active ? "text-primary-foreground" : "text-zinc-400 group-hover:text-primary")} />
+                    <span>{item.label}</span>
+                    {!active && (
+                      <ChevronRight className="ml-auto size-3 opacity-0 transition-opacity group-hover:opacity-40" />
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         {/* Divider */}
-        <div className="my-4 border-t border-border/50" />
+        <div className="border-t border-white/[0.06]" />
 
-        <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-          External
-        </p>
-        <a
-          href="/"
-          target="_blank"
-          rel="noreferrer"
-          className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-sand hover:text-ink transition-all duration-150"
-        >
-          <Globe className="size-4 shrink-0 text-muted-foreground group-hover:text-primary" />
-          <span>Public site</span>
-          <span className="ml-auto text-[10px] text-muted-foreground/50">↗</span>
-        </a>
+        <div>
+          <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            Quick Actions
+          </p>
+          <a
+            href="/"
+            target="_blank"
+            rel="noreferrer"
+            className="group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-zinc-400 hover:bg-white/[0.06] hover:text-white transition-all duration-200"
+          >
+            <Globe className="size-4 shrink-0 text-zinc-400 group-hover:text-primary" />
+            <span>Public Website</span>
+            <span className="ml-auto text-xs text-muted-foreground">↗</span>
+          </a>
+        </div>
       </nav>
 
       {/* User footer */}
-      <div className="border-t border-border/60 p-3">
-        <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 mb-1">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+      <div className="border-t border-white/[0.08] p-4 bg-surface-2/40">
+        <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 mb-2">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-primary/40 bg-primary/10 text-primary text-xs font-bold shadow-[0_0_10px_rgba(182,255,46,0.15)]">
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="truncate text-xs font-semibold text-ink">{adminEmail}</div>
-            <div className="text-[10px] text-muted-foreground">Administrator</div>
+            <div className="truncate text-xs font-bold text-white">{adminEmail}</div>
+            <div className="text-[10px] text-muted-foreground">Authorized Operator</div>
           </div>
         </div>
         <button
           onClick={signOut}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-all duration-150"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200 cursor-pointer"
         >
           <LogOut className="size-4 shrink-0" />
-          Sign out
+          <span>Sign Out</span>
         </button>
       </div>
     </aside>

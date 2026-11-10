@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { QuickHireLogo } from "@/components/logo";
+import { cn } from "@/lib/utils";
 
 const HR_WAVE_STAGES = [
   { key: "interview_done", label: "Interview Done", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
@@ -151,20 +152,20 @@ function WaveRosterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-ink">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Top Client Bar */}
-      <header className="border-b border-border/80 bg-white sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <header className="border-b border-white/[0.08] bg-surface-1 sticky top-0 z-30 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <QuickHireLogo size={32} />
+            <QuickHireLogo size={32} className="rounded-xl" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display font-bold text-base text-ink tracking-tight">QuickHire</span>
-                <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">
+                <span className="font-display font-bold text-base text-white tracking-tight">Quick<span className="text-primary">Hire</span></span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary">
                   Client HR Live Wave Portal
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">Direct Assessment & Gate Pass Management</p>
+              <p className="text-xs text-muted-foreground">Direct Assessment &amp; Gate Pass Management</p>
             </div>
           </div>
 
@@ -175,11 +176,11 @@ function WaveRosterPage() {
                 <select
                   value={waveTag}
                   onChange={(e) => navigate({ to: `/wave/${encodeURIComponent(e.target.value)}` })}
-                  className="appearance-none bg-sand/60 hover:bg-sand border border-border rounded-xl px-3.5 py-1.5 pr-8 text-xs font-semibold text-ink outline-none transition-colors cursor-pointer"
+                  className="appearance-none bg-surface-2 hover:bg-surface-3 border border-white/10 rounded-xl px-4 py-2 pr-8 text-xs font-semibold text-white outline-none transition-colors cursor-pointer"
                 >
-                  <option value="all">All Waves</option>
+                  <option value="all" className="bg-surface-1 text-white">All Waves</option>
                   {data.allAvailableWaves.map((w) => (
-                    <option key={w} value={w}>
+                    <option key={w} value={w} className="bg-surface-1 text-white">
                       Wave: {w}
                     </option>
                   ))}

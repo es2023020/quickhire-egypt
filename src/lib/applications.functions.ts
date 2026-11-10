@@ -184,7 +184,9 @@ export async function submitApplication({ data }: {
   const comm = Math.floor(Math.random() * 3) + 6;  // 6–8
   const exp = Math.floor(Math.random() * 4) + 5;   // 5–8
   const now = new Date().toISOString();
-  const refCode = generateCandidateReferralCode(data.full_name, data.phone);
+  const apps = await getRawApplications();
+  const existingCodes = apps.map((a) => a.referral_code).filter(Boolean) as string[];
+  const refCode = generateCandidateReferralCode(data.full_name, data.phone, existingCodes);
   const newApp: MockApplication = {
     id,
     offer_id: data.offer_id,
@@ -217,7 +219,6 @@ export async function submitApplication({ data }: {
     created_at: now,
     updated_at: now,
   };
-  const apps = await getRawApplications();
   apps.unshift(newApp);
   await saveApplications(apps);
   return { id, referral_code: refCode };

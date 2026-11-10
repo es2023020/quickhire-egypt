@@ -31,10 +31,10 @@ export const Route = createFileRoute("/_authenticated/admin/applicants/")({
 });
 
 const STATUS_STYLES = {
-  new: "bg-blue-100 text-blue-700 border-blue-200",
-  shortlisted: "bg-amber-100 text-amber-700 border-amber-200",
-  hired: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  rejected: "bg-red-100 text-red-600 border-red-200",
+  new: "bg-blue-500/15 text-blue-300 border-blue-500/30",
+  shortlisted: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+  hired: "bg-primary/15 text-primary border-primary/30",
+  rejected: "bg-red-500/15 text-red-400 border-red-500/30",
 } as const;
 
 const STATUS_LABELS = {
@@ -45,16 +45,16 @@ const STATUS_LABELS = {
 } as const;
 
 export const PIPELINE_STAGES = [
-  { key: "applied", label: "Applied / New", color: "bg-blue-100 text-blue-700 border-blue-200" },
-  { key: "interview_scheduled", label: "Interview Scheduled", color: "bg-violet-100 text-violet-700 border-violet-200" },
-  { key: "interview_done", label: "Interview Done / Under Evaluation", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
-  { key: "test_invited", label: "Test Sent / Assessment Invited", color: "bg-amber-100 text-amber-700 border-amber-200" },
-  { key: "test_completed", label: "Test Completed", color: "bg-orange-100 text-orange-700 border-orange-200" },
-  { key: "offer_pending", label: "Offer Pending / Approval", color: "bg-yellow-100 text-yellow-800 border-yellow-300" },
-  { key: "offer_extended", label: "Offer Extended", color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  { key: "accepted", label: "Accepted", color: "bg-green-100 text-green-800 border-green-300" },
-  { key: "rejected", label: "Rejected / Archived", color: "bg-red-100 text-red-600 border-red-200" },
-  { key: "withdrawn", label: "Withdrawn", color: "bg-slate-100 text-slate-600 border-slate-200" },
+  { key: "applied", label: "Applied / New", color: "bg-blue-500/15 text-blue-300 border-blue-500/30" },
+  { key: "interview_scheduled", label: "Interview Scheduled", color: "bg-violet-500/15 text-violet-300 border-violet-500/30" },
+  { key: "interview_done", label: "Interview Done / Evaluation", color: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" },
+  { key: "test_invited", label: "Test Sent / Invited", color: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
+  { key: "test_completed", label: "Test Completed", color: "bg-orange-500/15 text-orange-300 border-orange-500/30" },
+  { key: "offer_pending", label: "Offer Pending", color: "bg-yellow-500/15 text-yellow-300 border-yellow-500/30" },
+  { key: "offer_extended", label: "Offer Extended", color: "bg-teal-500/15 text-teal-300 border-teal-500/30" },
+  { key: "accepted", label: "Accepted / Placed", color: "bg-primary/15 text-primary border-primary/30" },
+  { key: "rejected", label: "Rejected / Archived", color: "bg-red-500/15 text-red-400 border-red-500/30" },
+  { key: "withdrawn", label: "Withdrawn", color: "bg-white/10 text-zinc-400 border-white/15" },
 ] as const;
 
 function waLink(phone: string, name: string, role: string) {
@@ -232,66 +232,66 @@ function Applicants() {
       {
         id: "new",
         title: "New Submissions",
-        badgeColor: "bg-blue-100 text-blue-700 border-blue-200",
+        badgeColor: "bg-blue-500/15 text-blue-300 border-blue-500/30",
         items: rows.filter((r) => r.status === "new" && !r.interview_date),
       },
       {
         id: "shortlisted",
         title: "Shortlisted ⭐",
-        badgeColor: "bg-amber-100 text-amber-700 border-amber-200",
+        badgeColor: "bg-amber-500/15 text-amber-300 border-amber-500/30",
         items: rows.filter((r) => r.status === "shortlisted" && !r.interview_date),
       },
       {
         id: "scheduled",
         title: "Wave Scheduled 📅",
-        badgeColor: "bg-violet-100 text-violet-700 border-violet-200",
+        badgeColor: "bg-violet-500/15 text-violet-300 border-violet-500/30",
         items: rows.filter((r) => !!r.interview_date && r.status !== "hired" && r.status !== "rejected"),
       },
       {
         id: "hired",
         title: "Hired / Offer 🎉",
-        badgeColor: "bg-emerald-100 text-emerald-700 border-emerald-200",
+        badgeColor: "bg-primary/15 text-primary border-primary/30",
         items: rows.filter((r) => r.status === "hired"),
       },
       {
         id: "rejected",
         title: "Archived / Rejected",
-        badgeColor: "bg-rose-100 text-rose-700 border-rose-200",
+        badgeColor: "bg-red-500/15 text-red-400 border-red-500/30",
         items: rows.filter((r) => r.status === "rejected"),
       },
     ];
   }, [rows]);
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 max-w-[1400px]">
+    <div className="p-4 md:p-6 lg:p-8 max-w-[1500px] mx-auto bg-background text-foreground space-y-6">
       {/* Delete confirmation modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="w-full max-w-sm rounded-3xl border border-red-500/30 bg-surface-1 p-6 shadow-2xl">
             <div className="mb-4 flex items-center gap-3">
-              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-red-100">
-                <Trash2 className="size-5 text-red-600" />
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-red-500/15 border border-red-500/30">
+                <Trash2 className="size-5 text-red-400" />
               </div>
               <div>
-                <div className="font-semibold text-ink">Delete Applicant?</div>
+                <div className="font-bold text-white text-base">Delete Applicant?</div>
                 <div className="text-xs text-muted-foreground">This action cannot be undone.</div>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-5">
-              All data including scores, notes, and voice notes will be permanently removed.
+            <p className="text-xs text-[#E4E4E7]/80 mb-5">
+              All data including scores, voice notes, and assessments will be permanently removed.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => deleteApp.mutate(deleteConfirm)}
                 disabled={deleteApp.isPending}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 cursor-pointer"
               >
-                {deleteApp.isPending && <Loader2 className="size-4 animate-spin" />}
-                Delete
+                {deleteApp.isPending && <Loader2 className="size-3.5 animate-spin" />}
+                Delete Record
               </button>
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-sand transition-colors"
+                className="flex-1 rounded-xl border border-white/10 bg-surface-2 px-4 py-2.5 text-xs font-medium text-zinc-300 hover:text-white hover:bg-surface-3 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -302,32 +302,32 @@ function Applicants() {
 
       {/* Bulk delete confirmation modal */}
       {showBulkDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="w-full max-w-sm rounded-3xl border border-red-500/30 bg-surface-1 p-6 shadow-2xl">
             <div className="mb-4 flex items-center gap-3">
-              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-red-100">
-                <Trash2 className="size-5 text-red-600" />
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-red-500/15 border border-red-500/30">
+                <Trash2 className="size-5 text-red-400" />
               </div>
               <div>
-                <div className="font-semibold text-ink">Delete {selectedIds.size} applicants?</div>
+                <div className="font-bold text-white text-base">Delete {selectedIds.size} applicants?</div>
                 <div className="text-xs text-muted-foreground">This action cannot be undone.</div>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-5">
+            <p className="text-xs text-[#E4E4E7]/80 mb-5">
               All data for the selected candidates will be permanently removed from the system.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => bulkDeleteApps.mutate([...selectedIds])}
                 disabled={bulkDeleteApps.isPending}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-60 cursor-pointer"
               >
-                {bulkDeleteApps.isPending && <Loader2 className="size-4 animate-spin" />}
-                Delete All
+                {bulkDeleteApps.isPending && <Loader2 className="size-3.5 animate-spin" />}
+                Delete Selected
               </button>
               <button
                 onClick={() => setShowBulkDelete(false)}
-                className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-sand transition-colors"
+                className="flex-1 rounded-xl border border-white/10 bg-surface-2 px-4 py-2.5 text-xs font-medium text-zinc-300 hover:text-white hover:bg-surface-3 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -337,46 +337,49 @@ function Applicants() {
       )}
 
       {/* Header */}
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold text-ink flex items-center gap-2 md:text-3xl">
-            <Users className="size-6 text-primary md:size-7" /> Applicants
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary font-mono mb-2">
+            <Users className="size-3.5" /> TALENT ROSTER
+          </div>
+          <h1 className="font-display text-2xl md:text-4xl font-bold tracking-tight text-white flex items-center gap-2.5">
+            Candidates &amp; Applications
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {total} candidate{total !== 1 ? "s" : ""} · {shortlisted} shortlisted · {hired} hired
+          <p className="mt-1 text-sm text-[#E4E4E7]/80">
+            {total} candidate{total !== 1 ? "s" : ""} registered · <strong className="text-amber-400">{shortlisted} shortlisted</strong> · <strong className="text-primary">{hired} placed &amp; hired</strong>
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="inline-flex rounded-xl border border-border bg-sand/60 p-1">
+          <div className="inline-flex rounded-xl border border-white/10 bg-surface-1 p-1">
             <button
               onClick={() => setViewMode("table")}
               className={cn(
-                "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all",
-                viewMode === "table" ? "bg-white text-ink shadow-xs" : "text-muted-foreground hover:text-ink"
+                "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer",
+                viewMode === "table" ? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(182,255,46,0.3)]" : "text-zinc-400 hover:text-white"
               )}
             >
-              <List className="size-3.5" /> Table
+              <List className="size-3.5" /> Table View
             </button>
             <button
               onClick={() => setViewMode("kanban")}
               className={cn(
-                "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all",
-                viewMode === "kanban" ? "bg-white text-ink shadow-xs" : "text-muted-foreground hover:text-ink"
+                "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer",
+                viewMode === "kanban" ? "bg-primary text-primary-foreground shadow-[0_0_10px_rgba(182,255,46,0.3)]" : "text-zinc-400 hover:text-white"
               )}
             >
-              <Kanban className="size-3.5" /> Pipeline Board
+              <Kanban className="size-3.5" /> Stage Kanban
             </button>
           </div>
 
           <button
             onClick={() => exportClientRosterCsv(rows, "Full_View_Roster")}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/15 px-3.5 py-2 text-xs font-bold text-emerald-400 hover:bg-emerald-500/25 transition-colors cursor-pointer"
           >
             <Download className="size-3.5" /> Export View CSV
           </button>
           <button
             onClick={() => qc.invalidateQueries({ queryKey: ["admin", "applications"] })}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-xs font-medium hover:bg-sand transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-surface-2 transition-colors cursor-pointer"
           >
             <RefreshCw className="size-3.5" /> Refresh
           </button>
@@ -385,129 +388,130 @@ function Applicants() {
 
       {/* Bulk actions bar */}
       {selectedIds.size > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3">
-          <span className="text-sm font-semibold text-violet-800 mr-1">
-            {selectedIds.size} selected
+        <div className="flex flex-wrap items-center gap-2.5 rounded-2xl border border-primary/30 bg-surface-2 px-4 py-3 shadow-xl animate-in fade-in">
+          <span className="text-xs font-bold font-mono text-primary mr-1">
+            {selectedIds.size} candidates selected:
           </span>
           <button
             onClick={() => exportClientRosterCsv(rows.filter(r => selectedIds.has(r.id)), "Selection_Roster")}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors cursor-pointer"
           >
-            <Download className="size-3.5" /> Export Roster CSV
+            <Download className="size-3.5" /> Export Selected CSV
           </button>
           <button
             onClick={() => bulkUpdateStatus.mutate({ ids: [...selectedIds], s: "shortlisted" })}
             disabled={bulkUpdateStatus.isPending}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 transition-colors disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 px-3 py-1.5 text-xs font-bold text-amber-300 hover:bg-amber-500/30 transition-colors disabled:opacity-60 cursor-pointer"
           >
             {bulkUpdateStatus.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Star className="size-3.5" />}
-            Shortlist All
+            Shortlist Selected
           </button>
           <button
             onClick={() => bulkUpdateStatus.mutate({ ids: [...selectedIds], s: "hired" })}
             disabled={bulkUpdateStatus.isPending}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-colors disabled:opacity-60 cursor-pointer"
           >
-            <CheckCircle2 className="size-3.5" /> Hire All
+            <CheckCircle2 className="size-3.5" /> Mark Placed &amp; Hired
           </button>
           <div className="flex items-center gap-1.5 flex-1 min-w-40">
             <input
               value={waveTagInput}
               onChange={(e) => setWaveTagInput(e.target.value)}
-              placeholder="Wave tag (e.g. Wave-3-HSBC)"
-              className="flex-1 rounded-xl border border-border bg-white px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-ring"
+              placeholder="Wave tag (e.g. Wave-3-Concentrix)"
+              className="flex-1 rounded-xl border border-white/10 bg-surface-1 px-3 py-1.5 text-xs text-white font-mono outline-none focus:border-primary/80"
             />
             <button
               onClick={() => { if (waveTagInput.trim()) bulkAssignWave.mutate({ ids: [...selectedIds], tag: waveTagInput.trim() }); }}
               disabled={!waveTagInput.trim() || bulkAssignWave.isPending}
-              className="inline-flex items-center gap-1 rounded-xl bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition-colors disabled:opacity-60"
+              className="inline-flex items-center gap-1 rounded-xl bg-violet-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-violet-700 transition-colors disabled:opacity-60 cursor-pointer"
             >
-              <Tag className="size-3.5" /> Assign
+              <Tag className="size-3.5" /> Assign Wave
             </button>
           </div>
           <button
             onClick={() => setShowBulkDelete(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors ml-auto"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/15 px-3 py-1.5 text-xs font-bold text-red-400 hover:bg-red-500/25 transition-colors ml-auto cursor-pointer"
           >
-            <Trash2 className="size-3.5" /> Delete Selected
+            <Trash2 className="size-3.5" /> Delete
           </button>
           <button
             onClick={() => setSelectedIds(new Set())}
-            className="rounded-xl border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-sand transition-colors"
+            className="rounded-xl border border-white/10 bg-surface-1 px-2.5 py-1.5 text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
           >
-            Clear
+            Clear Selection
           </button>
         </div>
       )}
 
-      {/* Filters */}
-
-      <div className="mb-5 flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-52">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+      {/* Filters Bar */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-56">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email, phone, role…"
-            className="w-full rounded-xl border border-border bg-card pl-9 pr-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+            placeholder="Search candidates by name, phone, role, email…"
+            className="w-full rounded-xl border border-white/10 bg-surface-1 pl-10 pr-3 py-2.5 text-sm text-white placeholder:text-muted-foreground outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 shadow-xl"
           />
         </div>
         <select
           value={offerFilter}
           onChange={(e) => setOfferFilter(e.target.value)}
-          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+          className="rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2.5 text-sm text-white outline-none focus:border-primary/80"
         >
-          <option value="all">All offers</option>
-          {offers.data?.map((o) => <option key={o.id} value={o.id}>{o.title}</option>)}
+          <option value="all" className="bg-surface-1">All Roles &amp; Openings</option>
+          {offers.data?.map((o) => (
+            <option key={o.id} value={o.id} className="bg-surface-1">{o.title} ({o.company})</option>
+          ))}
         </select>
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+          className="rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2.5 text-sm text-white outline-none focus:border-primary/80"
         >
-          <option value="all">All statuses</option>
+          <option value="all" className="bg-surface-1">All Statuses</option>
           {["new", "shortlisted", "hired", "rejected"].map((s) => (
-            <option key={s} value={s}>{STATUS_LABELS[s as keyof typeof STATUS_LABELS]}</option>
+            <option key={s} value={s} className="bg-surface-1">{STATUS_LABELS[s as keyof typeof STATUS_LABELS]}</option>
           ))}
         </select>
         <select
           value={attendanceFilter}
           onChange={(e) => setAttendanceFilter(e.target.value)}
-          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+          className="rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2.5 text-sm text-white outline-none focus:border-primary/80"
         >
-          <option value="all">All Interviews</option>
-          <option value="scheduled">Scheduled Wave</option>
-          <option value="confirmed">🟢 Confirmed Attendance</option>
-          <option value="pending">🟡 Pending Confirmation</option>
-          <option value="attended">🔵 Attended On-Site</option>
-          <option value="no_show">🔴 No-Shows</option>
+          <option value="all" className="bg-surface-1">All Interviews</option>
+          <option value="scheduled" className="bg-surface-1">Scheduled Wave</option>
+          <option value="confirmed" className="bg-surface-1">🟢 Confirmed Attendance</option>
+          <option value="pending" className="bg-surface-1">🟡 Pending Confirmation</option>
+          <option value="attended" className="bg-surface-1">🔵 Attended On-Site</option>
+          <option value="no_show" className="bg-surface-1">🔴 No-Shows</option>
         </select>
         <select
           value={referralFilter}
           onChange={(e) => setReferralFilter(e.target.value)}
-          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+          className="rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2.5 text-sm text-white outline-none focus:border-primary/80"
         >
-          <option value="all">All Channels</option>
-          <option value="referred">🎁 Ambassador Referrals</option>
-          <option value="direct">Direct / Organic</option>
+          <option value="all" className="bg-surface-1">All Channels</option>
+          <option value="referred" className="bg-surface-1">🎁 Ambassador Referrals</option>
+          <option value="direct" className="bg-surface-1">Direct / Organic</option>
         </select>
         <select
           value={cooldownFilter}
           onChange={(e) => setCooldownFilter(e.target.value)}
-          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+          className="rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2.5 text-sm text-white outline-none focus:border-primary/80"
         >
-          <option value="all">All Cooldown Statuses</option>
-          <option value="risk">⚠️ 90-Day Cooldown Risks</option>
-          <option value="clear">Clear (No Prior History)</option>
+          <option value="all" className="bg-surface-1">All Cooldown Statuses</option>
+          <option value="risk" className="bg-surface-1">⚠️ 90-Day Cooldown Risks</option>
+          <option value="clear" className="bg-surface-1">Clear (No History)</option>
         </select>
         <select
           value={outcomeFilter}
           onChange={(e) => setOutcomeFilter(e.target.value)}
-          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+          className="rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2.5 text-sm text-white outline-none focus:border-primary/80"
         >
-          <option value="all">All Outcome Codes</option>
+          <option value="all" className="bg-surface-1">All Outcome Codes</option>
           {OUTCOME_CODES.map((o) => (
-            <option key={o.code} value={o.code}>
+            <option key={o.code} value={o.code} className="bg-surface-1">
               {o.shortLabel}
             </option>
           ))}
@@ -515,11 +519,11 @@ function Applicants() {
         <select
           value={stageFilter}
           onChange={(e) => setStageFilter(e.target.value)}
-          className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+          className="rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2.5 text-sm text-white outline-none focus:border-primary/80"
         >
-          <option value="all">All Pipeline Stages</option>
+          <option value="all" className="bg-surface-1">All Pipeline Stages</option>
           {PIPELINE_STAGES.map((s) => (
-            <option key={s.key} value={s.key}>
+            <option key={s.key} value={s.key} className="bg-surface-1">
               {s.label}
             </option>
           ))}
@@ -528,11 +532,11 @@ function Applicants() {
           <select
             value={waveFilter}
             onChange={(e) => setWaveFilter(e.target.value)}
-            className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+            className="rounded-xl border border-white/10 bg-surface-1 px-3.5 py-2.5 text-sm text-white outline-none focus:border-primary/80"
           >
-            <option value="all">All Waves</option>
+            <option value="all" className="bg-surface-1">All Waves</option>
             {availableWaves.map((w) => (
-              <option key={w} value={w}>
+              <option key={w} value={w} className="bg-surface-1">
                 Wave: {w}
               </option>
             ))}
@@ -703,10 +707,10 @@ function Applicants() {
           </div>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-surface-1 shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-sand text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <thead className="bg-surface-2/80 text-left text-xs font-bold uppercase tracking-wider text-muted-foreground border-b border-white/10">
                 <tr>
                   <th className="px-3 py-3 w-10" onClick={(e) => e.stopPropagation()}>
                     <input
@@ -716,12 +720,12 @@ function Applicants() {
                         if (e.target.checked) setSelectedIds(new Set(rows.map(r => r.id)));
                         else setSelectedIds(new Set());
                       }}
-                      className="size-4 rounded cursor-pointer accent-violet-600"
+                      className="size-4 rounded cursor-pointer accent-primary"
                       title="Select all"
                     />
                   </th>
                   <th className="px-4 py-3">
-                    <button onClick={() => toggleSort("name")} className="flex items-center gap-1 hover:text-foreground">
+                    <button onClick={() => toggleSort("name")} className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
                       Candidate <ArrowUpDown className="size-3" />
                     </button>
                   </th>
@@ -730,7 +734,7 @@ function Applicants() {
                   <th className="px-4 py-3">Comm</th>
                   <th className="px-4 py-3">Exp</th>
                   <th className="px-4 py-3">
-                    <button onClick={() => toggleSort("score")} className="flex items-center gap-1 hover:text-foreground">
+                    <button onClick={() => toggleSort("score")} className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
                       Total <ArrowUpDown className="size-3" />
                     </button>
                   </th>
@@ -740,21 +744,21 @@ function Applicants() {
                   <th className="px-4 py-3">Assets</th>
                   <th className="px-4 py-3">Contact</th>
                   <th className="px-4 py-3">
-                    <button onClick={() => toggleSort("date")} className="flex items-center gap-1 hover:text-foreground">
+                    <button onClick={() => toggleSort("date")} className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
                       Date <ArrowUpDown className="size-3" />
                     </button>
                   </th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-white/[0.06]">
                 {rows.map((a) => (
                   <tr 
                     key={a.id} 
                     onClick={() => navigate({ to: "/admin/applicants/$id", params: { id: a.id } })}
                     className={cn(
-                      "hover:bg-sand/40 transition-colors group cursor-pointer",
-                      selectedIds.has(a.id) && "bg-violet-50/50"
+                      "hover:bg-surface-2/50 transition-colors group cursor-pointer",
+                      selectedIds.has(a.id) && "bg-primary/[0.04]"
                     )}
                   >
                     <td className="px-3 py-3 w-10" onClick={(e) => e.stopPropagation()}>
@@ -767,22 +771,22 @@ function Applicants() {
                           else next.delete(a.id);
                           setSelectedIds(next);
                         }}
-                        className="size-4 rounded cursor-pointer accent-violet-600"
+                        className="size-4 rounded cursor-pointer accent-primary"
                       />
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="size-8 shrink-0 flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                        <div className="size-8 shrink-0 flex items-center justify-center rounded-xl bg-surface-2 border border-white/10 text-primary text-xs font-bold font-mono">
                           {a.full_name[0]?.toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-semibold text-ink">{a.full_name}</div>
+                          <div className="font-bold text-white text-sm">{a.full_name}</div>
                           <div className="text-xs text-muted-foreground">{a.email}</div>
                           <div className="text-xs text-muted-foreground font-mono">{a.phone}</div>
                           {a.referred_by && (
                             <div className="mt-1">
-                              <span className="inline-flex items-center gap-1 rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-mono font-bold text-violet-800 border border-violet-200">
-                                <Gift className="size-2.5 text-violet-600" /> Ref: {a.referred_by}
+                              <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-mono font-bold text-primary border border-primary/20">
+                                <Gift className="size-2.5" /> Ref: {a.referred_by}
                               </span>
                             </div>
                           )}
@@ -791,8 +795,8 @@ function Applicants() {
                             if (cooldown.hasCooldownRisk) {
                               return (
                                 <div className="mt-1" title={cooldown.reason || "90-day cooldown risk"}>
-                                  <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-300">
-                                    <AlertTriangle className="size-2.5 text-amber-600" /> 90d Cooldown
+                                  <span className="inline-flex items-center gap-1 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/30">
+                                    <AlertTriangle className="size-2.5 text-amber-400" /> 90d Cooldown
                                   </span>
                                 </div>
                               );
@@ -803,18 +807,18 @@ function Applicants() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="text-ink font-medium">{a.offer?.title ?? "—"}</div>
-                      <div className="text-xs text-muted-foreground">{a.offer?.company}</div>
+                      <div className="text-white font-semibold text-xs">{a.offer?.title ?? "—"}</div>
+                      <div className="text-[11px] text-muted-foreground">{a.offer?.company}</div>
                     </td>
                     <td className="px-4 py-3"><ScorePill score={a.english_score} /></td>
                     <td className="px-4 py-3"><ScorePill score={a.comm_score} /></td>
                     <td className="px-4 py-3"><ScorePill score={a.exp_score} /></td>
                     <td className="px-4 py-3">
-                      <span className={cn("font-display text-lg font-bold",
+                      <span className={cn("font-display text-base font-extrabold font-mono",
                         a.total_score == null ? "text-muted-foreground" :
-                        a.total_score >= 25 ? "text-emerald-600" :
-                        a.total_score >= 20 ? "text-blue-600" :
-                        a.total_score >= 15 ? "text-amber-600" : "text-red-500"
+                        a.total_score >= 25 ? "text-primary" :
+                        a.total_score >= 20 ? "text-blue-400" :
+                        a.total_score >= 15 ? "text-amber-400" : "text-red-400"
                       )}>
                         {a.total_score != null ? `${a.total_score}/30` : a.scoring_status === "pending" ? "…" : "—"}
                       </span>
@@ -824,19 +828,19 @@ function Applicants() {
                         value={a.status}
                         onChange={(e) => updateStatus.mutate({ id: a.id, s: e.target.value as "new" | "shortlisted" | "rejected" | "hired" })}
                         className={cn(
-                          "rounded-full border px-2.5 py-1 text-xs font-semibold cursor-pointer outline-none appearance-none",
-                          STATUS_STYLES[a.status as keyof typeof STATUS_STYLES] ?? "bg-sand text-muted-foreground border-border",
+                          "rounded-full border px-2.5 py-1 text-xs font-bold cursor-pointer outline-none",
+                          STATUS_STYLES[a.status as keyof typeof STATUS_STYLES] ?? "bg-surface-2 text-muted-foreground border-white/10",
                         )}
                       >
                         {["new", "shortlisted", "hired", "rejected"].map(s => (
-                          <option key={s} value={s}>{STATUS_LABELS[s as keyof typeof STATUS_LABELS]}</option>
+                          <option key={s} value={s} className="bg-surface-1 text-white">{STATUS_LABELS[s as keyof typeof STATUS_LABELS]}</option>
                         ))}
                       </select>
                       {a.outcome_code && (
                         <div className="mt-1">
                           <span className={cn(
                             "inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold border",
-                            getOutcomeDefinition(a.outcome_code)?.badgeStyle || "bg-sand text-ink border-border"
+                            getOutcomeDefinition(a.outcome_code)?.badgeStyle || "bg-surface-2 text-white border-white/10"
                           )}>
                             {getOutcomeDefinition(a.outcome_code)?.shortLabel || a.outcome_code}
                           </span>
@@ -846,25 +850,25 @@ function Applicants() {
                     <td className="px-4 py-3">
                       <span className={cn(
                         "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border",
-                        PIPELINE_STAGES.find((s) => s.key === (a.pipeline_stage || "applied"))?.color || "bg-blue-100 text-blue-700 border-blue-200"
+                        PIPELINE_STAGES.find((s) => s.key === (a.pipeline_stage || "applied"))?.color || "bg-blue-500/15 text-blue-300 border-blue-500/30"
                       )}>
                         {PIPELINE_STAGES.find((s) => s.key === (a.pipeline_stage || "applied"))?.label || "Applied / New"}
                       </span>
                     </td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       {a.interview_date ? (
-                        <div className="space-y-0.5">
-                          <div className="text-xs font-semibold text-ink flex items-center gap-1">
-                            <Calendar className="size-3 text-violet-600 shrink-0" />
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-white flex items-center gap-1">
+                            <Calendar className="size-3 text-primary shrink-0" />
                             <span className="truncate">{a.interview_date}</span>
                           </div>
-                          <div className="text-[11px] font-mono text-muted-foreground">{a.interview_time || "11:30 AM"}</div>
+                          <div className="text-[11px] font-mono text-zinc-400">{a.interview_time || "11:30 AM"}</div>
                           <span className={cn(
-                            "inline-flex items-center gap-1 rounded-full px-2 py-0.2 text-[10px] font-bold border",
-                            a.interview_attendance === "confirmed" ? "bg-emerald-100 text-emerald-800 border-emerald-200" :
-                            a.interview_attendance === "attended" ? "bg-blue-100 text-blue-800 border-blue-200" :
-                            a.interview_attendance === "no_show" ? "bg-red-100 text-red-800 border-red-200" :
-                            "bg-amber-100 text-amber-800 border-amber-200"
+                            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border",
+                            a.interview_attendance === "confirmed" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" :
+                            a.interview_attendance === "attended" ? "bg-primary/15 text-primary border-primary/30" :
+                            a.interview_attendance === "no_show" ? "bg-red-500/15 text-red-400 border-red-500/30" :
+                            "bg-amber-500/15 text-amber-300 border-amber-500/30"
                           )}>
                             {a.interview_attendance === "confirmed" ? "Confirmed ✓" :
                              a.interview_attendance === "attended" ? "Attended" :
@@ -877,7 +881,7 @@ function Applicants() {
                                 href={`/wave/${encodeURIComponent(a.wave_tag)}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-violet-700 hover:text-violet-900 bg-violet-50 hover:bg-violet-100 px-1.5 py-0.5 rounded border border-violet-200 transition-colors"
+                                className="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-violet-300 hover:text-white bg-violet-500/15 hover:bg-violet-500/25 px-1.5 py-0.5 rounded border border-violet-500/30 transition-colors"
                                 title="Open Client HR Wave Portal"
                               >
                                 🏷️ {a.wave_tag} <ArrowUpRight className="size-2.5" />
@@ -887,23 +891,22 @@ function Applicants() {
                         </div>
                       ) : (
                         <Link
-                          to="/admin/applicants/$id"
-                          params={{ id: a.id }}
-                          className="text-xs text-violet-600 font-medium hover:underline inline-flex items-center gap-1"
+                          to="/admin/interviews"
+                          className="text-xs text-primary font-bold hover:underline inline-flex items-center gap-1"
                         >
-                          + Set Wave
+                          + Schedule
                         </Link>
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         {a.cv_path && (
-                          <span title="CV on file" className="grid size-6 place-items-center rounded-md bg-primary/10 text-primary">
+                          <span title="CV on file" className="grid size-6 place-items-center rounded-lg bg-surface-2 border border-white/10 text-primary">
                             <FileText className="size-3.5" />
                           </span>
                         )}
                         {a.voice_notes?.length > 0 && (
-                          <span title={`${a.voice_notes.length} voice note(s)`} className="grid size-6 place-items-center rounded-md bg-violet-100 text-violet-600">
+                          <span title={`${a.voice_notes.length} voice note(s)`} className="grid size-6 place-items-center rounded-lg bg-surface-2 border border-white/10 text-violet-400">
                             <Mic className="size-3.5" />
                           </span>
                         )}
@@ -916,27 +919,27 @@ function Applicants() {
                           target="_blank"
                           rel="noreferrer"
                           title="WhatsApp"
-                          className="grid size-7 place-items-center rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors"
+                          className="grid size-7 place-items-center rounded-lg bg-[#25D366]/15 border border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-colors cursor-pointer"
                         >
                           <MessageCircle className="size-3.5" />
                         </a>
                         <a
                           href={emailLink(a.email, a.full_name, a.offer?.title ?? "the role")}
                           title="Email"
-                          className="grid size-7 place-items-center rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                          className="grid size-7 place-items-center rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-300 hover:bg-blue-500 hover:text-white transition-colors cursor-pointer"
                         >
                           <Mail className="size-3.5" />
                         </a>
                         <a
                           href={`tel:${a.phone}`}
                           title="Call"
-                          className="grid size-7 place-items-center rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                          className="grid size-7 place-items-center rounded-lg bg-primary/15 border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
                         >
                           <Phone className="size-3.5" />
                         </a>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap font-mono">
                       {new Date(a.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}
                     </td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
@@ -944,14 +947,14 @@ function Applicants() {
                         <Link
                           to="/admin/applicants/$id"
                           params={{ id: a.id }}
-                          className="inline-flex items-center gap-1 rounded-lg bg-primary/5 border border-primary/20 px-2.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+                          className="inline-flex items-center gap-1 rounded-xl bg-primary/10 border border-primary/30 px-3 py-1.5 text-xs font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-all cursor-pointer"
                         >
                           Open <ChevronRight className="size-3" />
                         </Link>
                         <button
                           onClick={() => setDeleteConfirm(a.id)}
                           title="Delete applicant"
-                          className="grid size-7 place-items-center rounded-lg border border-red-200 bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 transition-colors"
+                          className="grid size-7 place-items-center rounded-xl border border-red-500/30 bg-red-500/15 text-red-400 hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
                         >
                           <Trash2 className="size-3.5" />
                         </button>

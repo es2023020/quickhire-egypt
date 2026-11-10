@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { CheckCircle2, Loader2, Upload, Info, MessageCircle, Mail, Sparkles, ArrowRight, Gift, Copy, Check, Share2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CheckCircle2, Loader2, Upload, Info, MessageCircle, Mail, Sparkles, ArrowRight, Gift, Copy, Check, Share2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { getOfferBySlug, listOffers } from "@/lib/offers.functions";
 import { submitApplication } from "@/lib/applications.functions";
@@ -111,7 +111,7 @@ function ApplyPage() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [voiceBlobs, setVoiceBlobs] = useState<Record<string, Blob | null>>({});
 
-  // New questions
+  // Questions
   const [workedBefore, setWorkedBefore] = useState("");
   const [hasContract, setHasContract] = useState("");
   const [contactedHR, setContactedHR] = useState("");
@@ -121,24 +121,46 @@ function ApplyPage() {
   const [referralInput, setReferralInput] = useState(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      return params.get("ref") || params.get("referred_by") || "";
+      return (
+        params.get("ref") ||
+        params.get("referred_by") ||
+        localStorage.getItem("qh_pending_ref") ||
+        ""
+      );
     }
     return "";
   });
   const [generatedRefCode, setGeneratedRefCode] = useState<string>("");
   const [copiedLink, setCopiedLink] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlRef = params.get("ref") || params.get("referred_by");
+      if (urlRef) {
+        setReferralInput(urlRef.trim().toUpperCase());
+        localStorage.setItem("qh_pending_ref", urlRef.trim().toUpperCase());
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (referralInput && typeof window !== "undefined") {
+      localStorage.setItem("qh_pending_ref", referralInput.trim().toUpperCase());
+    }
+  }, [referralInput]);
+
   if (!offer) return null;
   if (offer.status === "on_hold") {
     return (
-      <div className="mx-auto max-w-xl px-4 py-16 text-center">
-        <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 shadow-soft">
-          <h2 className="font-display text-2xl font-bold text-amber-900">Applications Paused</h2>
-          <p className="mt-4 text-sm text-amber-800 leading-relaxed">
+      <div className="mx-auto max-w-xl px-6 py-20 text-center bg-background text-foreground">
+        <div className="rounded-3xl border border-amber-500/30 bg-surface-1 p-10 shadow-2xl">
+          <h2 className="font-display text-2xl font-bold text-amber-300">Applications Paused</h2>
+          <p className="mt-4 text-sm text-[#E4E4E7]/90 leading-relaxed font-normal">
             Thank you for your interest! The position for <strong>{offer.title}</strong> at <strong>{offer.company}</strong> is currently on hold. We are not accepting applications at this time.
           </p>
           <div className="mt-6">
-            <Link to="/offers" className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-950 hover:underline">
+            <Link to="/offers" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
               ← Browse other opportunities
             </Link>
           </div>
@@ -153,12 +175,11 @@ function ApplyPage() {
     e.preventDefault();
     if (!offer) return;
     if (!cvFile) return toast.error("Please upload your CV (PDF or DOCX)");
-    // 5MB CV limit
     if (cvFile.size > 5 * 1024 * 1024) {
-      return toast.error("CV file is too large. Maximum size is 5MB. Please compress or re-export your CV.");
+      return toast.error("CV file is too large. Maximum size is 5MB.");
     }
     for (const v of voiceReqs) {
-      if (!voiceBlobs[v.lang]) return toast.error(`Please provide your ${v.lang} voice note (record or upload)`);
+      if (!voiceBlobs[v.lang]) return toast.error(`Please provide your ${v.lang} voice note`);
     }
     setSubmitting(true);
     try {
@@ -180,7 +201,6 @@ function ApplyPage() {
         ...roleAnswers,
       };
 
-      // Submit application to localStorage (metadata only)
       const { id: appId, referral_code } = await submitApplication({
         data: {
           offer_id: offer.id,
@@ -202,8 +222,6 @@ function ApplyPage() {
       });
       if (referral_code) setGeneratedRefCode(referral_code);
 
-      // Save actual file blobs to IndexedDB keyed by appId.
-      // IndexedDB supports gigabytes of data — no localStorage size limit.
       await saveFile(`${appId}-cv`, cvFile);
       for (let i = 0; i < voiceReqs.length; i++) {
         const blob = voiceBlobs[voiceReqs[i].lang]!;
@@ -211,7 +229,7 @@ function ApplyPage() {
       }
 
       setDone(true);
-      toast.success("Application submitted — we'll be in touch!");
+      toast.success("Application submitted successfully!");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -229,244 +247,129 @@ function ApplyPage() {
     );
 
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-4 py-12 text-center">
-        <div className="grid size-20 place-items-center rounded-full bg-success/15 text-success shadow-lift">
+      <div className="mx-auto flex min-h-[75vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center bg-background text-foreground">
+        <div className="grid size-20 place-items-center rounded-full border border-primary/40 bg-primary/10 text-primary shadow-[0_0_20px_rgba(182,255,46,0.35)]">
           <CheckCircle2 className="size-10" />
         </div>
-        <h1 className="mt-6 font-display text-4xl">You're in!</h1>
-        <p className="mt-3 text-muted-foreground leading-relaxed max-w-sm">
-          Your application for <b>{offer.title}</b> is submitted. Our AI is scoring it now —
-          shortlisted candidates hear from HR within <b>24–48 hours</b> on the phone number you provided.
+        <h1 className="mt-8 font-display text-4xl md:text-5xl font-bold text-white tracking-tight">Application Sent</h1>
+        <p className="mt-4 text-base text-[#E4E4E7]/90 leading-relaxed max-w-md font-normal">
+          Your profile for <b>{offer.title}</b> is currently being scored by our AI engine.
+          Shortlisted candidates receive a direct call or WhatsApp from HR within <b>24–48 hours</b>.
         </p>
 
-        <div className="mt-5 w-full rounded-2xl border border-primary/15 bg-primary/5 p-5 text-left">
-          <p className="text-sm font-semibold text-primary mb-3">📲 Confirm your application</p>
-          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-            Tap below to send us a quick confirmation on WhatsApp or email — this guarantees we have your contact details correct.
-          </p>
-          <div className="flex flex-col gap-2.5 sm:flex-row">
-            <a
-              href={`https://wa.me/${QUICKHIRE_WA}?text=${waText}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-soft hover:opacity-90 transition-opacity"
-            >
-              <MessageCircle className="size-4" />
-              Confirm on WhatsApp
-            </a>
-            <a
-              href={`mailto:${QUICKHIRE_EMAIL}?subject=${mailSubject}&body=${mailBody}`}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-sand transition-colors"
-            >
-              <Mail className="size-4" />
-              Confirm by Email
-            </a>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-xl bg-amber-50 border border-amber-100 px-4 py-2.5 text-xs text-amber-700 text-left w-full">
-          📱 Keep WhatsApp open on <b>{phone || "the number you provided"}</b> — HR will reach out within 24–48 hrs.
-        </div>
-
-        {/* Viral Ambassador & Foreign Language Referral Program */}
-        <div className="mt-5 w-full rounded-2xl border border-violet-300 bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 p-5 text-left shadow-soft">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 px-3 py-1 text-xs font-bold text-white shadow-soft">
-              <Gift className="size-3.5" /> QuickHire Ambassador Program
-            </div>
-            <span className="text-[11px] font-bold text-violet-800 bg-violet-100 px-2.5 py-0.5 rounded-full border border-violet-200">
-              Up to 3,500 EGP / Hire 💰
-            </span>
-          </div>
-
-          <h3 className="font-display text-lg font-bold text-ink">
-            رشح صحابك واكسب كاش على فودافون كاش أو إنستاباي!
-          </h3>
-          <p className="text-xs text-muted-foreground mt-1 mb-3 leading-relaxed">
-            عندك معارف بيتكلموا لغات (ألماني، فرنساوي، إيطالي، هولندي) أو إنجليزي فلوينت؟ شارك كودك واكسب مكافأة فورية أول ما يتعينوا:
-          </p>
-
-          {/* Bounty Rates */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
-            {LANGUAGE_BOUNTIES.slice(0, 4).map((b) => (
-              <div key={b.language} className="rounded-xl border border-violet-200 bg-white/90 p-2.5 text-center shadow-xs">
-                <div className="text-base">{b.flag}</div>
-                <div className="text-xs font-bold text-ink truncate">{b.language}</div>
-                <div className="text-xs font-extrabold text-violet-700 mt-0.5">+{b.bountyEgp.toLocaleString()} EGP</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5 font-mono">{b.avgSalaryText.split("–")[0]}</div>
-              </div>
-            ))}
-            <div className="rounded-xl border border-violet-200 bg-white/90 p-2.5 text-center col-span-2 sm:col-span-1 shadow-xs">
-              <div className="text-base">🇬🇧</div>
-              <div className="text-xs font-bold text-ink">English C1 / Sales</div>
-              <div className="text-xs font-extrabold text-violet-700 mt-0.5">+1,000 EGP</div>
-              <div className="text-[10px] text-muted-foreground mt-0.5 font-mono">16k – 26k</div>
-            </div>
-          </div>
-
-          {/* Referral Link & Actions */}
-          <div className="rounded-xl border border-violet-200 bg-white p-3 space-y-2.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground font-medium">Your Ambassador Code:</span>
-              <span className="font-mono font-bold text-violet-700 bg-violet-100 px-2 py-0.5 rounded">
-                {generatedRefCode || "QUICKHIRE"}
-              </span>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2 pt-1">
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(
-                  buildCandidateReferralShareMessage({
-                    referrerName: fullName,
-                    code: generatedRefCode || "QUICKHIRE",
-                    offerTitle: offer.title,
-                    company: offer.company,
-                    shareUrl: buildCandidateShareUrl(generatedRefCode || "QUICKHIRE", offer.slug),
-                  })
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white shadow-soft hover:opacity-95 transition-opacity"
-              >
-                <Share2 className="size-3.5" /> Share on WhatsApp
-              </a>
-
-              <button
-                type="button"
-                onClick={() => {
-                  const url = buildCandidateShareUrl(generatedRefCode || "QUICKHIRE", offer.slug);
-                  navigator.clipboard.writeText(url);
-                  setCopiedLink(true);
-                  toast.success("Referral link copied to clipboard!");
-                  setTimeout(() => setCopiedLink(false), 2500);
-                }}
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-violet-300 bg-violet-50 px-4 py-2.5 text-xs font-semibold text-violet-700 hover:bg-violet-100 transition-colors"
-              >
-                {copiedLink ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
-                {copiedLink ? "Link Copied!" : "Copy Link"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Smart Account Pooling Recommendations */}
-        {allOffersQuery.data && (
-          <div className="mt-5 w-full rounded-2xl border border-indigo-200/80 bg-indigo-50/50 p-4 text-left">
-            <div className="flex items-center gap-1.5 mb-1.5 text-xs font-bold text-indigo-900">
-              <Sparkles className="size-3.5 text-indigo-600" />
-              <span>Matching Waves Starting This Week</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
-              Based on your language level & location, our matching system also identified these open waves:
+        <div className="mt-8 w-full rounded-2xl border border-white/10 bg-surface-1 p-6 text-left shadow-xl space-y-4">
+          <div>
+            <p className="text-sm font-bold text-white">Confirm Your Contact Number</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Send a quick ping on WhatsApp to verify we have your correct contact:
             </p>
-            <div className="space-y-2">
-              {allOffersQuery.data
-                .filter((o) => o.id !== offer.id && o.status !== "on_hold")
-                .slice(0, 2)
-                .map((alt) => (
-                  <Link
-                    key={alt.id}
-                    to="/offers/$slug"
-                    params={{ slug: alt.slug }}
-                    className="flex items-center justify-between rounded-xl border border-border/80 bg-white p-3 hover:border-indigo-300 transition-all group"
-                  >
-                    <div>
-                      <div className="text-xs font-semibold text-ink group-hover:text-primary transition-colors">
-                        {alt.title}
-                      </div>
-                      <div className="text-[11px] text-muted-foreground mt-0.5">
-                        {alt.salary_text} · {alt.location}
-                      </div>
-                    </div>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary shrink-0">
-                      View <ArrowRight className="size-3" />
-                    </span>
-                  </Link>
-                ))}
-            </div>
           </div>
-        )}
+          <a
+            href={`https://wa.me/${QUICKHIRE_WA}?text=${waText}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_0_15px_rgba(182,255,46,0.35)] hover:shadow-[0_0_22px_rgba(182,255,46,0.6)] hover:bg-[#c2ff47] transition-all"
+          >
+            <MessageCircle className="size-4" /> Confirm on WhatsApp
+          </a>
+        </div>
 
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             to="/track"
             search={{ phone }}
-            className="rounded-xl border border-primary/30 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/15 transition-colors shadow-soft"
+            className="rounded-xl border border-primary/40 bg-primary/10 px-6 py-3 text-sm font-bold text-primary hover:bg-primary/20 transition-all shadow-sm"
           >
-            Track Application Live
+            Track Status Live
           </Link>
-          <Link to="/offers" className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft">Browse more jobs</Link>
-          <Link to="/prep" className="rounded-xl border border-border px-5 py-2.5 text-sm font-medium hover:bg-sand">Interview prep</Link>
+          <Link
+            to="/offers"
+            className="rounded-xl border border-white/10 bg-surface-2 px-6 py-3 text-sm font-semibold text-white hover:bg-surface-3 transition-colors"
+          >
+            Browse More Jobs
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 md:px-6 md:py-14">
+    <div className="mx-auto max-w-3xl px-6 py-12 md:px-8 md:py-16 space-y-10 bg-background text-foreground">
       {/* Header */}
-      <div className="mb-8">
-        <Link to="/offers/$slug" params={{ slug }} className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+      <div className="space-y-4">
+        <Link
+          to="/offers/$slug"
+          params={{ slug }}
+          className="text-sm font-medium text-muted-foreground hover:text-white inline-flex items-center gap-1.5 transition-colors"
+        >
           ← Back to job listing
         </Link>
-        <h1 className="mt-4 font-display text-3xl md:text-4xl">Apply · {offer.title}</h1>
-        <div className="mt-1 text-muted-foreground">{offer.company} · {offer.location}</div>
-        <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/15 px-3 py-2 text-sm text-primary">
-          <Info className="size-4" />
-          Takes about 5 minutes. Your details stay private until you're shortlisted.
+        <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-white">
+          Apply · {offer.title}
+        </h1>
+        <div className="text-base text-muted-foreground">
+          {offer.company} · {offer.location}
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-surface-1 px-4 py-2.5 text-xs text-zinc-300">
+          <ShieldCheck className="size-4 text-primary shrink-0" />
+          <span>Takes ~5 minutes. Your personal details stay strictly confidential until shortlisted.</span>
         </div>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-6">
+      <form onSubmit={onSubmit} className="space-y-8">
         {/* Personal Details */}
-        <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-          <h2 className="font-display text-xl mb-4">Your details</h2>
-          <div className="grid gap-4 md:grid-cols-2">
+        <section className="rounded-2xl border border-white/[0.08] bg-surface-1 p-7 md:p-8 shadow-xl shadow-black/40 space-y-6">
+          <h2 className="font-display text-2xl font-bold text-white">Your Contact Profile</h2>
+          <div className="grid gap-5 md:grid-cols-2">
             <Field label="Full name" required value={fullName} onChange={setFullName} placeholder="Mohamed Ahmed" />
             <Field label="Email address" type="email" required value={email} onChange={setEmail} placeholder="you@example.com" />
-            <Field label="WhatsApp number" required value={phone} onChange={setPhone} placeholder="+20 10 0000 0000" />
+            <Field label="WhatsApp phone number" required value={phone} onChange={setPhone} placeholder="+20 10 0000 0000" />
             <Field label="Age" type="number" value={age} onChange={setAge} placeholder="e.g. 24" />
-            <Field label="City" value={location} onChange={setLocation} placeholder="Cairo, Alexandria, Giza…" />
+            <Field label="City / Area" value={location} onChange={setLocation} placeholder="Cairo, Maadi, Giza…" />
             <Select label="Graduation status" value={gradStatus} onChange={setGradStatus}
-              options={["", "grad", "undergrad", "dropout"]} />
+              options={["", "Graduate", "Undergraduate", "Dropout"]} />
             <Select label="English level" value={englishLevel} onChange={setEnglishLevel}
-              options={["", "A1 – Beginner", "A2 – Elementary", "B1 – Intermediate", "B2 – Upper Intermediate", "C1 – Advanced", "C2 – Proficient / Native"]} />
-            <Field label="Years of experience" type="number" value={experience} onChange={setExperience} placeholder="0" />
-            <Field label="Salary expectation (EGP/month)" value={salaryExp} onChange={setSalaryExp} placeholder="e.g. 12000" className="md:col-span-2" />
+              options={["", "B1 – Intermediate", "B2 – Upper Intermediate", "C1 – Advanced", "C2 – Fluent / Native"]} />
+            <Field label="Years of relevant experience" type="number" value={experience} onChange={setExperience} placeholder="0" />
+            <Field label="Expected monthly salary (EGP)" value={salaryExp} onChange={setSalaryExp} placeholder="e.g. 15000" className="md:col-span-2" />
           </div>
         </section>
 
         {/* Company-specific questions */}
-        <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-          <h2 className="font-display text-xl mb-1">A few quick questions</h2>
-          <p className="text-sm text-muted-foreground mb-5">Please answer honestly — this helps us match you accurately.</p>
+        <section className="rounded-2xl border border-white/[0.08] bg-surface-1 p-7 md:p-8 shadow-xl shadow-black/40 space-y-5">
+          <div>
+            <h2 className="font-display text-2xl font-bold text-white">Pre-Screening Questions</h2>
+            <p className="text-xs text-muted-foreground mt-1">Please answer accurately to fast-track hiring review.</p>
+          </div>
           <div className="space-y-4">
             <Select
-              label={`Have you worked at ${offer.company} before?`}
+              label={`Have you worked at ${offer.company} previously?`}
               value={workedBefore}
               onChange={setWorkedBefore}
-              options={["", "Yes – full time", "Yes – part time / freelance", "No"]}
+              options={["", "Yes – full time employee", "Yes – contractor / intern", "No"]}
             />
             <Select
-              label="Do you currently have a contract or are you in a notice period?"
+              label="What is your current notice period / contract status?"
               value={hasContract}
               onChange={setHasContract}
-              options={["", "Yes – I have an active contract", "I'm in my notice period", "No – I'm currently free to join", "I was recently made redundant"]}
+              options={["", "Immediately available (0 notice)", "1-2 weeks notice period", "1 month notice period", "Active contract"]}
             />
             <Select
-              label={`Have you previously contacted any HR at ${offer.company}?`}
+              label={`Have you been interviewed by ${offer.company} in the last 6 months?`}
               value={contactedHR}
               onChange={setContactedHR}
-              options={["", "Yes – they reached out to me", "Yes – I reached out to them", "No"]}
+              options={["", "Yes – within last 3 months", "Yes – 3 to 6 months ago", "No"]}
             />
           </div>
         </section>
 
         {/* Role-specific questions */}
         {roleQuestions.length > 0 && (
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-            <h2 className="font-display text-xl mb-1">Role-specific questions</h2>
-            <p className="text-sm text-muted-foreground mb-5">These help us assess your fit for <b>{offer.category}</b> roles.</p>
+          <section className="rounded-2xl border border-white/[0.08] bg-surface-1 p-7 md:p-8 shadow-xl shadow-black/40 space-y-5">
+            <div>
+              <h2 className="font-display text-2xl font-bold text-white">Role-Specific Benchmarks</h2>
+              <p className="text-xs text-muted-foreground mt-1">Specific criteria for <b>{offer.category}</b> roles.</p>
+            </div>
             <div className="space-y-4">
               {roleQuestions.map((q) => (
                 <div key={q.label}>
@@ -492,27 +395,29 @@ function ApplyPage() {
         )}
 
         {/* CV Upload */}
-        <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-          <h2 className="font-display text-xl mb-1">Upload your CV</h2>
-          <p className="mt-1 text-sm text-muted-foreground mb-4">PDF or DOCX, up to 10MB. Your CV stays private until you're shortlisted.</p>
-          <label className="flex cursor-pointer items-center gap-4 rounded-xl border-2 border-dashed border-border bg-sand p-5 hover:border-primary transition-colors group">
-            <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary/15">
-              <Upload className="size-5" />
+        <section className="rounded-2xl border border-white/[0.08] bg-surface-1 p-7 md:p-8 shadow-xl shadow-black/40 space-y-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold text-white">Upload Your CV</h2>
+            <p className="text-xs text-muted-foreground mt-1">PDF or DOCX format, up to 5MB.</p>
+          </div>
+          <label className="flex cursor-pointer items-center gap-5 rounded-2xl border-2 border-dashed border-white/15 bg-surface-2 p-6 hover:border-primary/60 hover:bg-surface-3 transition-colors group">
+            <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+              <Upload className="size-6" />
             </div>
             <div className="flex-1 min-w-0">
               {cvFile ? (
                 <div>
-                  <div className="font-semibold text-sm text-ink truncate">{cvFile.name}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{(cvFile.size / 1024 / 1024).toFixed(1)} MB · Click to change</div>
+                  <div className="font-bold text-sm text-white truncate">{cvFile.name}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{(cvFile.size / 1024 / 1024).toFixed(1)} MB · Tap to replace</div>
                 </div>
               ) : (
                 <div>
-                  <div className="font-semibold text-sm text-primary">Choose file or drag &amp; drop</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">PDF, DOC, DOCX — max 5MB</div>
+                  <div className="font-bold text-sm text-primary">Choose CV file or drag here</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">PDF or Word document (max 5MB)</div>
                 </div>
               )}
             </div>
-            {cvFile && <CheckCircle2 className="size-5 text-success shrink-0" />}
+            {cvFile && <CheckCircle2 className="size-6 text-primary shrink-0" />}
             <input
               type="file"
               accept=".pdf,.doc,.docx"
@@ -535,9 +440,9 @@ function ApplyPage() {
         {voiceReqs.length > 0 && (
           <section className="space-y-4">
             <div>
-              <h2 className="font-display text-xl">Voice notes</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Record live or upload an existing audio file. This is what HR will hear — speak clearly and naturally.
+              <h2 className="font-display text-2xl font-bold text-white">AI Voice Assessment</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Record directly or upload audio. Our AI evaluates pronunciation, confidence and tone.
               </p>
             </div>
             {voiceReqs.map((v) => (
@@ -553,36 +458,43 @@ function ApplyPage() {
         )}
 
         {/* Optional Referral Code */}
-        <section className="rounded-2xl border border-violet-200/80 bg-violet-50/40 p-5 shadow-soft">
-          <div className="flex items-center gap-2 mb-1.5 text-ink font-semibold text-sm">
-            <Gift className="size-4 text-violet-600" />
-            <span>Have a friend's referral code? (Optional)</span>
+        <section className="rounded-2xl border border-white/10 bg-surface-2 p-6 shadow-xl space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-white font-bold text-sm">
+              <Gift className="size-4 text-primary" />
+              <span>Referral Ambassador Code (Optional)</span>
+            </div>
+            {referralInput && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[11px] font-mono font-bold text-primary">
+                <Check className="size-3" /> Active: {referralInput}
+              </span>
+            )}
           </div>
-          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-            If a friend or ambassador referred you, enter their code here so they get credited their referral reward when you are hired.
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            If an existing employee, student, or ambassador referred you, enter their unique code so their bounty is credited upon your placement.
           </p>
           <input
             type="text"
             value={referralInput}
             onChange={(e) => setReferralInput(e.target.value.toUpperCase())}
-            placeholder="e.g. REF-AHMED-1234"
-            className="w-full rounded-xl border border-border bg-white px-4 py-2.5 text-sm uppercase tracking-wider font-mono outline-none focus:ring-2 focus:ring-violet-400"
+            placeholder="e.g. REF-OMAR-4783"
+            className="w-full rounded-xl border border-white/10 bg-surface-1 px-4 py-3 text-sm text-white uppercase tracking-wider font-mono outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 transition-all"
           />
         </section>
 
-        {/* Submit */}
-        <div className="space-y-3">
+        {/* Submit (1 Primary Lime Action) */}
+        <div className="space-y-4 pt-2">
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-bold text-primary-foreground shadow-lift hover:opacity-90 disabled:opacity-60 transition-opacity"
+            className="group inline-flex w-full items-center justify-center gap-3 rounded-xl bg-primary px-8 py-4.5 text-base font-bold text-primary-foreground shadow-[0_0_15px_rgba(182,255,46,0.35)] hover:shadow-[0_0_25px_rgba(182,255,46,0.65)] hover:bg-[#c2ff47] active:scale-[0.98] disabled:opacity-60 transition-all duration-200 cursor-pointer"
           >
-            {submitting && <Loader2 className="size-4 animate-spin" />}
-            {submitting ? "Submitting your application…" : "Submit application"}
+            {submitting && <Loader2 className="size-5 animate-spin" />}
+            <span>{submitting ? "Submitting Application & Uploading Audio…" : "Submit Application Now"}</span>
+            {!submitting && <ArrowRight className="size-4.5 transition-transform duration-200 group-hover:translate-x-1" />}
           </button>
           <p className="text-center text-xs text-muted-foreground">
-            By submitting you agree to your data being processed for recruitment purposes only.
-            Your information stays private until you're shortlisted.
+            QuickHire is 100% free for candidates. Your information is processed under strict privacy guidelines.
           </p>
         </div>
       </form>
@@ -602,9 +514,9 @@ function Field({
   className?: string;
 }) {
   return (
-    <label className={`block ${className}`}>
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        {label}{required && <span className="ml-0.5 text-destructive">*</span>}
+    <label className={`block space-y-2 ${className}`}>
+      <span className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
+        {label}{required && <span className="ml-1 text-primary">*</span>}
       </span>
       <input
         type={type}
@@ -612,7 +524,7 @@ function Field({
         required={required}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring transition-shadow"
+        className="w-full rounded-xl border border-white/10 bg-surface-2 px-4 py-3 text-sm text-white placeholder:text-muted-foreground outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 focus:shadow-[0_0_12px_rgba(182,255,46,0.2)] transition-all"
       />
     </label>
   );
@@ -622,14 +534,18 @@ function Select({
   label, value, onChange, options,
 }: { label: string; value: string; onChange: (v: string) => void; options: string[] }) {
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+    <label className="block space-y-2">
+      <span className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring transition-shadow"
+        className="w-full rounded-xl border border-white/10 bg-surface-2 px-4 py-3 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 transition-all"
       >
-        {options.map((o) => <option key={o} value={o}>{o || "— Select —"}</option>)}
+        {options.map((o) => (
+          <option key={o} value={o} className="bg-surface-1 text-white">
+            {o || "— Please Select —"}
+          </option>
+        ))}
       </select>
     </label>
   );

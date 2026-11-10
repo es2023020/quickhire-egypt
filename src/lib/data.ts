@@ -90,7 +90,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
       { stage: "offer_extended", changed_by: "Concentrix HR - Mona Tarek", role: "client_hr", comment: "Offered 16k gross + commission package", timestamp: daysAgo(1) },
       { stage: "accepted", changed_by: "QuickHire Admin", role: "admin", comment: "Candidate signed formal offer letter", timestamp: daysAgo(0) },
     ],
-    referral_code: "REF-MOH-941", referred_by: "AMB-KARIM-88",
+    referral_code: "REF-MOH-941", referred_by: "REF-OMAR-4783",
   },
   {
     id: "app-002", offer_id: "o2", full_name: "Sara Hassan", email: "sara.hassan@hotmail.com", phone: "01098765432",
@@ -110,7 +110,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
       { stage: "applied", changed_by: "System", role: "admin", comment: null, timestamp: daysAgo(3) },
       { stage: "interview_scheduled", changed_by: "QuickHire Admin", role: "admin", comment: "Scheduled for Wave 1 Sutherland", timestamp: daysAgo(1) },
     ],
-    referral_code: "REF-SAR-102", referred_by: "AMB-YOUSSEF-14",
+    referral_code: "REF-SAR-102", referred_by: "REF-SARAH-3322",
   },
   {
     id: "app-003", offer_id: "o1", full_name: "Omar Ibrahim", email: "omar.ibr@yahoo.com", phone: "01155544433",
@@ -163,7 +163,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     ai_notes: "Very good German fluency, clear articulation. Strong customer service background. Recommended shortlist.", answers: { worked_before_at_company: "No", has_contract_or_resigned: "No – I'm currently free to join", contacted_hr_before: "No" },
     status: "hired", admin_notes: "Accepted offer. German Tier 1 placement.", scoring_status: "done", created_at: daysAgo(5),
     outcome_code: "passed_offer", outcome_notes: "Passed German native assessor test with C1 rating.",
-    referral_code: "REF-MAR-771", referred_by: "AMB-OMAR-21",
+    referral_code: "REF-MAR-771", referred_by: "REF-OMAR-4783",
   },
   {
     id: "app-007", offer_id: "o7", full_name: "Karim Mostafa", email: "karim.m@outlook.com", phone: "01234567890",
@@ -187,7 +187,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     interview_date: "2026-07-28", interview_time: "12:00 PM", interview_site: "Concentrix — Smart Village Building B12",
     interview_address: "KM 28 Cairo-Alex Desert Road, Smart Village",
     interview_attendance: "confirmed", wave_tag: "Wave-3-Concentrix", outcome_code: null,
-    referral_code: "REF-RAN-552",
+    referral_code: "REF-RAN-552", referred_by: "REF-OMAR-4783",
   },
   {
     id: "app-009", offer_id: "o2", full_name: "Hassan Farouk", email: "hassan.farouk@gmail.com", phone: "01556677889",
@@ -202,7 +202,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     ai_notes: "Near-native French. Outstanding communication scores. Top 1% of candidates reviewed. Immediate hire recommended.", answers: { worked_before_at_company: "Yes – full time", has_contract_or_resigned: "I'm in my notice period", contacted_hr_before: "Yes – they reached out to me" },
     status: "hired", admin_notes: "Star candidate. Hired. Start date 15 July.", scoring_status: "done", created_at: daysAgo(12),
     outcome_code: "passed_offer", outcome_notes: "Accepted offer. French Tier 1 Customer Care.",
-    referral_code: "REF-HAS-442", referred_by: "AMB-KARIM-88",
+    referral_code: "REF-HAS-442", referred_by: "REF-SARAH-3322",
   },
   {
     id: "app-010", offer_id: "o8", full_name: "Dina Walid", email: "dina.w@gmail.com", phone: "01099887766",

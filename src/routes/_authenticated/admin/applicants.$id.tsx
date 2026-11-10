@@ -607,7 +607,7 @@ function ApplicantDetail() {
   const referralRequestWaMsg = decodeURIComponent(adminReferralWaUrl.split("text=")[1] || "");
 
   return (
-    <div id="printable-candidate-profile" className="p-4 md:p-6 lg:p-8 max-w-6xl space-y-5">
+    <div id="printable-candidate-profile" className="p-4 md:p-6 lg:p-8 max-w-6xl space-y-5 bg-background text-foreground">
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (

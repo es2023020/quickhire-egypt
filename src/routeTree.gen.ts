@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as PrepRouteImport } from './routes/prep'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -40,6 +41,11 @@ const TrackRoute = TrackRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralsRoute = ReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrepRoute = PrepRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
+  '/referrals': typeof ReferralsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
+  '/referrals': typeof ReferralsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/c/$id': typeof CIdRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
+  '/referrals': typeof ReferralsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/how-it-works'
     | '/prep'
+    | '/referrals'
     | '/sitemap.xml'
     | '/track'
     | '/admin'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/how-it-works'
     | '/prep'
+    | '/referrals'
     | '/sitemap.xml'
     | '/track'
     | '/c/$id'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/how-it-works'
     | '/prep'
+    | '/referrals'
     | '/sitemap.xml'
     | '/track'
     | '/_authenticated/admin'
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   HowItWorksRoute: typeof HowItWorksRoute
   PrepRoute: typeof PrepRoute
+  ReferralsRoute: typeof ReferralsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrackRoute: typeof TrackRoute
   CIdRoute: typeof CIdRoute
@@ -319,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referrals': {
+      id: '/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof ReferralsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prep': {
@@ -525,6 +545,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   HowItWorksRoute: HowItWorksRoute,
   PrepRoute: PrepRoute,
+  ReferralsRoute: ReferralsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrackRoute: TrackRoute,
   CIdRoute: CIdRoute,

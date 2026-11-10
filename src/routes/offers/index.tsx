@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { 
   Search, Sparkles, HelpCircle, Compass, RefreshCw, 
   Check, ArrowRight, X, Star, MapPin, Briefcase, Languages
@@ -45,6 +45,17 @@ const INITIAL_ANSWERS: QuizAnswers = {
 
 function OffersPage() {
   const { data: offers } = useSuspenseQuery(offersQO);
+
+  // Capture and persist referral code from URL if present
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref") || params.get("referred_by");
+      if (ref) {
+        localStorage.setItem("qh_pending_ref", ref.trim().toUpperCase());
+      }
+    }
+  }, []);
   
   // Search and normal filters
   const [q, setQ] = useState("");
@@ -75,9 +86,9 @@ function OffersPage() {
       if (o.language && o.language.toLowerCase() === answers.language.toLowerCase()) {
         score += 35;
       } else if (answers.language === "Arabic" && !o.language) {
-        score += 20; // Arabic matches general Egyptian roles
+        score += 20;
       } else if (o.language === "English") {
-        score += 15; // English is a secondary match for most
+        score += 15;
       }
 
       // 2. Field Match (Weight: 30 points)
@@ -85,7 +96,7 @@ function OffersPage() {
           answers.category.toLowerCase().includes(o.category.toLowerCase())) {
         score += 30;
       } else if (o.category === "Customer Service") {
-        score += 15; // general customer service is a safe fallback
+        score += 15;
       }
 
       // 3. Location Match (Weight: 20 points)
@@ -97,55 +108,49 @@ function OffersPage() {
         if (jobLoc.includes(userLoc) || userLoc.includes(jobLoc)) {
           score += 20;
         } else if (jobLoc.includes("remote") || jobLoc.includes("work from home")) {
-          score += 15; // remote is a good secondary match
-        } else {
-          score -= 10;
+          score += 15;
         }
       }
 
       // 4. Experience Match (Weight: 15 points)
-      const reqText = (o.requirements ?? []).join(" ").toLowerCase();
-      const descText = o.description.toLowerCase();
-      const hasExperienceReq = reqText.includes("experience") || reqText.includes("exp") || descText.includes("experience");
-
       if (answers.experience === "freshman") {
-        if (!hasExperienceReq) score += 15;
-        else score -= 5;
+        if (o.salary_text.toLowerCase().includes("fresh") || o.summary.toLowerCase().includes("entry")) {
+          score += 15;
+        } else {
+          score += 10;
+        }
       } else if (answers.experience === "mid") {
-        score += 15; // fits most roles
+        score += 15;
       } else if (answers.experience === "senior") {
-        if (hasExperienceReq || descText.includes("senior") || descText.includes("lead")) {
+        if (o.title.toLowerCase().includes("senior") || o.title.toLowerCase().includes("lead")) {
           score += 15;
         } else {
           score += 10;
         }
       }
 
-      // Clamp score
-      scores[o.id] = Math.min(100, Math.max(30, score));
+      scores[o.id] = Math.min(score, 98);
     });
 
     setMatchScores(scores);
     setQuizOpen(false);
-    setQuizStep(1);
-    toast.success("Matching complete! Here are your personalized recommendations.");
+    toast.success("Job Matcher Complete!", {
+      description: `Ranked ${offers.length} openings according to your profile.`
+    });
   }
 
   function clearMatches() {
     setMatchScores(null);
     setQuizAnswers(INITIAL_ANSWERS);
+    setQuizStep(1);
+    toast.info("Matcher cleared", { description: "Viewing all standard job openings." });
   }
 
-  // Filter & sort rows
+  // Filtered list
   const filtered = useMemo(() => {
     let list = [...offers];
 
-    // Filter by match matcher scores if active
-    if (matchScores) {
-      list = list.filter(o => (matchScores[o.id] ?? 0) >= 60); // only show >60% match
-    }
-
-    // Standard Category & Language filters
+    // Filter by cat & lang only if Matcher isn't active
     if (cat !== "all" && !matchScores) {
       list = list.filter(o => o.category === cat);
     }
@@ -170,49 +175,50 @@ function OffersPage() {
   }, [offers, cat, lang, q, matchScores]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-12 space-y-8">
+    <div className="mx-auto max-w-7xl px-6 py-12 md:px-8 md:py-16 space-y-12 bg-background text-foreground">
       
-      {/* ── STUNNING HERO SECTION ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-br from-primary/5 via-violet-50/20 to-card p-6 md:p-10 shadow-soft">
-        <div className="absolute right-0 top-0 -mr-20 -mt-20 size-80 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute left-1/3 bottom-0 -ml-20 -mb-20 size-80 rounded-full bg-violet-300/10 blur-3xl" />
+      {/* ── STUNNING HERO SECTION (Midnight Depth + Ambient Glow) ── */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-surface-1 p-8 md:p-12 shadow-2xl shadow-black/80">
+        <div className="absolute right-0 top-0 size-96 rounded-full bg-primary/[0.06] blur-[100px] pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
         
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-4 max-w-xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold tracking-wide text-primary">
-              <Sparkles className="size-3.5" /> Egypt's Smartest Job Board
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="space-y-4 max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-bold tracking-wide uppercase text-primary">
+              <Sparkles className="size-3.5" /> Direct Egyptian Hiring Pool
             </span>
-            <h1 className="font-display text-3xl md:text-5xl leading-tight text-ink">
-              Find your next job in seconds
+            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
+              Explore Live Roles &amp; Opportunities
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Explore {offers.length} pre-qualified jobs with transparent salaries. Apply securely with one click using your CV and a voice note.
+            <p className="text-base text-[#E4E4E7]/90 leading-relaxed font-normal">
+              Browse {offers.length} verified listings with transparent compensation. Apply in 5 minutes with your CV and a 60-second voice note.
             </p>
           </div>
 
           {/* AI Matcher Banner Card */}
-          <div className="w-full md:max-w-xs shrink-0 rounded-2xl border border-violet-100 bg-white p-5 shadow-soft hover:shadow-lift transition-all">
-            <div className="flex items-center gap-2">
-              <div className="grid size-9 place-items-center rounded-xl bg-violet-100 text-violet-700">
+          <div className="w-full md:max-w-xs shrink-0 rounded-2xl border border-white/10 bg-surface-2 p-6 shadow-xl shadow-black/40">
+            <div className="flex items-center gap-3">
+              <div className="grid size-10 place-items-center rounded-xl border border-white/10 bg-surface-3 text-primary">
                 <Compass className="size-5" />
               </div>
               <div>
-                <h3 className="font-display font-semibold text-ink text-sm">Not sure what to apply in?</h3>
-                <p className="text-[10px] text-muted-foreground">Find matching positions in 30 seconds</p>
+                <h3 className="font-display font-bold text-white text-base">Unsure where to start?</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">30-second skill match quiz</p>
               </div>
             </div>
             
-            <div className="mt-4 space-y-2">
+            <div className="mt-5 space-y-2.5">
               <button
                 onClick={() => setQuizOpen(true)}
-                className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-soft hover:opacity-95 transition-opacity"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-xs font-bold text-primary-foreground shadow-[0_0_12px_rgba(182,255,46,0.3)] hover:shadow-[0_0_20px_rgba(182,255,46,0.6)] hover:bg-[#c2ff47] active:scale-[0.98] transition-all duration-200 cursor-pointer"
               >
-                Start Matcher Quiz <ArrowRight className="size-3.5" />
+                <span>Take Matcher Quiz</span>
+                <ArrowRight className="size-3.5" />
               </button>
               {matchScores && (
                 <button
                   onClick={clearMatches}
-                  className="w-full inline-flex items-center justify-center gap-1 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-medium text-muted-foreground hover:bg-sand transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-surface-1 px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:text-white hover:bg-surface-3 transition-colors cursor-pointer"
                 >
                   <RefreshCw className="size-3" /> Clear Matches ({Object.keys(matchScores).length})
                 </button>
@@ -224,42 +230,44 @@ function OffersPage() {
 
       {/* ── MATCH FINDER STEPS DIALOG MODAL ── */}
       {quizOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="relative w-full max-w-lg rounded-3xl border border-white/15 bg-surface-1 p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={() => { setQuizOpen(false); setQuizStep(1); }}
-              className="absolute right-4 top-4 grid size-8 place-items-center rounded-full bg-sand hover:bg-sand-deep text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-5 top-5 grid size-9 place-items-center rounded-full border border-white/10 bg-surface-2 text-muted-foreground hover:text-white hover:bg-surface-3 transition-colors cursor-pointer"
             >
               <X className="size-4" />
             </button>
 
             {/* Stepper Header */}
             <div className="mb-6">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-violet-600">
-                <Compass className="size-4 animate-spin-slow" /> Job Matcher Quiz
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+                <Compass className="size-4 animate-spin-slow" /> Matcher Step {quizStep} of 4
               </div>
-              <div className="mt-2 flex gap-1 h-1.5 w-full bg-sand rounded-full overflow-hidden">
+              <div className="mt-3 flex gap-1.5 h-1.5 w-full bg-surface-3 rounded-full overflow-hidden">
                 {[1, 2, 3, 4].map(s => (
-                  <div key={s} className={cn("flex-1 h-full rounded-full transition-all duration-300", s <= quizStep ? "bg-violet-600" : "bg-border")} />
+                  <div key={s} className={cn("flex-1 h-full rounded-full transition-all duration-300", s <= quizStep ? "bg-primary shadow-[0_0_8px_rgba(182,255,46,0.5)]" : "bg-white/10")} />
                 ))}
               </div>
             </div>
 
             {/* Step 1: Language */}
             {quizStep === 1 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <h3 className="font-display text-lg font-bold text-ink">What is your primary work language?</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">We will show jobs requiring this language.</p>
+                  <h3 className="font-display text-xl font-bold text-white">What is your primary work language?</h3>
+                  <p className="text-xs text-muted-foreground mt-1">We match roles according to language proficiency.</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   {["English", "German", "French", "Italian", "Spanish", "Dutch", "Portuguese", "Russian", "Arabic"].map(l => (
                     <button
                       key={l}
                       onClick={() => { setQuizAnswers(p => ({ ...p, language: l })); setQuizStep(2); }}
                       className={cn(
-                        "rounded-xl border p-3 text-left text-sm font-semibold transition-all hover:bg-violet-50 hover:border-violet-300",
-                        quizAnswers.language === l ? "border-violet-600 bg-violet-50/50 text-violet-700" : "border-border"
+                        "rounded-xl border p-3.5 text-left text-sm font-semibold transition-all cursor-pointer",
+                        quizAnswers.language === l
+                          ? "border-primary bg-primary/10 text-primary shadow-[0_0_12px_rgba(182,255,46,0.2)]"
+                          : "border-white/10 bg-surface-2 text-zinc-200 hover:border-white/25 hover:bg-surface-3 hover:text-white"
                       )}
                     >
                       {l}
@@ -271,78 +279,82 @@ function OffersPage() {
 
             {/* Step 2: Field */}
             {quizStep === 2 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <h3 className="font-display text-lg font-bold text-ink">Which field interests you most?</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">Select a role type you enjoy.</p>
+                  <h3 className="font-display text-xl font-bold text-white">Which career track interests you most?</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Select the operational role you thrive in.</p>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {[
-                    { val: "Customer Service", title: "📞 Customer Service", desc: "Resolving customer queries, handling accounts, chat & calls." },
-                    { val: "Sales", title: "🎯 Sales & Telesales", desc: "Hitting targets, outperforming pipelines, uncapped commissions." },
-                    { val: "Technical Support", title: "🛠 Technical Support", desc: "Troubleshooting product errors, software billing support." }
+                    { val: "Customer Service", title: "Customer Support & Accounts", desc: "Omnichannel customer resolution, retention and chat." },
+                    { val: "Sales", title: "Direct Sales & Telesales", desc: "Pipeline generation, closing quotas and commissions." },
+                    { val: "Technical Support", title: "Technical Support & Troubleshooting", desc: "Product diagnostics, tier-1 IT support, SaaS setup." }
                   ].map(f => (
                     <button
                       key={f.val}
                       onClick={() => { setQuizAnswers(p => ({ ...p, category: f.val })); setQuizStep(3); }}
                       className={cn(
-                        "w-full rounded-xl border p-4 text-left transition-all hover:bg-violet-50 hover:border-violet-300 block",
-                        quizAnswers.category === f.val ? "border-violet-600 bg-violet-50/50" : "border-border"
+                        "w-full rounded-xl border p-4 text-left transition-all cursor-pointer block",
+                        quizAnswers.category === f.val
+                          ? "border-primary bg-primary/10 shadow-[0_0_12px_rgba(182,255,46,0.2)]"
+                          : "border-white/10 bg-surface-2 hover:border-white/25 hover:bg-surface-3"
                       )}
                     >
-                      <div className="font-semibold text-sm text-ink">{f.title}</div>
+                      <div className="font-semibold text-sm text-white">{f.title}</div>
                       <div className="text-xs text-muted-foreground mt-1">{f.desc}</div>
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setQuizStep(1)} className="text-xs text-muted-foreground hover:underline">← Back</button>
+                <button onClick={() => setQuizStep(1)} className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer">← Back</button>
               </div>
             )}
 
             {/* Step 3: Location */}
             {quizStep === 3 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <h3 className="font-display text-lg font-bold text-ink">What is your location preference?</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">We will match jobs near you or remote.</p>
+                  <h3 className="font-display text-xl font-bold text-white">What is your location preference?</h3>
+                  <p className="text-xs text-muted-foreground mt-1">We filter jobs with nearby shuttle hubs or remote work.</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   {[
-                    { val: "Maadi", label: "📍 Maadi" },
-                    { val: "New Cairo", label: "📍 New Cairo" },
-                    { val: "Smart Village", label: "📍 Smart Village" },
-                    { val: "6th of October", label: "📍 6th of October" },
-                    { val: "remote", label: "🏠 Work from Home" },
-                    { val: "no_pref", label: "✨ No Preference" },
+                    { val: "Maadi", label: "Maadi / Degla" },
+                    { val: "New Cairo", label: "New Cairo / 5th Settl." },
+                    { val: "Smart Village", label: "Smart Village" },
+                    { val: "6th of October", label: "6th of October" },
+                    { val: "remote", label: "Work From Home" },
+                    { val: "no_pref", label: "No Preference / All" },
                   ].map(locOpt => (
                     <button
                       key={locOpt.val}
                       onClick={() => { setQuizAnswers(p => ({ ...p, location: locOpt.val })); setQuizStep(4); }}
                       className={cn(
-                        "rounded-xl border p-3 text-left text-sm font-semibold transition-all hover:bg-violet-50 hover:border-violet-300",
-                        quizAnswers.location === locOpt.val ? "border-violet-600 bg-violet-50/50 text-violet-700" : "border-border"
+                        "rounded-xl border p-3.5 text-left text-sm font-semibold transition-all cursor-pointer",
+                        quizAnswers.location === locOpt.val
+                          ? "border-primary bg-primary/10 text-primary shadow-[0_0_12px_rgba(182,255,46,0.2)]"
+                          : "border-white/10 bg-surface-2 text-zinc-200 hover:border-white/25 hover:bg-surface-3 hover:text-white"
                       )}
                     >
                       {locOpt.label}
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setQuizStep(2)} className="text-xs text-muted-foreground hover:underline">← Back</button>
+                <button onClick={() => setQuizStep(2)} className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer">← Back</button>
               </div>
             )}
 
             {/* Step 4: Experience */}
             {quizStep === 4 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <h3 className="font-display text-lg font-bold text-ink">What is your experience level?</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">Helps filter qualifications and seniority.</p>
+                  <h3 className="font-display text-xl font-bold text-white">What is your experience level?</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Helps align salary tier and seniority expectations.</p>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {[
-                    { val: "freshman", title: "Fresh Graduate / No Experience", desc: "Looking for entry-level training and onboarding." },
-                    { val: "mid", title: "1–3 Years Experience", desc: "Comfortable handling customer calls and CRM tools." },
-                    { val: "senior", title: "3+ Years Experience", desc: "Seeking team lead track or premium accounts." }
+                    { val: "freshman", title: "Fresh Graduate / Under 1 Year", desc: "Ready for intensive training and entry placement." },
+                    { val: "mid", title: "1–3 Years Commercial Experience", desc: "Experienced handling calls, quota, and CRM workflows." },
+                    { val: "senior", title: "3+ Years / Senior Specialist", desc: "Seeking team leadership or enterprise tier accounts." }
                   ].map(eOpt => (
                     <button
                       key={eOpt.val}
@@ -352,16 +364,18 @@ function OffersPage() {
                         runMatcher(finalAnswers);
                       }}
                       className={cn(
-                        "w-full rounded-xl border p-4 text-left transition-all hover:bg-violet-50 hover:border-violet-300 block",
-                        quizAnswers.experience === eOpt.val ? "border-violet-600 bg-violet-50/50" : "border-border"
+                        "w-full rounded-xl border p-4 text-left transition-all cursor-pointer block",
+                        quizAnswers.experience === eOpt.val
+                          ? "border-primary bg-primary/10 shadow-[0_0_12px_rgba(182,255,46,0.2)]"
+                          : "border-white/10 bg-surface-2 hover:border-white/25 hover:bg-surface-3"
                       )}
                     >
-                      <div className="font-semibold text-sm text-ink">{eOpt.title}</div>
+                      <div className="font-semibold text-sm text-white">{eOpt.title}</div>
                       <div className="text-xs text-muted-foreground mt-1">{eOpt.desc}</div>
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setQuizStep(3)} className="text-xs text-muted-foreground hover:underline">← Back</button>
+                <button onClick={() => setQuizStep(3)} className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer">← Back</button>
               </div>
             )}
 
@@ -369,58 +383,58 @@ function OffersPage() {
         </div>
       )}
 
-      {/* ── PREMIUM PILL FILTER PANEL ── */}
+      {/* ── FILTER & SEARCH SECTION (Generous Padding) ── */}
       {!matchScores && (
-        <div className="space-y-4">
+        <div className="space-y-6 rounded-2xl border border-white/[0.08] bg-surface-1 p-6 md:p-8 shadow-xl">
           {/* Search bar */}
-          <div className="relative max-w-lg">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative max-w-xl">
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by title, role, company keywords…"
-              className="w-full rounded-2xl border border-border bg-card pl-9 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring shadow-soft"
+              placeholder="Search by role title, company, or keywords…"
+              className="w-full rounded-xl border border-white/10 bg-surface-2 pl-11 pr-4 py-3.5 text-sm text-white placeholder:text-muted-foreground outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 focus:shadow-[0_0_15px_rgba(182,255,46,0.2)] transition-all"
             />
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4 pt-2">
             {/* Category Pills */}
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Category</span>
-              <div className="flex flex-wrap gap-1.5">
+            <div className="space-y-2">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground">Category</span>
+              <div className="flex flex-wrap gap-2">
                 {cats.map((c) => (
                   <button
                     key={c}
                     onClick={() => setCat(c)}
                     className={cn(
-                      "rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer border",
+                      "rounded-xl px-4 py-2 text-xs font-semibold transition-all cursor-pointer border",
                       cat === c
-                        ? "bg-primary border-primary text-primary-foreground shadow-sm"
-                        : "bg-white border-border text-muted-foreground hover:text-foreground hover:bg-sand"
+                        ? "bg-white border-white text-black font-bold shadow-md"
+                        : "bg-surface-2 border-white/10 text-muted-foreground hover:text-white hover:border-white/20"
                     )}
                   >
-                    {c === "all" ? "All categories" : c}
+                    {c === "all" ? "All Categories" : c}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Language Pills */}
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Language</span>
-              <div className="flex flex-wrap gap-1.5">
+            <div className="space-y-2">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground">Language</span>
+              <div className="flex flex-wrap gap-2">
                 {langs.map((l) => (
                   <button
                     key={l}
                     onClick={() => setLang(l)}
                     className={cn(
-                      "rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer border",
+                      "rounded-xl px-4 py-2 text-xs font-semibold transition-all cursor-pointer border",
                       lang === l
-                        ? "bg-violet-600 border-violet-600 text-white shadow-sm"
-                        : "bg-white border-border text-muted-foreground hover:text-foreground hover:bg-sand"
+                        ? "bg-primary border-primary text-primary-foreground font-bold shadow-[0_0_12px_rgba(182,255,46,0.3)]"
+                        : "bg-surface-2 border-white/10 text-muted-foreground hover:text-white hover:border-white/20"
                     )}
                   >
-                    {l === "all" ? "All languages" : l}
+                    {l === "all" ? "All Languages" : l}
                   </button>
                 ))}
               </div>
@@ -429,43 +443,43 @@ function OffersPage() {
         </div>
       )}
 
-      {/* MATCHED SUMMARY BAR */}
+      {/* MATCHED SUMMARY BANNER */}
       {matchScores && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-violet-200 bg-violet-50/50 p-4 shadow-sm">
-          <div>
-            <div className="flex items-center gap-1.5 text-sm font-bold text-violet-900">
-              <Star className="size-4 text-violet-600 fill-violet-600" />
-              Showing Matches For You
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-6 shadow-xl">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm font-bold text-white">
+              <Sparkles className="size-4 text-primary" />
+              <span>Personalized AI Matches Active</span>
             </div>
-            <p className="text-xs text-violet-700 mt-0.5">
-              Filtered to display positions matching your language ({quizAnswers.language}), field ({quizAnswers.category}), location, and experience.
+            <p className="text-xs text-[#E4E4E7]/90">
+              Ranked according to: {quizAnswers.language} • {quizAnswers.category} • {quizAnswers.location} • {quizAnswers.experience}.
             </p>
           </div>
           <button
             onClick={clearMatches}
-            className="inline-flex items-center gap-1 rounded-xl bg-violet-600 px-3.5 py-2 text-xs font-semibold text-white shadow-soft hover:bg-violet-700 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-surface-2 border border-white/15 px-4 py-2.5 text-xs font-semibold text-white hover:bg-surface-3 transition-colors cursor-pointer"
           >
-            Clear matches & reset view
+            Clear matches &amp; reset
           </button>
         </div>
       )}
 
       {/* ── JOB GRID VIEW ── */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl text-ink">
-            {matchScores ? "Top Recommendations" : "Browse Positions"} ({filtered.length} found)
+          <h2 className="font-display text-2xl font-bold text-white">
+            {matchScores ? "Top Recommendations" : "Available Openings"} ({filtered.length})
           </h2>
         </div>
 
         {filtered.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground shadow-soft">
+          <div className="rounded-3xl border border-dashed border-white/15 bg-surface-1 p-16 text-center text-muted-foreground shadow-xl">
             <Compass className="size-10 mx-auto text-muted-foreground/30 animate-pulse" />
-            <p className="mt-4 text-sm font-medium">No offers match your search filters.</p>
-            <p className="text-xs text-muted-foreground/75 mt-1">Try resetting filters or expanding your keywords.</p>
+            <p className="mt-4 text-base font-semibold text-white">No positions match your selected criteria.</p>
+            <p className="text-xs text-muted-foreground mt-1">Try resetting the language or category filters to view more.</p>
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((o) => (
               <OfferCard 
                 key={o.id} 

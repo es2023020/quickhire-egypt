@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { QuickHireLogo } from "@/components/logo";
+import { cn } from "@/lib/utils";
 
 const HR_PIPELINE_STAGES = [
   { key: "interview_done", label: "Interview Done / Under Evaluation", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
@@ -174,10 +175,10 @@ function ClientCandidateProfilePage() {
   // 1. Loading State
   if (profileQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-[#f7f8fa] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 text-foreground">
         <div className="text-center">
           <RefreshCw className="size-8 animate-spin mx-auto text-primary mb-3" />
-          <p className="text-sm font-semibold text-ink">Loading candidate profile...</p>
+          <p className="text-sm font-semibold text-white">Loading candidate profile...</p>
         </div>
       </div>
     );
@@ -186,17 +187,17 @@ function ClientCandidateProfilePage() {
   // 2. Candidate Not Found
   if (!candidate) {
     return (
-      <div className="min-h-screen bg-[#f7f8fa] flex items-center justify-center p-4">
-        <div className="max-w-md w-full rounded-3xl border border-border bg-white p-8 text-center shadow-soft">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 text-foreground">
+        <div className="max-w-md w-full rounded-3xl border border-white/10 bg-surface-1 p-8 text-center shadow-xl">
           <Users className="size-12 mx-auto text-muted-foreground/30 mb-3" />
-          <h2 className="text-xl font-bold font-display text-ink">Candidate Not Found</h2>
+          <h2 className="text-xl font-bold font-display text-white">Candidate Not Found</h2>
           <p className="text-xs text-muted-foreground mt-2">
             The profile link may have expired or this applicant ID does not exist in our live database.
           </p>
           <div className="mt-6">
             <Link
               to="/offers"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white shadow-soft"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-[0_0_12px_rgba(182,255,46,0.25)]"
             >
               Browse Open Positions
             </Link>
@@ -209,22 +210,22 @@ function ClientCandidateProfilePage() {
   // 3. Security Code Gate (if code missing or invalid)
   if (!isValidCode) {
     return (
-      <div className="min-h-screen bg-[#f7f8fa] flex items-center justify-center p-4">
-        <div className="max-w-md w-full rounded-3xl border border-border bg-white p-8 shadow-soft">
-          <div className="flex items-center justify-center size-12 rounded-2xl bg-violet-100 text-violet-700 mx-auto mb-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 text-foreground">
+        <div className="max-w-md w-full rounded-3xl border border-white/10 bg-surface-1 p-8 shadow-2xl">
+          <div className="flex items-center justify-center size-12 rounded-2xl border border-primary/30 bg-primary/10 text-primary mx-auto mb-4">
             <Lock className="size-6" />
           </div>
-          <h2 className="text-xl font-bold font-display text-ink text-center">
+          <h2 className="text-xl font-bold font-display text-white text-center">
             Partner Access Verification
           </h2>
           <p className="text-xs text-muted-foreground text-center mt-1.5">
             This dossier contains confidential candidate assessment data, voice recordings, and CV for{" "}
-            <b>{candidate.full_name}</b>. Please enter the access code provided via WhatsApp.
+            <b className="text-white">{candidate.full_name}</b>. Please enter the access code provided via WhatsApp.
           </p>
 
           <form onSubmit={handleUnlockSubmit} className="mt-6 space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
                 Candidate Access Code
               </label>
               <div className="relative">
@@ -235,16 +236,16 @@ function ClientCandidateProfilePage() {
                   placeholder={`e.g. ${expectedCode}`}
                   value={enteredCode}
                   onChange={(e) => setEnteredCode(e.target.value.toUpperCase())}
-                  className="w-full rounded-2xl border border-border bg-sand/30 pl-10 pr-4 py-3 text-sm font-mono font-bold uppercase tracking-widest outline-none focus:ring-2 focus:ring-violet-600 focus:bg-white"
+                  className="w-full rounded-2xl border border-white/10 bg-surface-2 pl-10 pr-4 py-3 text-sm font-mono font-bold uppercase tracking-widest text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 focus:bg-surface-2"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full rounded-2xl bg-violet-700 px-4 py-3 text-sm font-bold text-white hover:bg-violet-800 transition-colors shadow-soft"
+              className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:bg-[#c2ff47] transition-all shadow-[0_0_15px_rgba(182,255,46,0.35)] cursor-pointer"
             >
-              Unlock Dossier & Voice Notes 🚀
+              Unlock Dossier &amp; Voice Notes 🚀
             </button>
 
             <div className="p-3 rounded-xl bg-sand/60 border border-border text-center">
@@ -263,21 +264,21 @@ function ClientCandidateProfilePage() {
   const activeOutcome = candidate.outcome_code ? getOutcomeDefinition(candidate.outcome_code) : null;
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-ink pb-16">
+    <div className="min-h-screen bg-background text-foreground pb-16">
       {/* Top Client Bar */}
-      <header className="border-b border-border/80 bg-white sticky top-0 z-30 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+      <header className="border-b border-white/[0.08] bg-surface-1 sticky top-0 z-30 shadow-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <QuickHireLogo size={30} />
+            <QuickHireLogo size={32} className="rounded-xl" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display font-bold text-base text-ink">QuickHire</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-100 text-violet-800">
-                  Client HR Candidate Dossier
+                <span className="font-display font-bold text-base text-white">Quick<span className="text-primary">Hire</span></span>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary">
+                  Client HR Dossier
                 </span>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Verified Profile & Direct Hiring Scorecard
+                Verified Candidate Profile &amp; Direct Hiring Scorecard
               </p>
             </div>
           </div>
@@ -285,13 +286,13 @@ function ClientCandidateProfilePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={copyCandidateShareWhatsApp}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:bg-sand transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-surface-2 px-3.5 py-2 text-xs font-semibold text-white hover:bg-surface-3 transition-colors shadow-xs cursor-pointer"
             >
-              <Share2 className="size-3.5 text-violet-600" /> Share WhatsApp Link
+              <Share2 className="size-3.5 text-primary" /> Share WhatsApp Link
             </button>
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground shadow-[0_0_10px_rgba(182,255,46,0.25)] hover:bg-[#c2ff47] transition-all cursor-pointer"
             >
               Print / Save PDF
             </button>
