@@ -60,6 +60,18 @@ export type MockApplication = {
   bounty_payment_method?: "vodafone_cash" | "instapay" | "orange_money" | "bank_transfer" | null;
   bounty_transaction_ref?: string | null;
   bounty_paid_at?: string | null;
+  placement_fee?: number | null;
+  offer?: {
+    id?: string;
+    title: string;
+    slug: string;
+    company: string;
+    category?: string;
+    salary_text?: string;
+    placement_fee_egp?: number;
+    location?: string;
+    [key: string]: any;
+  } | null;
   created_at: string;
   updated_at?: string;
 };

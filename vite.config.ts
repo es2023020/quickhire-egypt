@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import type { ViteDevServer, Connect } from "vite";
 import react from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -9,8 +10,8 @@ import path from "path";
 function localDbPlugin() {
   return {
     name: "local-db-plugin",
-    configureServer(server) {
-      server.middlewares.use(async (req, res, next) => {
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use(async (req: Connect.IncomingMessage, res: any, next: Connect.NextFunction) => {
         const url = req.url?.split("?")[0];
         
         if (url === "/api/db/offers") {

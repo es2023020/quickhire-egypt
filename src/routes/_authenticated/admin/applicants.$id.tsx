@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   Loader2, FileText, Phone, Mail, MessageCircle, MapPin,
   Calendar, RefreshCw, User, Briefcase, Clock, ChevronLeft,
@@ -209,7 +209,7 @@ function ApplicantDetail() {
     return checkCandidateCooldown(app, allAppsQuery.data || []);
   }, [app, allAppsQuery.data]);
 
-  const poolMatches = useMemo(() => {
+  const poolMatches = useMemo<PooledMatch[]>(() => {
     if (!app || !offersQuery.data) return [];
     return calculateSmartPoolMatches(
       {
@@ -345,7 +345,7 @@ function ApplicantDetail() {
   }, [app]);
 
   const update = useMutation({
-    mutationFn: (patch: Parameters<typeof adminUpdateApplicationStatus>[0]["data"]) =>
+    mutationFn: (patch: Omit<Parameters<typeof adminUpdateApplicationStatus>[0]["data"], "id">) =>
       adminUpdateApplicationStatus({ data: { id, ...patch } }),
     onSuccess: () => {
       toast.success("Saved");

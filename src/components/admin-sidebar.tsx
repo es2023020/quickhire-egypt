@@ -35,7 +35,7 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   }
 
   function isActive(item: (typeof navItems)[number]) {
-    if (item.exact) return location.pathname === item.to || location.pathname === item.to + "/";
+    if ("exact" in item && item.exact) return location.pathname === item.to || location.pathname === item.to + "/";
     return location.pathname.startsWith(item.to);
   }
 

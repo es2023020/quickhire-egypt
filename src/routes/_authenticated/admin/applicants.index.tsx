@@ -126,7 +126,7 @@ function Applicants() {
     mutationFn: ({ ids, s }: { ids: string[]; s: "new" | "shortlisted" | "rejected" | "hired" }) =>
       adminBulkUpdateStatus({ data: { ids, status: s } }),
     onSuccess: (res) => {
-      toast.success(`Updated ${res.updated} applicants`);
+      toast.success(`Updated ${res.count} applicants`);
       qc.invalidateQueries({ queryKey: ["admin", "applications"] });
       qc.invalidateQueries({ queryKey: ["admin", "stats"] });
       setSelectedIds(new Set());
@@ -138,7 +138,7 @@ function Applicants() {
     mutationFn: ({ ids, tag }: { ids: string[]; tag: string }) =>
       adminBulkAssignWave({ data: { ids, wave_tag: tag } }),
     onSuccess: (res) => {
-      toast.success(`Wave tag assigned to ${res.updated} applicants`);
+      toast.success(`Wave tag assigned to ${res.count} applicants`);
       qc.invalidateQueries({ queryKey: ["admin", "applications"] });
       setSelectedIds(new Set());
       setWaveTagInput("");
@@ -149,7 +149,7 @@ function Applicants() {
   const bulkDeleteApps = useMutation({
     mutationFn: (ids: string[]) => adminBulkDeleteApplications({ data: { ids } }),
     onSuccess: (res) => {
-      toast.success(`Deleted ${res.deleted} applicants`);
+      toast.success(`Deleted ${res.count} applicants`);
       qc.invalidateQueries({ queryKey: ["admin", "applications"] });
       qc.invalidateQueries({ queryKey: ["admin", "stats"] });
       setSelectedIds(new Set());

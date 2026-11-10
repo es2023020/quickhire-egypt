@@ -41,6 +41,15 @@ export type AdminApplicationRow = {
   referral_code?: string | null;
   outcome_code?: string | null;
   outcome_notes?: string | null;
+  pipeline_stage?: string | null;
+  pipeline_history?: Array<{
+    stage: string;
+    changed_by: string;
+    role: "admin" | "client_hr";
+    comment: string | null;
+    timestamp: string;
+  }> | null;
+  placement_fee?: number | null;
   billing_status?: "pending_guarantee" | "invoiced" | "collected" | null;
   bounty_status?: "pending_review" | "ready_to_pay" | "paid" | null;
   bounty_payment_method?: "vodafone_cash" | "instapay" | "orange_money" | "bank_transfer" | null;
@@ -286,7 +295,7 @@ export async function adminUpdateApplicationStatus({ data }: {
   if (data.exp_score !== undefined) apps[idx].exp_score = data.exp_score;
   if (data.cv_review_notes !== undefined) apps[idx].cv_review_notes = data.cv_review_notes;
   if (data.cv_review_status !== undefined) apps[idx].cv_review_status = data.cv_review_status;
-  if (data.transcripts !== undefined) apps[idx].transcripts = data.transcripts;
+  if (data.transcripts !== undefined) apps[idx].transcripts = data.transcripts || {};
   if (data.english_score !== undefined || data.comm_score !== undefined || data.exp_score !== undefined) {
     const eng = apps[idx].english_score ?? 0;
     const comm = apps[idx].comm_score ?? 0;
@@ -420,8 +429,8 @@ export async function adminRerouteApplicant({ data }: {
   if (idx === -1) return { ok: false };
 
   const offers = getOffers();
-  const targetOffer = offers.find((o) => o.id === data.new_offer_id);
-  const oldOffer = offers.find((o) => o.id === apps[idx].offer_id);
+  const targetOffer = offers.find((o: { id: string; title?: string }) => o.id === data.new_offer_id);
+  const oldOffer = offers.find((o: { id: string; title?: string }) => o.id === apps[idx].offer_id);
 
   apps[idx].offer_id = data.new_offer_id;
   apps[idx].status = "shortlisted";
@@ -559,6 +568,14 @@ export type TrackedApplication = {
   interview_notes?: string | null;
   referral_code?: string | null;
   referred_by?: string | null;
+  pipeline_stage?: string | null;
+  pipeline_history?: Array<{
+    stage: string;
+    changed_by: string;
+    role: "admin" | "client_hr";
+    comment: string | null;
+    timestamp: string;
+  }> | null;
   offer: {
     id: string;
     title: string;
@@ -615,6 +632,8 @@ export async function trackApplicationByPhone({ data }: {
       interview_notes: a.interview_notes,
       referral_code: a.referral_code,
       referred_by: a.referred_by,
+      pipeline_stage: a.pipeline_stage || "applied",
+      pipeline_history: a.pipeline_history || [],
       offer: offer
         ? {
             id: offer.id,

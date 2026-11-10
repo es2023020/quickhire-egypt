@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrackRouteImport } from './routes/track'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as PrepRouteImport } from './routes/prep'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
@@ -36,11 +35,6 @@ import { Route as AuthenticatedAdminApplicantsIdRouteImport } from './routes/_au
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
   path: '/track',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReferralsRoute = ReferralsRouteImport.update({
@@ -162,7 +156,6 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/referrals': typeof ReferralsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/c/$id': typeof CIdRoute
@@ -186,7 +179,6 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/referrals': typeof ReferralsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/c/$id': typeof CIdRoute
   '/wave/$waveTag': typeof WaveWaveTagRoute
@@ -210,7 +202,6 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/referrals': typeof ReferralsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/c/$id': typeof CIdRoute
@@ -236,7 +227,6 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/prep'
     | '/referrals'
-    | '/sitemap.xml'
     | '/track'
     | '/admin'
     | '/c/$id'
@@ -260,7 +250,6 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/prep'
     | '/referrals'
-    | '/sitemap.xml'
     | '/track'
     | '/c/$id'
     | '/wave/$waveTag'
@@ -283,7 +272,6 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/prep'
     | '/referrals'
-    | '/sitemap.xml'
     | '/track'
     | '/_authenticated/admin'
     | '/c/$id'
@@ -309,7 +297,6 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   PrepRoute: typeof PrepRoute
   ReferralsRoute: typeof ReferralsRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrackRoute: typeof TrackRoute
   CIdRoute: typeof CIdRoute
   WaveWaveTagRoute: typeof WaveWaveTagRoute
@@ -325,13 +312,6 @@ declare module '@tanstack/react-router' {
       path: '/track'
       fullPath: '/track'
       preLoaderRoute: typeof TrackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/referrals': {
@@ -546,7 +526,6 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   PrepRoute: PrepRoute,
   ReferralsRoute: ReferralsRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrackRoute: TrackRoute,
   CIdRoute: CIdRoute,
   WaveWaveTagRoute: WaveWaveTagRoute,

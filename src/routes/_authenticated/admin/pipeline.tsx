@@ -218,7 +218,7 @@ function PipelinePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
           {PIPELINE_GROUPS.map((group) => {
             const groupApps = allApps.filter((a) =>
-              group.stages.includes((a.pipeline_stage || "applied") as any)
+              (group.stages as readonly string[]).includes(a.pipeline_stage || "applied")
             );
 
             return (
