@@ -3,14 +3,7 @@ import { useEffect, useState } from "react";
 import { Loader2, Eye, EyeOff, ShieldAlert, KeyRound, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { QuickHireLogo } from "@/components/logo";
-
-const ADMIN_PASSWORD = "TalentBridge2025";
-const VALID_PASSWORDS = [
-  ADMIN_PASSWORD,
-  "QuickHire2025",
-  "CareerCommunityAdmin2026!",
-  "QuickHireAdmin#2026",
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -26,48 +19,46 @@ function AuthPage() {
   const [failedAttempts, setFailedAttempts] = useState(0);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("qh_admin") === "1") {
-      navigate({ to: "/admin" });
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        localStorage.setItem("qh_admin", "1");
+        navigate({ to: "/admin" });
+      }
+    });
   }, [navigate]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return toast.error("Please enter your admin credentials");
+    if (!email.trim()) return toast.error("Please enter your operator email");
+    if (!password.trim()) return toast.error("Please enter your password");
 
     const cleanEmail = email.trim().toLowerCase();
-    const allowedEmails = [
-      "admin@careercommunity.eg",
-      "admin@quickhire.eg",
-      "ops@quickhire.eg",
-    ];
-
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
 
-    const validSecurityKey =
-      accessPasscode.trim() === "QH-SECURE-99" ||
-      accessPasscode.trim() === "9910" ||
-      accessPasscode.trim() === "";
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password: password.trim(),
+      });
 
-    if (!allowedEmails.includes(cleanEmail) || !validSecurityKey) {
-      setFailedAttempts((prev) => prev + 1);
-      toast.error("Unauthorized terminal access. Security incident logged.");
-      setLoading(false);
-      return;
-    }
+      if (authError || !authData.session) {
+        setFailedAttempts((prev) => prev + 1);
+        toast.error(authError?.message || "Invalid authentication credentials. Access denied.");
+        setLoading(false);
+        return;
+      }
 
-    if (VALID_PASSWORDS.includes(password)) {
       localStorage.setItem("qh_admin", "1");
       localStorage.setItem("qh_admin_email", cleanEmail);
       localStorage.setItem("qh_admin_session", new Date().toISOString());
-      toast.success("Identity verified. Welcome to QuickHire Operations.");
+      toast.success("Identity verified via Supabase Auth. Welcome to QuickHire Operations.");
       navigate({ to: "/admin" });
-    } else {
+    } catch (err: any) {
       setFailedAttempts((prev) => prev + 1);
-      toast.error("Invalid authentication credentials. Access denied.");
+      toast.error(err?.message || "Authentication service error.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (
@@ -84,7 +75,7 @@ function AuthPage() {
             QuickHire Operations Gate
           </h1>
           <p className="text-xs text-muted-foreground">
-            Internal administrative clearance required
+            Supabase Cryptographic Authentication Required
           </p>
         </div>
 
@@ -99,74 +90,68 @@ function AuthPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-surface-2 px-4 py-3 text-xs text-white placeholder:text-muted-foreground outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 transition-all"
                 placeholder="admin@quickhire.eg"
-                autoComplete="username"
+                className="w-full rounded-xl border border-white/10 bg-surface-2 px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary font-mono transition-colors"
+                autoComplete="email"
               />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-zinc-300 font-mono">
-                Terminal Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPw ? "text" : "password"}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-surface-2 px-4 py-3 pr-10 text-xs text-white placeholder:text-muted-foreground outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 transition-all"
-                  placeholder="••••••••••••"
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPw((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white cursor-pointer"
-                >
-                  {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
-              </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-300 font-mono">
-                  Clearance Key (Optional)
+                  Master Password
                 </label>
-                <span className="text-[10px] text-muted-foreground font-mono">2FA Gate</span>
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="text-xs text-muted-foreground hover:text-white transition-colors flex items-center gap-1"
+                >
+                  {showPw ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                  <span>{showPw ? "Hide" : "Show"}</span>
+                </button>
               </div>
               <input
-                type="password"
-                value={accessPasscode}
-                onChange={(e) => setAccessPasscode(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-surface-2 px-4 py-2.5 text-xs text-white placeholder:text-muted-foreground outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 transition-all font-mono"
-                placeholder="QH-SECURE-••"
+                type={showPw ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••"
+                className="w-full rounded-xl border border-white/10 bg-surface-2 px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary font-mono transition-colors"
+                autoComplete="current-password"
               />
             </div>
-
-            {failedAttempts >= 2 && (
-              <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 flex items-center gap-2 text-xs text-red-300">
-                <ShieldAlert className="size-4 text-red-400 shrink-0" />
-                <span>Repeated unauthorized attempts may trigger IP isolation.</span>
-              </div>
-            )}
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-3 group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-xs font-bold text-primary-foreground shadow-[0_0_12px_rgba(182,255,46,0.3)] hover:shadow-[0_0_20px_rgba(182,255,46,0.6)] hover:bg-[#c2ff47] active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all disabled:opacity-50"
             >
-              {loading ? <Loader2 className="size-4 animate-spin" /> : <KeyRound className="size-4" />}
-              <span>Verify Identity &amp; Unlock</span>
+              {loading ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  <span>Verifying Credentials...</span>
+                </>
+              ) : (
+                <>
+                  <KeyRound className="size-4" />
+                  <span>Authorize Session</span>
+                </>
+              )}
             </button>
           </form>
 
-          <div className="mt-6 border-t border-white/[0.08] pt-4 text-center">
-            <span className="text-[10px] text-muted-foreground font-mono">
-              QuickHire Core Engine · Encrypted Dark Session
-            </span>
-          </div>
+          {failedAttempts > 0 && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-400">
+              <ShieldAlert className="size-4 shrink-0" />
+              <span>Failed verification attempt recorded.</span>
+            </div>
+          )}
+        </div>
+
+        <div className="text-center">
+          <p className="text-[11px] font-mono text-zinc-300">
+            SECURED WITH SUPABASE ROW LEVEL SECURITY (RLS)
+          </p>
         </div>
       </div>
     </div>

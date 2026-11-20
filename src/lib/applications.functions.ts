@@ -788,6 +788,55 @@ export async function trackApplicationByPhone({ data }: {
   const q = data.query.trim().toLowerCase();
   if (!q) return { applications: [] };
 
+  // 1. Try secure RPC function first (enables tracking even when applications table is locked down with strict RLS)
+  try {
+    const { data: rpcRows, error: rpcErr } = await supabase.rpc("track_candidate_status", {
+      query_text: q,
+    });
+
+    if (!rpcErr && Array.isArray(rpcRows) && rpcRows.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const results: TrackedApplication[] = rpcRows.map((r: any) => ({
+        id: r.id,
+        full_name: r.full_name,
+        email: "",
+        phone: "",
+        status: r.status,
+        created_at: r.created_at,
+        english_level: r.english_level ?? null,
+        interview_date: r.interview_date ?? null,
+        interview_time: r.interview_time ?? null,
+        interview_site: r.interview_site ?? null,
+        interview_address: r.interview_address ?? null,
+        interview_maps_link: r.interview_maps_link ?? null,
+        interview_bus_point: r.interview_bus_point ?? null,
+        interview_bus_time: r.interview_bus_time ?? null,
+        interview_attendance: r.interview_attendance ?? null,
+        interview_notes: null,
+        referral_code: r.referral_code ?? null,
+        referred_by: null,
+        pipeline_stage: r.pipeline_stage || "applied",
+        pipeline_history: [],
+        offer: r.offer_title
+          ? {
+              id: r.offer_id,
+              title: r.offer_title,
+              slug: r.offer_slug || "",
+              company: r.offer_company || "",
+              location: r.offer_location || "",
+              salary_text: r.offer_salary_text || "",
+              category: r.offer_category || "",
+            }
+          : null,
+      }));
+      return { applications: results };
+    }
+  } catch (_) {
+    // non-fatal, fallback to direct query below
+  }
+
+  // 2. Direct query fallback (when user is authenticated admin)
+
   // Try phone match first (last 9 digits), then email
   const cleanQueryPhone = q.replace(/[^0-9]/g, "").slice(-9);
   const isEmail = q.includes("@");

@@ -27,7 +27,13 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  function signOut() {
+  async function signOut() {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      await supabase.auth.signOut();
+    } catch (_) {
+      // non-fatal
+    }
     localStorage.removeItem("qh_admin");
     localStorage.removeItem("qh_admin_email");
     toast.success("Signed out");
