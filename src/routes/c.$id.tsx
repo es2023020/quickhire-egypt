@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { QuickHireLogo } from "@/components/logo";
 import { cn } from "@/lib/utils";
+import { openDocumentSafely, downloadDocumentSafely } from "@/lib/document-utils";
 
 const HR_PIPELINE_STAGES = [
   { key: "interview_done", label: "Interview Done / Under Evaluation", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
@@ -468,14 +469,16 @@ function ClientCandidateProfilePage() {
                   <FileText className="size-4 text-violet-600" /> Candidate Resume / CV Document
                 </h3>
                 {candidate.cv_data || candidate.cv_path ? (
-                  <a
-                    href={candidate.cv_data || (candidate.cv_path?.startsWith("http") ? candidate.cv_path : "/placeholder-cv.pdf")}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const docTarget = candidate.cv_data || (candidate.cv_path?.startsWith("http") ? candidate.cv_path : "/placeholder-cv.pdf");
+                      openDocumentSafely(docTarget, `${candidate.full_name.replace(/\s+/g, "_")}_CV.pdf`);
+                    }}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline cursor-pointer"
                   >
                     Open Full PDF <ArrowUpRight className="size-3" />
-                  </a>
+                  </button>
                 ) : null}
               </div>
 
@@ -490,15 +493,16 @@ function ClientCandidateProfilePage() {
                       <div className="text-[10px] text-muted-foreground">Verified Document on File</div>
                     </div>
                   </div>
-                  <a
-                    href={candidate.cv_data || (candidate.cv_path?.startsWith("http") ? candidate.cv_path : "/placeholder-cv.pdf")}
-                    target="_blank"
-                    rel="noreferrer"
-                    download={`${candidate.full_name.replace(/\s+/g, "_")}_CV.pdf`}
-                    className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-colors shadow-2xs inline-flex items-center gap-1.5"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const docTarget = candidate.cv_data || (candidate.cv_path?.startsWith("http") ? candidate.cv_path : "/placeholder-cv.pdf");
+                      downloadDocumentSafely(docTarget, `${candidate.full_name.replace(/\s+/g, "_")}_CV.pdf`);
+                    }}
+                    className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
                   >
                     <Download className="size-3.5" /> Download CV
-                  </a>
+                  </button>
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-xs text-muted-foreground">

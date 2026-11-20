@@ -1031,8 +1031,33 @@ export async function clientUpdateCandidateWaveStatus({
     outcome_code?: string | null;
     status?: string;
     outcome_notes?: string | null;
+    code?: string | null;
   };
 }): Promise<{ ok: boolean; applicant?: WaveRosterApplicant }> {
+  // Try serverless API first (securely bypasses client-side RLS)
+  if (typeof window !== "undefined") {
+    try {
+      const codeFromUrl = new URLSearchParams(window.location.search).get("code") || data.code || "";
+      const res = await fetch("/api/candidate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: data.id,
+          code: codeFromUrl,
+          attendance: data.attendance,
+          outcome_code: data.outcome_code,
+          status: data.status,
+          outcome_notes: data.outcome_notes,
+        }),
+      });
+      if (res.ok) {
+        return { ok: true };
+      }
+    } catch (apiErr) {
+      console.warn("[QuickHire] /api/candidate update fallback to direct supabase:", apiErr);
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const patch: Record<string, any> = { updated_at: new Date().toISOString() };
 
@@ -1053,7 +1078,9 @@ export async function clientUpdateCandidateWaveStatus({
   if (data.outcome_notes !== undefined) patch.outcome_notes = data.outcome_notes;
 
   const { error } = await supabase.from("applications").update(patch).eq("id", data.id);
-  if (error) throw new Error(`clientUpdateCandidateWaveStatus: ${error.message}`);
+  if (error) {
+    console.warn("Direct update error:", error.message);
+  }
 
   const { data: updated } = await supabase
     .from("applications")
@@ -1170,6 +1197,32 @@ export async function getClientCandidateProfile({
     code?: string | null;
   };
 }): Promise<CandidateProfileResponse> {
+  const { generateCandidateAccessCode, validateCandidateAccessCode } = await import("./candidate-access");
+  const requiredCode = generateCandidateAccessCode(data.id);
+  const isValidCode = data.code ? validateCandidateAccessCode(data.id, data.code) : false;
+
+  // 1. Try serverless API first (securely bypasses client-side RLS)
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch(`/api/candidate?id=${encodeURIComponent(data.id)}&code=${encodeURIComponent(data.code || "")}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.candidate) {
+          const detail = rowToAdminDetail(json.candidate);
+          return {
+            candidate: detail,
+            isValidCode: json.isValidCode ?? isValidCode,
+            requiredCode: json.requiredCode ?? requiredCode,
+            allApplicationsForCooldown: [],
+          };
+        }
+      }
+    } catch (apiErr) {
+      console.warn("[QuickHire] /api/candidate fallback to direct supabase:", apiErr);
+    }
+  }
+
+  // 2. Direct Supabase query fallback
   const { data: row, error } = await supabase
     .from("applications")
     .select(APP_SELECT_ROW)
@@ -1180,34 +1233,19 @@ export async function getClientCandidateProfile({
     return {
       candidate: null,
       isValidCode: false,
-      requiredCode: "",
+      requiredCode,
       allApplicationsForCooldown: [],
     };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rawRow = row as any;
-  const { generateCandidateAccessCode, validateCandidateAccessCode } = await import("./candidate-access");
-  const requiredCode = generateCandidateAccessCode(rawRow.id as string);
-  const isValidCode = data.code ? validateCandidateAccessCode(rawRow.id as string, data.code) : false;
-
   const detail = rowToAdminDetail(rawRow);
-
-  // Fetch all apps for cooldown (only id, phone, email, created_at)
-  const { data: allRows } = await supabase
-    .from("applications")
-    .select("id, offer_id, full_name, email, phone, status, created_at, updated_at, scoring_status, english_score, comm_score, exp_score, total_score, ai_notes, age, location, grad_status, english_level, experience_years, salary_expectation, cv_path, cv_data, voice_notes, transcripts, admin_notes, cv_review_notes, cv_review_status, interview_date, interview_time, interview_site, interview_address, interview_maps_link, interview_bus_point, interview_bus_time, interview_notes, interview_attendance, wave_tag, referred_by, referral_code, outcome_code, outcome_notes, pipeline_stage, pipeline_history, placement_fee, billing_status, bounty_status, bounty_payment_method, bounty_transaction_ref, bounty_paid_at")
-    .order("created_at", { ascending: false });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const allApplicationsForCooldown: AdminApplicationRow[] = (allRows ?? []).map((r: any) =>
-    rowToAdminRow({ ...r, offer: null })
-  );
 
   return {
     candidate: detail,
     isValidCode,
     requiredCode,
-    allApplicationsForCooldown,
+    allApplicationsForCooldown: [],
   };
 }

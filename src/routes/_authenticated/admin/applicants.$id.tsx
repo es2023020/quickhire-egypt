@@ -54,6 +54,7 @@ import {
 } from "@/lib/interview-logistics";
 import { cn } from "@/lib/utils";
 import { getFile } from "@/lib/db";
+import { openDocumentSafely, downloadDocumentSafely } from "@/lib/document-utils";
 
 export const Route = createFileRoute("/_authenticated/admin/applicants/$id")({
   head: () => ({ meta: [{ title: "Applicant — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
@@ -520,10 +521,7 @@ function ApplicantDetail() {
       console.error(err);
       toast.info("Browser security restricts copying document files directly to clipboard. The CV is downloading instead — drag & drop it directly into WhatsApp!");
       
-      const link = document.createElement("a");
-      link.href = cvUrl || "/placeholder-cv.pdf";
-      link.download = app?.cv_path?.split("/").pop() || "cv.pdf";
-      link.click();
+      downloadDocumentSafely(cvUrl || "/placeholder-cv.pdf", app?.cv_path?.split("/").pop() || "cv.pdf");
     }
   }
 
@@ -2161,21 +2159,20 @@ function ApplicantDetail() {
                     >
                       <FileText className="size-3.5" /> Preview CV
                     </button>
-                    <a
-                      href={cvUrl || "/placeholder-cv.pdf"}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-white/20 transition-colors"
+                    <button
+                      type="button"
+                      onClick={() => openDocumentSafely(cvUrl || "/placeholder-cv.pdf", app.cv_path?.split("/").pop() || "candidate-cv.pdf")}
+                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-white/20 transition-colors cursor-pointer"
                     >
                       <ExternalLink className="size-3" /> Open
-                    </a>
-                    <a
-                      href={cvUrl || "/placeholder-cv.pdf"}
-                      download={app.cv_path?.split("/").pop() || "candidate-cv.pdf"}
-                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-white/20 transition-colors"
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => downloadDocumentSafely(cvUrl || "/placeholder-cv.pdf", app.cv_path?.split("/").pop() || "candidate-cv.pdf")}
+                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-white/20 transition-colors cursor-pointer"
                     >
                       <Download className="size-3" /> Download
-                    </a>
+                    </button>
                   </div>
                 </div>
 
@@ -2269,13 +2266,13 @@ function ApplicantDetail() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <a
-                      href={cvUrl || "/placeholder-cv.pdf"}
-                      download={app.cv_path?.split("/").pop() || "candidate-cv.pdf"}
-                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-3 py-1 text-xs font-medium text-white hover:bg-surface-3 transition-colors"
+                    <button
+                      type="button"
+                      onClick={() => downloadDocumentSafely(cvUrl || "/placeholder-cv.pdf", app.cv_path?.split("/").pop() || "candidate-cv.pdf")}
+                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-3 py-1 text-xs font-medium text-white hover:bg-surface-3 transition-colors cursor-pointer"
                     >
                       <Download className="size-3" /> Download
-                    </a>
+                    </button>
                     <button
                       onClick={() => setCvPreviewOpen(false)}
                       className="grid size-7 place-items-center rounded-lg border border-white/10 text-muted-foreground hover:text-white hover:bg-surface-3 cursor-pointer"

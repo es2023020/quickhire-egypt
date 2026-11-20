@@ -75,68 +75,104 @@ function OffersPage() {
     [offers],
   );
 
-  // Compute match score for each offer
+  // Compute match score for each offer with strict language & track prioritization
   function runMatcher(answers: QuizAnswers) {
     const scores: Record<string, number> = {};
+    const foreignLangs = ["german", "french", "italian", "spanish", "dutch", "portuguese", "russian"];
+    const userLang = answers.language.toLowerCase();
     
     offers.forEach(o => {
-      let score = 50; // base score
+      let score = 20; // base score
+      const jobLang = (o.language || "English").toLowerCase();
 
-      // 1. Language Match (Weight: 35 points)
-      if (o.language && o.language.toLowerCase() === answers.language.toLowerCase()) {
-        score += 35;
-      } else if (answers.language === "Arabic" && !o.language) {
+      // 1. Language Match (Weight: up to 50 points, with strict mismatch penalty)
+      if (jobLang === userLang) {
+        // Exact target language match (e.g., German to German)
+        score += 50;
+      } else if (foreignLangs.includes(userLang) && foreignLangs.includes(jobLang) && userLang !== jobLang) {
+        // Incompatible foreign language (e.g., German applicant vs Italian role) -> strict penalty
+        score -= 50;
+      } else if (userLang === "arabic") {
+        if (jobLang === "arabic" || !o.language) {
+          score += 45;
+        } else if (jobLang === "english") {
+          score += 20;
+        } else {
+          score -= 30;
+        }
+      } else if (userLang === "english") {
+        if (jobLang === "english") {
+          score += 50;
+        } else {
+          // English speaker cannot do German/French/Italian
+          score -= 40;
+        }
+      } else if (foreignLangs.includes(userLang) && jobLang === "english") {
+        // Secondary fallback for multilingual speakers
+        score += 15;
+      }
+
+      // 2. Field / Track Match (Weight: 20 points)
+      const jobCat = o.category.toLowerCase();
+      const userCat = answers.category.toLowerCase();
+      if (jobCat.includes(userCat) || userCat.includes(jobCat)) {
         score += 20;
-      } else if (o.language === "English") {
-        score += 15;
+      } else if (jobCat.includes("customer service") || userCat.includes("customer support")) {
+        score += 10;
       }
 
-      // 2. Field Match (Weight: 30 points)
-      if (o.category.toLowerCase().includes(answers.category.toLowerCase()) || 
-          answers.category.toLowerCase().includes(o.category.toLowerCase())) {
-        score += 30;
-      } else if (o.category === "Customer Service") {
-        score += 15;
-      }
-
-      // 3. Location Match (Weight: 20 points)
+      // 3. Location Match (Weight: 15 points)
       if (answers.location === "no_pref") {
-        score += 20;
+        score += 15;
       } else {
         const jobLoc = o.location.toLowerCase();
         const userLoc = answers.location.toLowerCase();
         if (jobLoc.includes(userLoc) || userLoc.includes(jobLoc)) {
-          score += 20;
-        } else if (jobLoc.includes("remote") || jobLoc.includes("work from home")) {
           score += 15;
+        } else if (userLoc === "remote" && (jobLoc.includes("remote") || jobLoc.includes("work from home") || jobLoc.includes("wfh"))) {
+          score += 15;
+        } else if (jobLoc.includes("remote") || jobLoc.includes("work from home")) {
+          score += 10;
         }
       }
 
       // 4. Experience Match (Weight: 15 points)
+      const jobText = `${o.title} ${o.salary_text} ${o.summary}`.toLowerCase();
       if (answers.experience === "freshman") {
-        if (o.salary_text.toLowerCase().includes("fresh") || o.summary.toLowerCase().includes("entry")) {
+        if (jobText.includes("fresh") || jobText.includes("entry") || jobText.includes("junior") || jobText.includes("0-1")) {
           score += 15;
+        } else if (jobText.includes("senior") || jobText.includes("lead")) {
+          score -= 10;
         } else {
           score += 10;
         }
       } else if (answers.experience === "mid") {
         score += 15;
       } else if (answers.experience === "senior") {
-        if (o.title.toLowerCase().includes("senior") || o.title.toLowerCase().includes("lead")) {
+        if (jobText.includes("senior") || jobText.includes("lead") || jobText.includes("supervisor")) {
           score += 15;
         } else {
           score += 10;
         }
       }
 
-      scores[o.id] = Math.min(score, 98);
+      // Final bounded score between 10% and 99%
+      scores[o.id] = Math.max(10, Math.min(score, 99));
     });
 
     setMatchScores(scores);
     setQuizOpen(false);
     toast.success("Job Matcher Complete!", {
-      description: `Ranked ${offers.length} openings according to your profile.`
+      description: `Ranked ${offers.length} openings. Found top matches for your ${answers.language} track.`
     });
+
+    // Auto-scroll to results grid
+    setTimeout(() => {
+      const el = document.getElementById("offers-grid");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 120);
   }
 
   function clearMatches() {
@@ -445,27 +481,53 @@ function OffersPage() {
 
       {/* MATCHED SUMMARY BANNER */}
       {matchScores && (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-6 shadow-xl">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm font-bold text-white">
-              <Sparkles className="size-4 text-primary" />
-              <span>Personalized AI Matches Active</span>
+        <div className="rounded-2xl border border-primary/30 bg-primary/10 p-6 shadow-xl backdrop-blur-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="grid size-6 place-items-center rounded-lg bg-primary text-black">
+                  <Sparkles className="size-3.5 fill-current" />
+                </span>
+                <span className="text-base font-bold text-white">Personalized Role Matches Active</span>
+                <span className="rounded-full bg-primary/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary border border-primary/30">
+                  {filtered.length} ranked
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                <span className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-2 px-2.5 py-1 text-white font-medium">
+                  🌐 Language: <strong className="text-primary">{quizAnswers.language}</strong>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-2 px-2.5 py-1 text-white font-medium">
+                  🎯 Track: <strong className="text-zinc-200">{quizAnswers.category}</strong>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-2 px-2.5 py-1 text-white font-medium">
+                  📍 Location: <strong className="text-zinc-200">{quizAnswers.location === "no_pref" ? "All Egypt" : quizAnswers.location}</strong>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-2 px-2.5 py-1 text-white font-medium">
+                  💼 Exp: <strong className="text-zinc-200">{quizAnswers.experience}</strong>
+                </span>
+              </div>
             </div>
-            <p className="text-xs text-[#E4E4E7]/90">
-              Ranked according to: {quizAnswers.language} • {quizAnswers.category} • {quizAnswers.location} • {quizAnswers.experience}.
-            </p>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => { setQuizStep(1); setQuizOpen(true); }}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-black hover:bg-[#c2ff47] transition-all cursor-pointer shadow-sm"
+              >
+                <Compass className="size-3.5" /> Retake Quiz
+              </button>
+              <button
+                onClick={clearMatches}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-surface-2 border border-white/15 px-3.5 py-2 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-surface-3 transition-colors cursor-pointer"
+              >
+                <RefreshCw className="size-3.5" /> Reset View
+              </button>
+            </div>
           </div>
-          <button
-            onClick={clearMatches}
-            className="inline-flex items-center gap-2 rounded-xl bg-surface-2 border border-white/15 px-4 py-2.5 text-xs font-semibold text-white hover:bg-surface-3 transition-colors cursor-pointer"
-          >
-            Clear matches &amp; reset
-          </button>
         </div>
       )}
 
       {/* ── JOB GRID VIEW ── */}
-      <div className="space-y-6">
+      <div id="offers-grid" className="space-y-6 scroll-mt-24">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-2xl font-bold text-white">
             {matchScores ? "Top Recommendations" : "Available Openings"} ({filtered.length})
