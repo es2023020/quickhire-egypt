@@ -34,3 +34,4 @@ PropTrack*
 
 .env
 .env.local
+seed-supabase.mjs

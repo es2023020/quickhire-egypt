@@ -1,6 +1,7 @@
 // QuickHire Full-Stack Referral & Ambassador Core Engine
-import { MOCK_APPLICATIONS, BUILT_IN_OFFERS, type MockApplication } from "./data";
-import { LANGUAGE_BOUNTIES, generateCandidateReferralCode, buildCandidateShareUrl, buildCandidateReferralShareMessage } from "./referral-engine";
+import { BUILT_IN_OFFERS } from "./data";
+import { generateCandidateReferralCode, buildCandidateShareUrl, buildCandidateReferralShareMessage } from "./referral-engine";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface AmbassadorAccount {
   id: string;
@@ -131,14 +132,32 @@ function savePayouts(list: PayoutRequest[]) {
   localStorage.setItem(STORAGE_KEY_PAYOUTS, JSON.stringify(list));
 }
 
-async function getLiveApplications(): Promise<MockApplication[]> {
-  if (typeof window === "undefined") return [...MOCK_APPLICATIONS];
+interface LiveApp {
+  id: string;
+  offer_id: string;
+  full_name: string;
+  phone: string;
+  email: string;
+  referral_code: string | null;
+  referred_by: string | null;
+  status: string;
+  pipeline_stage: string | null;
+  created_at: string;
+  offer?: { id: string; title: string; company: string; language: string | null } | null;
+}
+
+async function getLiveApplications(): Promise<LiveApp[]> {
   try {
-    const raw = localStorage.getItem("qh_applications_v2");
-    if (!raw) return [...MOCK_APPLICATIONS];
-    return JSON.parse(raw) as MockApplication[];
+    const { data, error } = await supabase
+      .from("applications")
+      .select("id, offer_id, full_name, phone, email, referral_code, referred_by, status, pipeline_stage, created_at, offer:offers(id, title, company, language)")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error || !data) return [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return data as any as LiveApp[];
   } catch {
-    return [...MOCK_APPLICATIONS];
+    return [];
   }
 }
 
@@ -298,7 +317,7 @@ export async function getAmbassadorDashboard(queryCodeOrPhone: string): Promise<
   let inPipeline = 0;
 
   const referrals: ReferredCandidateItem[] = matchedApps.map((app) => {
-    const offer = BUILT_IN_OFFERS.find((o) => o.id === app.offer_id) || app.offer;
+    const offer = app.offer || BUILT_IN_OFFERS.find((o) => o.id === app.offer_id) || null;
     const bountyEgp = getBountyForOffer(offer);
 
     const isHired =
