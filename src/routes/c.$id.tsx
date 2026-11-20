@@ -469,10 +469,10 @@ function ClientCandidateProfilePage() {
                 </h3>
                 {candidate.cv_data || candidate.cv_path ? (
                   <a
-                    href={candidate.cv_data || candidate.cv_path || "#"}
+                    href={candidate.cv_data || (candidate.cv_path?.startsWith("http") ? candidate.cv_path : "/placeholder-cv.pdf")}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 hover:underline"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
                   >
                     Open Full PDF <ArrowUpRight className="size-3" />
                   </a>
@@ -480,28 +480,28 @@ function ClientCandidateProfilePage() {
               </div>
 
               {candidate.cv_data || candidate.cv_path ? (
-                <div className="border border-border rounded-xl p-4 bg-sand/30 flex items-center justify-between gap-4">
+                <div className="border border-white/10 rounded-xl p-4 bg-surface-2 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-white border border-border flex items-center justify-center text-primary shadow-2xs">
+                    <div className="size-10 rounded-xl bg-surface-1 border border-white/10 flex items-center justify-center text-primary shadow-2xs">
                       <FileText className="size-5" />
                     </div>
                     <div>
-                      <div className="font-semibold text-xs text-ink">{candidate.full_name} — CV.pdf</div>
+                      <div className="font-semibold text-xs text-white">{candidate.full_name} — CV.pdf</div>
                       <div className="text-[10px] text-muted-foreground">Verified Document on File</div>
                     </div>
                   </div>
                   <a
-                    href={candidate.cv_data || candidate.cv_path || "#"}
+                    href={candidate.cv_data || (candidate.cv_path?.startsWith("http") ? candidate.cv_path : "/placeholder-cv.pdf")}
                     target="_blank"
                     rel="noreferrer"
                     download={`${candidate.full_name.replace(/\s+/g, "_")}_CV.pdf`}
-                    className="rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary/90 transition-colors shadow-2xs inline-flex items-center gap-1.5"
+                    className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-colors shadow-2xs inline-flex items-center gap-1.5"
                   >
                     <Download className="size-3.5" /> Download CV
                   </a>
                 </div>
               ) : (
-                <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+                <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-xs text-muted-foreground">
                   No CV file uploaded. Candidate applied with voice screening and profile questions.
                 </div>
               )}
@@ -510,10 +510,10 @@ function ClientCandidateProfilePage() {
 
           {/* Right Column: Direct Partner Action Panel (Real-Time Database Sync) */}
           <div className="space-y-6">
-            <div className="rounded-2xl border-2 border-violet-300 bg-white p-5 shadow-soft sticky top-20">
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
+            <div className="rounded-2xl border border-white/10 bg-surface-1 p-5 shadow-soft sticky top-20">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div>
-                  <h3 className="font-display font-bold text-base text-ink">
+                  <h3 className="font-display font-bold text-base text-white">
                     Client Decision Panel
                   </h3>
                   <p className="text-[11px] text-muted-foreground">

@@ -412,6 +412,8 @@ export async function adminUpdateApplicant({ data }: {
     english_level?: string | null;
     experience_years?: number | null;
     salary_expectation?: string | null;
+    cv_path?: string | null;
+    cv_data?: string | null;
   };
 }): Promise<{ ok: boolean }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -425,6 +427,8 @@ export async function adminUpdateApplicant({ data }: {
   if (data.english_level !== undefined) patch.english_level = data.english_level;
   if (data.experience_years !== undefined) patch.experience_years = data.experience_years;
   if (data.salary_expectation !== undefined) patch.salary_expectation = data.salary_expectation;
+  if (data.cv_path !== undefined) patch.cv_path = data.cv_path;
+  if (data.cv_data !== undefined) patch.cv_data = data.cv_data;
 
   const { error } = await supabase.from("applications").update(patch).eq("id", data.id);
   if (error) {

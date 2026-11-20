@@ -171,6 +171,15 @@ function ApplyPage() {
   const voiceReqs = offer.form_schema?.voice_notes ?? [];
   const roleQuestions = getRoleQuestions(offer.category);
 
+  function blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!offer) return;
@@ -184,14 +193,33 @@ function ApplyPage() {
     setSubmitting(true);
     try {
       const cvPath = fakePath("cvs", cvFile.name);
-      const voiceNotes: { lang: string; path: string }[] = [];
+      
+      // Convert CV to base64 so it is saved permanently in Supabase
+      let cvDataUrl: string | null = null;
+      try {
+        cvDataUrl = await blobToBase64(cvFile);
+      } catch (err) {
+        console.warn("Failed to encode CV base64:", err);
+      }
+
+      const voiceNotes: { lang: string; path: string; data?: string }[] = [];
       for (const v of voiceReqs) {
         const blob = voiceBlobs[v.lang]!;
         const ext = blob.type.includes("mp4") || blob.type.includes("m4a") ? "m4a"
           : blob.type.includes("mp3") || blob.type.includes("mpeg") ? "mp3"
           : blob.type.includes("wav") ? "wav"
           : "webm";
-        voiceNotes.push({ lang: v.lang, path: fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`) });
+        let audioDataUrl: string | undefined = undefined;
+        try {
+          audioDataUrl = await blobToBase64(blob);
+        } catch (err) {
+          console.warn("Failed to encode voice note base64:", err);
+        }
+        voiceNotes.push({
+          lang: v.lang,
+          path: fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`),
+          data: audioDataUrl,
+        });
       }
 
       const answers: Record<string, string> = {
@@ -215,7 +243,7 @@ function ApplyPage() {
           salary_expectation: salaryExp || null,
           answers,
           cv_path: cvPath,
-          cv_data: null,
+          cv_data: cvDataUrl,
           voice_notes: voiceNotes,
           referred_by: referralInput.trim() || null,
         },

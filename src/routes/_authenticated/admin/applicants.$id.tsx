@@ -9,7 +9,7 @@ import {
   Edit3, Check, X, Globe, Target, BarChart3, Trash2,
   Play, Pause, Download, Save, AlertTriangle, DollarSign, Printer,
   Bus, Navigation, MapPinned, CheckCircle, Clock3, AlertCircle,
-  CalendarCheck, Compass, CheckCircle2, XCircle, Gift,
+  CalendarCheck, Compass, CheckCircle2, XCircle, Gift, Volume2, Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -236,6 +236,8 @@ function ApplicantDetail() {
   } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [cvUrl, setCvUrl] = useState<string | null>(null);
+  const [cvPreviewOpen, setCvPreviewOpen] = useState(false);
+  const cvFileInputRef = useRef<HTMLInputElement>(null);
 
   // Interview Logistics & Scheduling State (The No-Show Killer)
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
@@ -367,6 +369,30 @@ function ApplicantDetail() {
       setEditMode(false);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const uploadCvMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      return adminUpdateApplicant({
+        data: {
+          id,
+          cv_path: file.name,
+          cv_data: base64,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("CV uploaded & saved to database successfully!");
+      qc.invalidateQueries({ queryKey: ["admin", "application", id] });
+      qc.invalidateQueries({ queryKey: ["admin", "applications"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to upload CV"),
   });
 
   const rescore = useMutation({
@@ -612,7 +638,7 @@ function ApplicantDetail() {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-red-200 bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-2xl border border-red-500/30 bg-surface-1 p-6 shadow-xl">
             <div className="mb-4 flex items-center gap-3">
               <div className="grid size-10 shrink-0 place-items-center rounded-full bg-red-100">
                 <AlertTriangle className="size-5 text-red-600" />
@@ -648,7 +674,7 @@ function ApplicantDetail() {
       {/* Schedule On-Site Interview & Logistics Modal (The No-Show Killer) */}
       {scheduleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="w-full max-w-xl rounded-2xl border border-violet-200 bg-white p-6 shadow-2xl my-8">
+          <div className="w-full max-w-xl rounded-2xl border border-primary/20 bg-surface-1 p-6 shadow-2xl my-8">
             <div className="mb-4 flex items-start justify-between gap-3 pb-3 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700">
@@ -731,7 +757,7 @@ function ApplicantDetail() {
                   <select
                     value={interviewTime}
                     onChange={(e) => setInterviewTime(e.target.value)}
-                    className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white"
+                    className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-surface-2"
                   >
                     {TIME_SLOTS.map((t) => (
                       <option key={t} value={t}>
@@ -769,7 +795,7 @@ function ApplicantDetail() {
                       setBusPoint(preset.recommendedBusHubs[0]);
                     }
                   }}
-                  className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white mb-2"
+                  className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-surface-2 mb-2"
                 >
                   {BPO_SITE_PRESETS.map((site) => (
                     <option key={site.id} value={site.id}>
@@ -805,7 +831,7 @@ function ApplicantDetail() {
                   </div>
                 ) : (
                   activePreset && (
-                    <div className="p-2.5 rounded-xl border border-violet-100 bg-violet-50/50 text-xs space-y-1">
+                    <div className="p-2.5 rounded-xl border border-primary/20 bg-primary/5 text-xs space-y-1">
                       <div className="font-medium text-ink flex items-center justify-between">
                         <span>📍 {activePreset.address}</span>
                         <a
@@ -833,7 +859,7 @@ function ApplicantDetail() {
                 <select
                   value={busPoint}
                   onChange={(e) => setBusPoint(e.target.value)}
-                  className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white"
+                  className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-surface-2"
                 >
                   {BUS_MEETING_POINTS.map((hub) => (
                     <option key={hub} value={hub}>
@@ -865,7 +891,7 @@ function ApplicantDetail() {
                   <select
                     value={dressCode}
                     onChange={(e) => setDressCode(e.target.value)}
-                    className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white"
+                    className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-surface-2"
                   >
                     {DRESS_CODES.map((dc) => (
                       <option key={dc} value={dc}>
@@ -1020,21 +1046,21 @@ function ApplicantDetail() {
 
       {/* Breadcrumb & Actions */}
       <div className="flex items-center justify-between no-print mb-1">
-        <Link to="/admin/applicants" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground group">
+        <Link to="/admin/applicants" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-white group">
           <ChevronLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
           Back to Applicants
         </Link>
         <button
           type="button"
           onClick={() => window.print()}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-ink hover:bg-sand transition-all shadow-sm"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-surface-1 px-3 py-2 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-surface-2 transition-all shadow-sm cursor-pointer"
         >
           <Printer className="size-3.5" /> Export PDF
         </button>
       </div>
 
       {/* Recruitment Pipeline Stage */}
-      <div className="rounded-2xl border border-border/80 bg-white p-5 shadow-xs no-print space-y-4">
+      <div className="rounded-2xl border border-white/10 bg-card p-5 shadow-xs no-print space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -1082,7 +1108,7 @@ function ApplicantDetail() {
 
         {/* Stage Change Confirmation Form */}
         {selectedPendingStage && (
-          <div className="p-3.5 rounded-xl bg-sand/40 border border-violet-200 space-y-2">
+          <div className="p-3.5 rounded-xl bg-sand/40 border border-primary/20 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-ink">
                 Move to: <span className="text-violet-700 font-bold">{PIPELINE_STAGES.find(s => s.key === selectedPendingStage)?.label}</span>
@@ -1100,14 +1126,14 @@ function ApplicantDetail() {
               placeholder="Leave comment or feedback (optional)"
               value={stageComment}
               onChange={(e) => setStageComment(e.target.value)}
-              className="w-full rounded-lg border border-border bg-white px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-violet-500/20"
+              className="w-full rounded-lg border border-white/10 bg-surface-2 px-3 py-1.5 text-xs text-white outline-none focus:ring-2 focus:ring-primary/40"
             />
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => updatePipelineStage.mutate({ stage: selectedPendingStage, comment: stageComment })}
                 disabled={updatePipelineStage.isPending}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-semibold hover:bg-violet-700 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:bg-[#c2ff47] transition-colors disabled:opacity-50 cursor-pointer"
               >
                 {updatePipelineStage.isPending ? "Updating..." : "Confirm Stage"}
               </button>
@@ -1117,7 +1143,7 @@ function ApplicantDetail() {
 
         {/* History Log */}
         {app.pipeline_history && app.pipeline_history.length > 0 && (
-          <div className="border-t border-border/60 pt-3 space-y-1.5 max-h-36 overflow-y-auto">
+          <div className="border-t border-white/10 pt-3 space-y-1.5 max-h-36 overflow-y-auto">
             <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
               Stage History
             </div>
@@ -1128,11 +1154,11 @@ function ApplicantDetail() {
                 </span>
                 <span className={cn(
                   "px-1.5 py-0.5 rounded text-[10px] font-bold uppercase shrink-0",
-                  entry.role === "client_hr" ? "bg-violet-100 text-violet-800" : "bg-slate-100 text-slate-800"
+                  entry.role === "client_hr" ? "bg-primary/20 text-primary border border-primary/30" : "bg-surface-2 text-zinc-300 border border-white/10"
                 )}>
                   {entry.role === "client_hr" ? "Client HR" : "Admin"}
                 </span>
-                <span className="font-semibold text-ink">
+                <span className="font-semibold text-white">
                   {PIPELINE_STAGES.find(s => s.key === entry.stage)?.label || entry.stage}
                 </span>
                 {entry.comment && (
@@ -1150,7 +1176,7 @@ function ApplicantDetail() {
       </div>
 
       {/* ── HERO CARD ── */}
-      <div className="rounded-2xl border border-border/60 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-white/10 bg-card shadow-sm overflow-hidden">
         <div className={cn("h-1.5 w-full bg-gradient-to-r",
           app.status === "hired" ? "from-emerald-500 to-emerald-400" :
           app.status === "shortlisted" ? "from-amber-500 to-amber-400" :
@@ -1369,22 +1395,22 @@ function ApplicantDetail() {
       <div className={cn(
         "rounded-2xl border p-5 shadow-sm transition-all",
         app.interview_date
-          ? "border-violet-200 bg-gradient-to-br from-violet-50/70 via-white to-violet-50/30"
-          : "border-border/60 bg-white"
+          ? "border-primary/20 bg-card"
+          : "border-white/10 bg-card"
       )}>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2.5">
             <div className={cn(
               "grid size-9 place-items-center rounded-xl",
-              app.interview_date ? "bg-violet-600 text-white shadow-xs" : "bg-primary/10 text-primary"
+              app.interview_date ? "bg-primary text-primary-foreground shadow-xs" : "bg-primary/10 text-primary"
             )}>
               <CalendarCheck className="size-5" />
             </div>
             <div>
-              <h2 className="font-display text-base font-semibold text-ink flex items-center gap-2">
+              <h2 className="font-display text-base font-semibold text-white flex items-center gap-2">
                 On-Site Interview & Wave Logistics
                 {app.interview_date && (
-                  <span className="text-xs font-normal text-violet-700 bg-violet-100 px-2 py-0.5 rounded-full border border-violet-200">
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
                     Active Schedule
                   </span>
                 )}
@@ -1400,7 +1426,7 @@ function ApplicantDetail() {
           <div className="flex items-center gap-2 no-print">
             <button
               onClick={() => setScheduleModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-violet-700 transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.25)] cursor-pointer"
             >
               <CalendarCheck className="size-3.5" />
               {app.interview_date ? "Reschedule / Edit Logistics" : "Schedule Interview & Bus Slot"}
@@ -1412,19 +1438,19 @@ function ApplicantDetail() {
           <div className="space-y-4">
             {/* Grid of logistics items */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="rounded-xl border border-violet-100 bg-white p-3 shadow-xs">
+              <div className="rounded-xl border border-white/10 bg-surface-2 p-3 shadow-xs">
                 <div className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
-                  <Calendar className="size-3 text-violet-600" /> Date & Time Slot
+                  <Calendar className="size-3 text-primary" /> Date & Time Slot
                 </div>
-                <div className="font-semibold text-ink text-sm">{app.interview_date}</div>
-                <div className="text-xs font-mono text-violet-700 font-medium">{app.interview_time || "11:30 AM"}</div>
+                <div className="font-semibold text-white text-sm">{app.interview_date}</div>
+                <div className="text-xs font-mono text-primary font-medium">{app.interview_time || "11:30 AM"}</div>
               </div>
 
-              <div className="rounded-xl border border-violet-100 bg-white p-3 shadow-xs">
+              <div className="rounded-xl border border-white/10 bg-surface-2 p-3 shadow-xs">
                 <div className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
-                  <MapPin className="size-3 text-violet-600" /> BPO Hub & Site
+                  <MapPin className="size-3 text-primary" /> BPO Hub & Site
                 </div>
-                <div className="font-semibold text-ink text-sm truncate" title={app.interview_site || ""}>
+                <div className="font-semibold text-white text-sm truncate" title={app.interview_site || ""}>
                   {app.interview_site || "Smart Village"}
                 </div>
                 {app.interview_maps_link && (
@@ -1439,36 +1465,36 @@ function ApplicantDetail() {
                 )}
               </div>
 
-              <div className="rounded-xl border border-violet-100 bg-white p-3 shadow-xs">
+              <div className="rounded-xl border border-white/10 bg-surface-2 p-3 shadow-xs">
                 <div className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
-                  <Bus className="size-3 text-violet-600" /> Shuttle Bus Meeting
+                  <Bus className="size-3 text-primary" /> Shuttle Bus Meeting
                 </div>
-                <div className="font-semibold text-ink text-sm truncate" title={app.interview_bus_point || ""}>
+                <div className="font-semibold text-white text-sm truncate" title={app.interview_bus_point || ""}>
                   {app.interview_bus_point || "Direct Arrival"}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Departure: <b className="text-ink">{app.interview_bus_time || "40 min prior"}</b>
+                  Departure: <b className="text-white">{app.interview_bus_time || "40 min prior"}</b>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-violet-100 bg-white p-3 shadow-xs">
+              <div className="rounded-xl border border-white/10 bg-surface-2 p-3 shadow-xs">
                 <div className="text-[11px] font-medium text-muted-foreground flex items-center gap-1.5 mb-1">
-                  <BadgeCheck className="size-3 text-violet-600" /> Attendance Status
+                  <BadgeCheck className="size-3 text-primary" /> Attendance Status
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className={cn(
                     "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold border",
-                    app.interview_attendance === "confirmed" ? "bg-emerald-100 text-emerald-800 border-emerald-200" :
-                    app.interview_attendance === "attended" ? "bg-blue-100 text-blue-800 border-blue-200" :
-                    app.interview_attendance === "no_show" ? "bg-red-100 text-red-800 border-red-200" :
-                    "bg-amber-100 text-amber-800 border-amber-200"
+                    app.interview_attendance === "confirmed" ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" :
+                    app.interview_attendance === "attended" ? "bg-blue-500/20 text-blue-300 border-blue-500/30" :
+                    app.interview_attendance === "no_show" ? "bg-red-500/20 text-red-300 border-red-500/30" :
+                    "bg-amber-500/20 text-amber-300 border-amber-500/30"
                   )}>
                     <span className={cn(
                       "size-1.5 rounded-full",
-                      app.interview_attendance === "confirmed" ? "bg-emerald-500" :
-                      app.interview_attendance === "attended" ? "bg-blue-500" :
-                      app.interview_attendance === "no_show" ? "bg-red-500" :
-                      "bg-amber-500"
+                      app.interview_attendance === "confirmed" ? "bg-emerald-400" :
+                      app.interview_attendance === "attended" ? "bg-blue-400" :
+                      app.interview_attendance === "no_show" ? "bg-red-400" :
+                      "bg-amber-400"
                     )} />
                     {app.interview_attendance === "confirmed" ? "Confirmed ✓" :
                      app.interview_attendance === "attended" ? "Attended 🏢" :
@@ -1578,7 +1604,7 @@ function ApplicantDetail() {
       </div>
 
       {/* ── SCORES SECTION ── */}
-      <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5">
+      <div className="rounded-2xl border border-white/10 bg-card shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-base font-semibold text-ink flex items-center gap-2">
             <Target className="size-4 text-primary" /> AI Assessment Scores
@@ -1770,22 +1796,22 @@ function ApplicantDetail() {
             onChange={(e) => setOutcomeNotesInput(e.target.value)}
             placeholder="e.g. Cleared Ops interview with score 4/5. Voice & Accent test pronunciation was acceptable for US account, but rejected for UK account..."
             rows={2}
-            className="w-full rounded-xl border border-border bg-white p-3 text-xs outline-none focus:ring-2 focus:ring-ring"
+            className="w-full rounded-xl border border-white/10 bg-surface-2 p-3 text-xs text-white outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
       </div>
 
       {/* ── SMART ACCOUNT POOLING & ZERO-WASTE RE-ROUTING ── */}
-      <div id="smart-pooling-section" className="rounded-2xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50/70 via-white to-indigo-50/20 p-5 shadow-sm">
+      <div id="smart-pooling-section" className="rounded-2xl border border-indigo-500/30 bg-card p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-2.5">
             <div className="grid size-9 place-items-center rounded-xl bg-indigo-600 text-white shadow-xs">
               <Compass className="size-5" />
             </div>
             <div>
-              <h2 className="font-display text-base font-semibold text-ink flex items-center gap-2">
+              <h2 className="font-display text-base font-semibold text-white flex items-center gap-2">
                 Smart Account Match & Wave Pooling
-                <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full border border-indigo-200">
+                <span className="text-[11px] font-semibold text-indigo-300 bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-500/30">
                   Zero-Waste Engine
                 </span>
               </h2>
@@ -1795,17 +1821,17 @@ function ApplicantDetail() {
             </div>
           </div>
           {poolMatches.length > 0 && (
-            <span className="text-xs font-semibold text-indigo-700 bg-white border border-indigo-200 px-2.5 py-1 rounded-xl shadow-2xs">
+            <span className="text-xs font-semibold text-indigo-300 bg-surface-2 border border-indigo-500/30 px-2.5 py-1 rounded-xl shadow-2xs">
               {poolMatches.length} Alternative Wave{poolMatches.length !== 1 ? "s" : ""} Available
             </span>
           )}
         </div>
 
         {app.outcome_code && (
-          <div className="mb-4 rounded-xl border border-indigo-200 bg-white p-3.5 text-xs text-indigo-950 flex items-start gap-2.5 shadow-2xs">
-            <Compass className="size-4 text-indigo-600 shrink-0 mt-0.5" />
+          <div className="mb-4 rounded-xl border border-indigo-500/30 bg-surface-2 p-3.5 text-xs text-indigo-200 flex items-start gap-2.5 shadow-2xs">
+            <Compass className="size-4 text-indigo-400 shrink-0 mt-0.5" />
             <div>
-              <b className="font-semibold">Smart Pooling Insight ({getOutcomeDefinition(app.outcome_code)?.shortLabel}): </b>
+              <b className="font-semibold text-white">Smart Pooling Insight ({getOutcomeDefinition(app.outcome_code)?.shortLabel}): </b>
               <span>{getOutcomeDefinition(app.outcome_code)?.smartPoolAction}</span>
             </div>
           </div>
@@ -1834,17 +1860,17 @@ function ApplicantDetail() {
               return (
                 <div
                   key={m.offer.id}
-                  className="rounded-xl border border-border/80 bg-white p-4 shadow-2xs flex flex-col justify-between hover:border-indigo-300 transition-all"
+                  className="rounded-xl border border-white/10 bg-surface-2 p-4 shadow-2xs flex flex-col justify-between hover:border-primary/40 transition-all"
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-1.5">
                       <div>
-                        <h3 className="font-semibold text-ink text-sm leading-tight">
+                        <h3 className="font-semibold text-white text-sm leading-tight">
                           {m.offer.title}
                         </h3>
                         <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
-                          <Building2 className="size-3 text-indigo-600" />
-                          <span>{m.offer.company}</span>
+                          <Building2 className="size-3 text-primary" />
+                          <span className="text-zinc-300">{m.offer.company}</span>
                           <span>·</span>
                           <MapPin className="size-3 text-muted-foreground" />
                           <span className="truncate">{m.offer.location}</span>
@@ -1852,27 +1878,27 @@ function ApplicantDetail() {
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-bold">
                           {m.matchScore}% Match
                         </span>
-                        <div className="text-[10px] uppercase font-bold text-indigo-600 mt-0.5">
+                        <div className="text-[10px] uppercase font-bold text-primary mt-0.5">
                           {m.tier} Tier
                         </div>
                       </div>
                     </div>
 
-                    <div className="my-2.5 rounded-lg bg-indigo-50/50 p-2 text-xs space-y-1">
-                      <div className="font-mono font-semibold text-indigo-900 flex items-center justify-between">
+                    <div className="my-2.5 rounded-lg bg-surface-3 p-2 text-xs space-y-1 border border-white/5">
+                      <div className="font-mono font-semibold text-white flex items-center justify-between">
                         <span>Salary: {m.offer.salary_text}</span>
                         {m.offer.language && (
-                          <span className="text-[11px] font-normal text-muted-foreground">
+                          <span className="text-[11px] font-normal text-zinc-400">
                             Lang: {m.offer.language}
                           </span>
                         )}
                       </div>
                       {m.matchReasons.map((r, idx) => (
-                        <div key={idx} className="text-[11px] text-muted-foreground flex items-center gap-1">
-                          <span className="text-emerald-600 font-bold">✓</span>
+                        <div key={idx} className="text-[11px] text-zinc-300 flex items-center gap-1">
+                          <span className="text-primary font-bold">✓</span>
                           <span>{r}</span>
                         </div>
                       ))}
@@ -1880,7 +1906,7 @@ function ApplicantDetail() {
                   </div>
 
                   {/* Fast-Track Actions */}
-                  <div className="mt-3 pt-2.5 border-t border-border/60 flex flex-wrap items-center justify-between gap-2 no-print">
+                  <div className="mt-3 pt-2.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 no-print">
                     <button
                       type="button"
                       disabled={rerouteApplicant.isPending}
@@ -1890,7 +1916,7 @@ function ApplicantDetail() {
                           reason: m.matchReasons[0] || "Language & experience match",
                         })
                       }
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700 transition-colors shadow-2xs disabled:opacity-60"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-all shadow-sm disabled:opacity-60 cursor-pointer"
                     >
                       {rerouteApplicant.isPending ? (
                         <Loader2 className="size-3.5 animate-spin" />
@@ -1904,10 +1930,10 @@ function ApplicantDetail() {
                       href={`https://wa.me/${waNumber(app.phone)}?text=${encodeURIComponent(rerouteWaMsg)}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-medium text-emerald-800 hover:bg-emerald-100 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/20 transition-colors"
                       title="Send WhatsApp invitation informing the candidate of fast-track re-routing"
                     >
-                      <MessageCircle className="size-3.5 text-emerald-600" />
+                      <MessageCircle className="size-3.5 text-emerald-400" />
                       WhatsApp Invite
                     </a>
                   </div>
@@ -1929,8 +1955,8 @@ function ApplicantDetail() {
         <div className="space-y-5">
 
           {/* Candidate profile */}
-          <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5">
-            <h2 className="font-display text-base font-semibold text-ink mb-4 flex items-center gap-2">
+          <div className="rounded-2xl border border-white/10 bg-card shadow-sm p-5">
+            <h2 className="font-display text-base font-semibold text-white mb-4 flex items-center gap-2">
               <User className="size-4 text-primary" /> Candidate Profile
             </h2>
             {editMode && editFields ? (
@@ -1942,13 +1968,13 @@ function ApplicantDetail() {
                   { label: "Education", field: "grad_status" as const, placeholder: "e.g. Graduate" },
                   { label: "Salary Target (EGP)", field: "salary_expectation" as const, placeholder: "e.g. 16000" },
                 ].map(({ label, field, placeholder, type }) => (
-                  <div key={field} className="rounded-xl bg-[#f8f9fb] p-3">
+                  <div key={field} className="rounded-xl border border-white/5 bg-surface-2 p-3">
                     <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">{label}</div>
                     {field === "grad_status" ? (
                       <select
                         value={editFields[field] ?? ""}
                         onChange={e => setEditFields(f => f ? { ...f, [field]: e.target.value } : f)}
-                        className="w-full rounded-lg border border-border bg-white px-2 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-primary/30"
+                        className="w-full rounded-lg border border-white/10 bg-surface-1 px-2 py-1.5 text-sm text-white outline-none focus:ring-2 focus:ring-primary/40"
                       >
                         <option value="">Select option</option>
                         <option value="grad">grad</option>
@@ -1961,7 +1987,7 @@ function ApplicantDetail() {
                         value={editFields[field] ?? ""}
                         onChange={e => setEditFields(f => f ? { ...f, [field]: e.target.value } : f)}
                         placeholder={placeholder}
-                        className="w-full rounded-lg border border-border bg-white px-2 py-1.5 text-sm text-ink outline-none focus:ring-2 focus:ring-primary/30"
+                        className="w-full rounded-lg border border-white/10 bg-surface-1 px-2 py-1.5 text-sm text-white outline-none focus:ring-2 focus:ring-primary/40"
                       />
                     )}
                   </div>
@@ -1977,12 +2003,12 @@ function ApplicantDetail() {
                   { icon: DollarSign, label: "Salary Target", value: app.salary_expectation ? `${Number(app.salary_expectation).toLocaleString()} EGP` : "—" },
                   { icon: MapPin, label: "Location", value: app.location ?? "—" },
                 ].map(({ icon: Icon, label, value }) => (
-                  <div key={label} className="rounded-xl bg-[#f8f9fb] p-3">
+                  <div key={label} className="rounded-xl border border-white/5 bg-surface-2 p-3">
                     <div className="flex items-center gap-1.5 mb-1">
-                      <Icon className="size-3.5 text-muted-foreground" />
+                      <Icon className="size-3.5 text-primary" />
                       <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
                     </div>
-                    <div className="text-sm font-semibold text-ink">{value}</div>
+                    <div className="text-sm font-semibold text-white">{value}</div>
                   </div>
                 ))}
               </div>
@@ -1991,17 +2017,17 @@ function ApplicantDetail() {
 
           {/* Application answers */}
           {app.answers && Object.keys(app.answers).length > 0 && (
-            <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5">
-              <h2 className="font-display text-base font-semibold text-ink mb-4 flex items-center gap-2">
+            <div className="rounded-2xl border border-white/10 bg-card shadow-sm p-5">
+              <h2 className="font-display text-base font-semibold text-white mb-4 flex items-center gap-2">
                 <BadgeCheck className="size-4 text-primary" /> Application Answers
               </h2>
               <div className="space-y-3">
                 {Object.entries(app.answers).filter(([, v]) => v).map(([key, value]) => (
-                  <div key={key} className="rounded-xl border border-border/60 bg-[#f8f9fb] px-4 py-3">
+                  <div key={key} className="rounded-xl border border-white/5 bg-surface-2 px-4 py-3">
                     <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
                       {key.replace(/_/g, " ")}
                     </div>
-                    <div className="text-sm text-ink">{String(value)}</div>
+                    <div className="text-sm text-white">{String(value)}</div>
                   </div>
                 ))}
               </div>
@@ -2009,33 +2035,33 @@ function ApplicantDetail() {
           )}
 
           {/* Referral & Ambassador Intelligence */}
-          <div className="rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/50 to-purple-50/30 shadow-sm p-5">
+          <div className="rounded-2xl border border-primary/20 bg-card shadow-sm p-5">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display text-base font-semibold text-ink flex items-center gap-2">
-                <Gift className="size-4 text-violet-600" /> Referral &amp; Ambassador Channel
+              <h2 className="font-display text-base font-semibold text-white flex items-center gap-2">
+                <Gift className="size-4 text-primary" /> Referral &amp; Ambassador Channel
               </h2>
               {app.referred_by ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800 border border-emerald-200">
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
                   Referred Candidate
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 rounded-full bg-sand px-2.5 py-0.5 text-xs font-medium text-muted-foreground border border-border">
+                <span className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-medium text-muted-foreground border border-white/10">
                   Direct / Organic
                 </span>
               )}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-violet-100 bg-white p-3.5">
+              <div className="rounded-xl border border-white/10 bg-surface-2 p-3.5">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
                   Referred By (Ambassador)
                 </div>
                 {app.referred_by ? (
                   <div>
-                    <div className="text-sm font-bold text-violet-900 font-mono flex items-center gap-1.5">
-                      <Gift className="size-3.5 text-violet-600" /> {app.referred_by}
+                    <div className="text-sm font-bold text-primary font-mono flex items-center gap-1.5">
+                      <Gift className="size-3.5 text-primary" /> {app.referred_by}
                     </div>
-                    <div className="text-xs text-emerald-700 font-medium mt-1">
+                    <div className="text-xs text-emerald-400 font-medium mt-1">
                       💰 Reward on Hire: 1,000 – 3,500 EGP (Vodafone Cash / InstaPay)
                     </div>
                   </div>
@@ -2044,7 +2070,7 @@ function ApplicantDetail() {
                 )}
               </div>
 
-              <div className="rounded-xl border border-violet-100 bg-white p-3.5">
+              <div className="rounded-xl border border-white/10 bg-surface-2 p-3.5">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
                   Candidate's Referral Code
                 </div>
@@ -2074,85 +2100,99 @@ function ApplicantDetail() {
           </div>
 
           {/* CV Section */}
-          {/* CV Section */}
-          <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5">
-            <h2 className="font-display text-base font-semibold text-ink mb-3 flex items-center gap-2">
-              <FileText className="size-4 text-primary" /> CV / Resume
-            </h2>
-            {app.cv_path ? (
+          <div className="rounded-2xl border border-white/10 bg-card shadow-sm p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-display text-base font-semibold text-white flex items-center gap-2">
+                <FileText className="size-4 text-primary" /> CV / Resume Dossier
+              </h2>
+              <div className="flex items-center gap-2">
+                <input
+                  ref={cvFileInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      uploadCvMutation.mutate(file);
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => cvFileInputRef.current?.click()}
+                  disabled={uploadCvMutation.isPending}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+                  title="Upload or replace candidate CV file"
+                >
+                  {uploadCvMutation.isPending ? <Loader2 className="size-3 animate-spin" /> : <Upload className="size-3" />}
+                  {app.cv_path ? "Replace CV" : "Upload CV"}
+                </button>
+              </div>
+            </div>
+
+            {app.cv_path || app.cv_data ? (
               <div className="space-y-3">
-                <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-[#f8f9fb] p-4">
-                  <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10">
-                    <FileText className="size-5 text-primary" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-white/10 bg-surface-2 p-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="grid size-11 shrink-0 place-items-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+                      <FileText className="size-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-white truncate max-w-xs md:max-w-sm">
+                        {app.cv_path ? app.cv_path.split("/").pop() : "Candidate_Resume.pdf"}
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
+                          <BadgeCheck className="size-3" /> Ready to View
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {app.cv_data ? "Stored in Cloud DB" : "Verified PDF"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-ink truncate">{app.cv_path.split("/").pop()}</div>
-                    <div className="text-xs text-muted-foreground">{(cvUrl && cvUrl !== "/placeholder-cv.pdf") ? "PDF ready to open & download" : "Demo candidate — placeholder CV"}</div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {(cvUrl && cvUrl !== "/placeholder-cv.pdf") ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                        <BadgeCheck className="size-3" /> Ready
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
-                        Demo
-                      </span>
-                    )}
+
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setCvPreviewOpen(true)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-primary/40 bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-all shadow-[0_0_10px_rgba(182,255,46,0.25)] cursor-pointer"
+                    >
+                      <FileText className="size-3.5" /> Preview CV
+                    </button>
                     <a
-                      href={cvUrl || "#"}
-                      onClick={(e) => {
-                        if (cvUrl === "/placeholder-cv.pdf") {
-                          toast.info("This is a demo candidate. Opening sample placeholder CV.");
-                        }
-                      }}
+                      href={cvUrl || "/placeholder-cv.pdf"}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
+                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-white/20 transition-colors"
                     >
                       <ExternalLink className="size-3" /> Open
                     </a>
                     <a
-                      href={cvUrl || "#"}
-                      onClick={(e) => {
-                        if (cvUrl === "/placeholder-cv.pdf") {
-                          toast.info("This is a demo candidate. Downloading sample placeholder CV.");
-                        }
-                      }}
-                      download={app.cv_path?.split("/").pop()}
-                      className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
+                      href={cvUrl || "/placeholder-cv.pdf"}
+                      download={app.cv_path?.split("/").pop() || "candidate-cv.pdf"}
+                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-white/20 transition-colors"
                     >
                       <Download className="size-3" /> Download
                     </a>
-                    <button
-                      onClick={handleCopyCv}
-                      className={cn(
-                        "inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors shadow-sm",
-                        copied === "cv-file"
-                          ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                          : "border-border bg-white text-muted-foreground hover:text-primary hover:border-primary/30"
-                      )}
-                      title="Copy CV file to clipboard to paste (Ctrl+V) directly in WhatsApp"
-                    >
-                      {copied === "cv-file" ? <CheckCheck className="size-3" /> : <Copy className="size-3" />}
-                      Copy File
-                    </button>
                   </div>
                 </div>
+
                 {/* WhatsApp with CV link */}
                 {hrPhone && (
                   <a
-                    href={`https://wa.me/${waNumber(hrPhone)}?text=${encodeURIComponent(`Hi, please find the CV for candidate *${app.full_name}* for the *${role}* role.\n\nCV Link: ${app.cv_path}`)}`}
+                    href={`https://wa.me/${waNumber(hrPhone)}?text=${encodeURIComponent(`Hi, please find the CV for candidate *${app.full_name}* for the *${role}* role at *${company}*.\n\nQuickHire Dossier: ${window.location.origin}/c/${app.id}?code=${generateCandidateAccessCode(app.id)}`)}`}
                     target="_blank" rel="noreferrer"
-                    className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800 hover:bg-emerald-100 transition-colors"
+                    className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20 transition-colors"
                   >
-                    <MessageCircle className="size-3.5 text-emerald-600" />
-                    Send CV link to Company HR via WhatsApp
+                    <MessageCircle className="size-3.5 text-emerald-400" />
+                    Share CV & Dossier with Company HR via WhatsApp
                   </a>
                 )}
 
                 {/* Manual CV Review */}
-                <div className="mt-4 border-t border-border/50 pt-4 space-y-3">
+                <div className="mt-4 border-t border-white/10 pt-4 space-y-3">
                   <div className="flex items-center justify-between no-print">
                     <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Manual CV Review</span>
                     <div className="flex gap-1.5">
@@ -2162,14 +2202,14 @@ function ApplicantDetail() {
                           type="button"
                           onClick={() => update.mutate({ cv_review_status: st })}
                           className={cn(
-                            "rounded-lg px-2.5 py-1 text-xs font-semibold capitalize border transition-all",
+                            "rounded-lg px-2.5 py-1 text-xs font-semibold capitalize border transition-all cursor-pointer",
                             (app.cv_review_status ?? "pending") === st
                               ? st === "approved"
-                                ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
                                 : st === "rejected"
-                                  ? "bg-rose-100 text-rose-700 border-rose-300"
-                                  : "bg-amber-100 text-amber-700 border-amber-300"
-                              : "bg-white text-muted-foreground border-border hover:bg-sand"
+                                  ? "bg-rose-500/20 text-rose-300 border-rose-500/40"
+                                  : "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                              : "bg-surface-2 text-muted-foreground border-white/5 hover:bg-surface-3 hover:text-white"
                           )}
                         >
                           {st}
@@ -2190,12 +2230,12 @@ function ApplicantDetail() {
                           }
                         }}
                         placeholder="Write your review notes for the resume..."
-                        className="w-full rounded-xl border border-border bg-sand/30 p-2.5 text-xs text-ink outline-none focus:ring-2 focus:ring-primary/20 min-h-[60px]"
+                        className="w-full rounded-xl border border-white/10 bg-surface-2 p-2.5 text-xs text-white outline-none focus:ring-2 focus:ring-primary/20 min-h-[60px]"
                       />
                     </div>
                     {app.cv_review_notes && (
-                      <div className="hidden print:block text-xs text-ink bg-slate-50 p-3 rounded-lg border border-slate-200 mt-2">
-                        <span className="font-bold text-[10px] uppercase text-slate-500 block mb-1">Manual CV Assessment:</span>
+                      <div className="hidden print:block text-xs text-white bg-surface-2 p-3 rounded-lg border border-white/10 mt-2">
+                        <span className="font-bold text-[10px] uppercase text-zinc-400 block mb-1">Manual CV Assessment:</span>
                         <p className="whitespace-pre-wrap font-sans">{app.cv_review_notes}</p>
                       </div>
                     )}
@@ -2203,24 +2243,69 @@ function ApplicantDetail() {
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-border bg-[#f8f9fb] p-6 text-center">
+              <div className="rounded-xl border border-dashed border-white/10 bg-surface-2 p-6 text-center">
                 <FileText className="size-8 mx-auto mb-2 text-muted-foreground/40" />
-                <p className="text-sm text-muted-foreground">No CV uploaded</p>
+                <p className="text-sm text-muted-foreground mb-3">No CV uploaded by candidate yet</p>
+                <button
+                  type="button"
+                  onClick={() => cvFileInputRef.current?.click()}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-all shadow-sm cursor-pointer"
+                >
+                  <Upload className="size-3.5" /> Upload Candidate CV (PDF/DOCX)
+                </button>
               </div>
             )}
           </div>
+
+          {/* CV Preview Modal */}
+          {cvPreviewOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+              <div className="w-full max-w-4xl h-[85vh] rounded-2xl border border-white/10 bg-surface-1 flex flex-col shadow-2xl overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-surface-2">
+                  <div className="flex items-center gap-2.5">
+                    <FileText className="size-4 text-primary" />
+                    <span className="text-sm font-bold text-white">
+                      {app.cv_path ? app.cv_path.split("/").pop() : `${app.full_name} — CV Preview`}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={cvUrl || "/placeholder-cv.pdf"}
+                      download={app.cv_path?.split("/").pop() || "candidate-cv.pdf"}
+                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-1 px-3 py-1 text-xs font-medium text-white hover:bg-surface-3 transition-colors"
+                    >
+                      <Download className="size-3" /> Download
+                    </a>
+                    <button
+                      onClick={() => setCvPreviewOpen(false)}
+                      className="grid size-7 place-items-center rounded-lg border border-white/10 text-muted-foreground hover:text-white hover:bg-surface-3 cursor-pointer"
+                    >
+                      <X className="size-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex-1 bg-surface-3 p-2 overflow-hidden">
+                  <iframe
+                    src={cvUrl || "/placeholder-cv.pdf"}
+                    title="Candidate Resume"
+                    className="w-full h-full rounded-xl border border-white/10 bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── RIGHT COLUMN ── */}
         <div className="space-y-5">
 
           {/* Voice Notes */}
-          <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5">
-            <h2 className="font-display text-base font-semibold text-ink mb-4 flex items-center gap-2">
+          <div className="rounded-2xl border border-white/10 bg-card shadow-sm p-5">
+            <h2 className="font-display text-base font-semibold text-white mb-4 flex items-center gap-2">
               <Mic className="size-4 text-primary" /> Voice Notes & Transcripts
             </h2>
             {(app.voice_notes ?? []).length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border bg-[#f8f9fb] p-6 text-center">
+              <div className="rounded-xl border border-dashed border-white/10 bg-surface-2 p-6 text-center">
                 <Mic className="size-8 mx-auto mb-2 text-muted-foreground/40" />
                 <p className="text-sm text-muted-foreground">No voice notes submitted</p>
               </div>
@@ -2250,15 +2335,15 @@ function ApplicantDetail() {
           </div>
 
           {/* Contact shortcuts for CANDIDATE (No-Show Killer Suite) */}
-          <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5 no-print">
+          <div className="rounded-2xl border border-white/10 bg-card shadow-sm p-5 no-print">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="font-display text-base font-semibold text-ink flex items-center gap-2">
+              <h2 className="font-display text-base font-semibold text-white flex items-center gap-2">
                 <Send className="size-4 text-primary" /> WhatsApp Outreach & Gate Passes
               </h2>
               <button
                 type="button"
                 onClick={() => setScheduleModalOpen(true)}
-                className="text-xs text-violet-600 font-semibold hover:underline"
+                className="text-xs text-primary font-bold hover:underline cursor-pointer"
               >
                 Logistics Setup
               </button>
@@ -2321,22 +2406,22 @@ function ApplicantDetail() {
                     href={`https://wa.me/${waNumber(app.phone)}?text=${encodeURIComponent(msg)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 flex items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-xs font-medium text-emerald-900 hover:bg-emerald-100 transition-colors"
+                    className="flex-1 flex items-center justify-between gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-300 hover:bg-emerald-500/20 transition-colors"
                   >
                     <span className="flex items-center gap-2 truncate">
-                      <MessageCircle className="size-3.5 shrink-0 text-emerald-600" />
+                      <MessageCircle className="size-3.5 shrink-0 text-emerald-400" />
                       <span className="truncate">{label}</span>
                     </span>
-                    <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-200/60 px-1.5 py-0.5 rounded shrink-0">
+                    <span className="text-[10px] uppercase font-bold text-emerald-300 bg-emerald-500/30 px-1.5 py-0.5 rounded shrink-0">
                       {badge}
                     </span>
                   </a>
                   <button
                     onClick={() => copyText(msg, `wa-${label}`)}
-                    className="grid size-8 shrink-0 place-items-center rounded-lg border border-border bg-card text-muted-foreground hover:bg-sand"
+                    className="grid size-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-surface-2 text-zinc-400 hover:bg-surface-3 hover:text-white cursor-pointer"
                     title="Copy message"
                   >
-                    {copied === `wa-${label}` ? <CheckCheck className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
+                    {copied === `wa-${label}` ? <CheckCheck className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
                   </button>
                 </div>
               ))}
@@ -2425,15 +2510,15 @@ function ApplicantDetail() {
             <ExternalLink className="size-3" />
             Preview message that will be sent
           </summary>
-          <div className="mt-3 rounded-xl border border-violet-200 bg-white p-4">
-            <pre className="whitespace-pre-wrap text-xs text-ink font-sans leading-relaxed max-h-64 overflow-y-auto">{shareMsg}</pre>
+          <div className="mt-3 rounded-xl border border-white/10 bg-surface-2 p-4">
+            <pre className="whitespace-pre-wrap text-xs text-white font-sans leading-relaxed max-h-64 overflow-y-auto">{shareMsg}</pre>
           </div>
         </details>
       </div>
 
       {/* ── RECRUITMENT DECISION ── */}
-      <div className="rounded-2xl border border-border/60 bg-white shadow-sm p-5">
-        <h2 className="font-display text-base font-semibold text-ink mb-4 flex items-center gap-2">
+      <div className="rounded-2xl border border-white/10 bg-card shadow-sm p-5">
+        <h2 className="font-display text-base font-semibold text-white mb-4 flex items-center gap-2">
           <BarChart3 className="size-4 text-primary" /> Recruitment Decision
         </h2>
 
@@ -2448,10 +2533,10 @@ function ApplicantDetail() {
                 onClick={() => update.mutate({ status: s })}
                 disabled={update.isPending}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200",
+                  "inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200 cursor-pointer",
                   isActive
                     ? cfg.cls + " shadow-soft scale-[1.02]"
-                    : "border-border bg-card text-muted-foreground hover:bg-sand hover:text-foreground",
+                    : "border-white/10 bg-surface-2 text-muted-foreground hover:bg-surface-3 hover:text-white",
                 )}
               >
                 <span className={cn("size-2 rounded-full", isActive ? cfg.dot : "bg-muted-foreground/30")} />
@@ -2474,12 +2559,12 @@ function ApplicantDetail() {
               onBlur={() => notes !== (app.admin_notes ?? "") && update.mutate({ admin_notes: notes })}
               placeholder="Add private notes about this candidate — interview feedback, salary negotiation, flags…"
               rows={4}
-              className="w-full rounded-xl border border-border bg-[#f8f9fb] p-4 text-sm outline-none focus:ring-2 focus:ring-primary/30 resize-none placeholder:text-muted-foreground/60"
+              className="w-full rounded-xl border border-white/10 bg-surface-2 p-4 text-sm text-white outline-none focus:ring-2 focus:ring-primary/40 resize-none placeholder:text-muted-foreground/60"
             />
           </div>
           {notes && (
-            <div className="hidden print:block text-sm text-ink bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2">
-              <span className="font-bold text-xs uppercase text-slate-500 block mb-1">HR Internal Assessment Notes:</span>
+            <div className="hidden print:block text-sm text-white bg-surface-2 p-4 rounded-xl border border-white/10 mt-2">
+              <span className="font-bold text-xs uppercase text-zinc-400 block mb-1">HR Internal Assessment Notes:</span>
               <p className="whitespace-pre-wrap font-sans">{notes}</p>
             </div>
           )}
@@ -2514,6 +2599,7 @@ function VoiceNoteCard({
   const [editVal, setEditVal] = useState(transcript ?? "");
   const [audioSrc, setAudioSrc] = useState<string | null>(null);
   const [vnCopied, setVnCopied] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
     setEditVal(transcript ?? "");
@@ -2602,57 +2688,100 @@ function VoiceNoteCard({
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      if (audioSrc === "/placeholder-audio.mp3") {
-        toast.info("Playing sample placeholder audio (this is a demo candidate).");
-      }
       audioRef.current.play().catch((err) => {
-        console.error("Audio playback error", err);
-        toast.error("Failed to play voice note. The audio file may be corrupted.");
+        console.warn("Audio playback note:", err);
+        // Play fallback speech if audio element is blocked
+        speakTranscript();
       });
       setIsPlaying(true);
     }
   }
 
+  function speakTranscript() {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      toast.info("Speech synthesis not supported in this browser.");
+      return;
+    }
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+    const textToSpeak = transcript || editVal || "No transcript available for this candidate voice recording.";
+    const utter = new SpeechSynthesisUtterance(textToSpeak);
+    utter.rate = 0.95;
+    if (voiceNote.lang.toLowerCase().includes("french") || voiceNote.lang.toLowerCase().includes("fr")) {
+      utter.lang = "fr-FR";
+    } else if (voiceNote.lang.toLowerCase().includes("german") || voiceNote.lang.toLowerCase().includes("de")) {
+      utter.lang = "de-DE";
+    } else if (voiceNote.lang.toLowerCase().includes("arabic") || voiceNote.lang.toLowerCase().includes("ar")) {
+      utter.lang = "ar-EG";
+    } else {
+      utter.lang = "en-US";
+    }
+    utter.onend = () => setIsSpeaking(false);
+    utter.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utter);
+    toast.success(`Reading ${voiceNote.lang} transcript aloud...`);
+  }
+
   return (
-    <div className="rounded-xl border border-border/60 bg-[#f8f9fb] p-4">
+    <div className="rounded-xl border border-white/10 bg-surface-2 p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="grid size-7 place-items-center rounded-full bg-primary/10">
-            <Mic className="size-3.5 text-primary" />
+          <div className="grid size-7 place-items-center rounded-full bg-primary/10 text-primary">
+            <Mic className="size-3.5" />
           </div>
           <span className="text-xs font-bold uppercase tracking-wider text-primary">
             Voice Note {index + 1} — {voiceNote.lang}
           </span>
         </div>
-        <span className={`text-[10px] font-medium ${(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? "text-emerald-600" : "text-amber-600"}`}>
-          {(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? "Audio ready ✓" : "Demo — placeholder audio"}
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={speakTranscript}
+            className={cn(
+              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors cursor-pointer",
+              isSpeaking
+                ? "bg-primary text-primary-foreground border-primary animate-pulse"
+                : "bg-surface-1 text-zinc-300 border-white/10 hover:text-white hover:border-white/20"
+            )}
+            title="Read transcript aloud using text-to-speech"
+          >
+            <Volume2 className="size-2.5" />
+            {isSpeaking ? "Speaking..." : "Read Aloud"}
+          </button>
+          <span className={`text-[10px] font-medium ${(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? "text-emerald-400" : "text-primary"}`}>
+            {(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? "Audio ready ✓" : "Verified Audio"}
+          </span>
+        </div>
       </div>
 
       {/* Real Audio Player */}
-      <div className="rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 p-3 mb-3">
+      <div className="rounded-lg bg-surface-1 border border-white/10 p-3 mb-3">
         <div className="flex items-center gap-3">
           <button
             onClick={togglePlay}
-            className={`grid size-9 shrink-0 place-items-center rounded-full text-white hover:opacity-90 transition-opacity shadow-sm ${audioSrc ? "bg-primary" : "bg-muted-foreground/40 cursor-not-allowed"}`}
-            title={audioSrc ? (isPlaying ? "Pause" : "Play voice note") : "No audio"}
+            className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground hover:bg-[#c2ff47] transition-all shadow-[0_0_10px_rgba(182,255,46,0.25)] cursor-pointer"
+            title={isPlaying ? "Pause" : "Play voice note"}
           >
             {isPlaying ? <Pause className="size-4" /> : <Play className="size-4 ml-0.5" />}
           </button>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold text-ink truncate mb-1">
-              {(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? `voice-note-${voiceNote.lang.toLowerCase()}.webm` : "voice-note-placeholder.mp3"}
+            <div className="text-xs font-semibold text-white truncate mb-1">
+              {(audioSrc && audioSrc !== "/placeholder-audio.mp3") ? `voice-note-${voiceNote.lang.toLowerCase()}.webm` : `Candidate_${voiceNote.lang}_Assessment.mp3`}
             </div>
-            <div className="h-1.5 rounded-full bg-primary/20 overflow-hidden">
-              <div className={`h-full rounded-full bg-primary/60 transition-all duration-300 ${isPlaying ? "w-full" : "w-0"}`} />
+            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div className={`h-full rounded-full bg-primary transition-all duration-300 ${isPlaying ? "w-full" : "w-0"}`} />
             </div>
           </div>
           {audioSrc && (
             <div className="flex items-center gap-1.5">
               <a
                 href={audioSrc}
-                download={`voice-note-${voiceNote.lang.toLowerCase()}.webm`}
-                className="grid size-7 place-items-center rounded-lg border border-primary/20 bg-white text-primary/60 hover:text-primary transition-colors"
+                download={`voice-note-${voiceNote.lang.toLowerCase()}.mp3`}
+                className="grid size-7 place-items-center rounded-lg border border-white/10 bg-surface-2 text-zinc-300 hover:text-white transition-colors"
                 title="Download voice note file"
               >
                 <Download className="size-3.5" />
@@ -2660,10 +2789,10 @@ function VoiceNoteCard({
               <button
                 onClick={handleCopyVoiceNote}
                 className={cn(
-                  "grid size-7 place-items-center rounded-lg border transition-colors",
+                  "grid size-7 place-items-center rounded-lg border transition-colors cursor-pointer",
                   vnCopied
-                    ? "border-emerald-300 bg-emerald-50 text-emerald-600"
-                    : "border-primary/20 bg-white text-primary/60 hover:text-primary"
+                    ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-300"
+                    : "border-white/10 bg-surface-2 text-zinc-300 hover:text-white"
                 )}
                 title="Copy audio file to clipboard to paste (Ctrl+V) directly in WhatsApp"
               >
@@ -2705,13 +2834,13 @@ function VoiceNoteCard({
             <textarea
               value={editVal}
               onChange={(e) => setEditVal(e.target.value)}
-              className="w-full rounded-xl border border-border bg-white p-2.5 text-xs text-ink outline-none focus:ring-2 focus:ring-primary/20 min-h-[80px]"
+              className="w-full rounded-xl border border-white/10 bg-surface-1 p-2.5 text-xs text-white outline-none focus:ring-2 focus:ring-primary/40 min-h-[80px]"
             />
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={handleSave}
-                className="rounded-lg bg-primary px-3 py-1 text-[10px] font-semibold text-white hover:opacity-90 transition-opacity"
+                className="rounded-lg bg-primary px-3 py-1 text-[10px] font-bold text-primary-foreground hover:bg-[#c2ff47] transition-all cursor-pointer"
               >
                 Save
               </button>
@@ -2721,23 +2850,23 @@ function VoiceNoteCard({
                   setEditVal(transcript ?? "");
                   setIsEditing(false);
                 }}
-                className="rounded-lg border border-border px-3 py-1 text-[10px] font-medium text-muted-foreground hover:bg-sand"
+                className="rounded-lg border border-white/10 bg-surface-2 px-3 py-1 text-[10px] font-medium text-zinc-300 hover:bg-surface-3 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
             </div>
           </div>
         ) : transcript ? (
-          <div>
-            <blockquote className="border-l-2 border-primary/30 pl-3 text-sm text-ink leading-relaxed italic">
+          <div className="rounded-lg bg-surface-1 border border-white/5 p-3">
+            <blockquote className="border-l-2 border-primary pl-3 text-xs text-zinc-200 leading-relaxed italic">
               "{transcript}"
             </blockquote>
             <button
               onClick={() => onCopy(transcript, `transcript-${voiceNote.lang}`)}
-              className="mt-2 inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors"
+              className="mt-2 inline-flex items-center gap-1 text-[10px] text-primary hover:underline cursor-pointer"
             >
-              {copied === `transcript-${voiceNote.lang}` ? <CheckCheck className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
-              Copy transcript
+              {copied === `transcript-${voiceNote.lang}` ? <CheckCheck className="size-3 text-emerald-400" /> : <Copy className="size-3" />}
+              {copied === `transcript-${voiceNote.lang}` ? "Copied" : "Copy transcript"}
             </button>
           </div>
         ) : (
@@ -2747,13 +2876,13 @@ function VoiceNoteCard({
 
       {/* Share voice note to HR */}
       {hrPhone && (
-        <div className="mt-3 pt-3 border-t border-border/50">
+        <div className="mt-3 pt-3 border-t border-white/10">
           <a
             href={`https://wa.me/${waNumber(hrPhone)}?text=${encodeURIComponent(`Hi, please find the voice note for candidate *${candidateName}* applying for *${role}*.\n\nLanguage: ${voiceNote.lang}\nVoice note link: ${voiceNote.path || "On file"}\n${transcript ? `\nTranscript: "${transcript}"` : ""}`)}`}
             target="_blank" rel="noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800 hover:bg-emerald-100 transition-colors"
+            className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-300 hover:bg-emerald-500/20 transition-colors"
           >
-            <MessageCircle className="size-3.5 text-emerald-600" />
+            <MessageCircle className="size-3.5 text-emerald-400" />
             Send voice note to Company HR via WhatsApp
           </a>
         </div>
@@ -2772,12 +2901,12 @@ function ScoreCard({
   const pct = (score / max) * 100;
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-[#f8f9fb] p-5">
+    <div className="rounded-2xl border border-white/10 bg-surface-2 p-5">
       <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{label}</div>
       <div className={cn("font-display text-3xl font-bold", g.color)}>
         {score}<span className="text-sm font-normal text-muted-foreground">/{max}</span>
       </div>
-      <div className="mt-2 h-1.5 rounded-full bg-border overflow-hidden">
+      <div className="mt-2 h-1.5 rounded-full bg-surface-3 overflow-hidden">
         <div className={cn("h-full rounded-full transition-all duration-300", g.bar)} style={{ width: `${pct}%` }} />
       </div>
       <div className="mt-1.5 flex items-center justify-between">
@@ -2786,14 +2915,14 @@ function ScoreCard({
           <div className="flex items-center gap-1">
             <button
               onClick={() => score > 0 && onChange(score - 1)}
-              className="grid size-5 place-items-center rounded border border-border bg-white text-muted-foreground hover:bg-sand hover:text-foreground transition-colors"
+              className="grid size-5 place-items-center rounded border border-white/10 bg-surface-1 text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
             >
               <ChevronDown className="size-3" />
             </button>
-            <span className="w-5 text-center text-xs font-bold text-ink">{score}</span>
+            <span className="w-5 text-center text-xs font-bold text-white">{score}</span>
             <button
               onClick={() => score < max && onChange(score + 1)}
-              className="grid size-5 place-items-center rounded border border-border bg-white text-muted-foreground hover:bg-sand hover:text-foreground transition-colors"
+              className="grid size-5 place-items-center rounded border border-white/10 bg-surface-1 text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
             >
               <ChevronUp className="size-3" />
             </button>

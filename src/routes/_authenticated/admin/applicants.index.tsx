@@ -577,7 +577,7 @@ function Applicants() {
                   <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold border", col.badgeColor)}>
                     {col.title}
                   </span>
-                  <span className="text-xs font-bold text-muted-foreground bg-white px-2 py-0.5 rounded-full border border-border shadow-xs">
+                  <span className="text-xs font-bold text-zinc-300 bg-surface-2 px-2 py-0.5 rounded-full border border-white/10 shadow-xs">
                     {col.items.length}
                   </span>
                 </div>
@@ -585,7 +585,7 @@ function Applicants() {
                 {/* Cards Container */}
                 <div className="space-y-3 overflow-y-auto max-h-[72vh] pr-1">
                   {col.items.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border/70 p-6 text-center text-xs text-muted-foreground/60 bg-white/40">
+                    <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-xs text-muted-foreground/60 bg-surface-2/40">
                       No candidates in this stage
                     </div>
                   ) : (
@@ -595,11 +595,11 @@ function Applicants() {
                         <div
                           key={a.id}
                           onClick={() => navigate({ to: "/admin/applicants/$id", params: { id: a.id } })}
-                          className="rounded-xl border border-border/80 bg-white p-3.5 shadow-xs hover:shadow-soft hover:border-primary/40 transition-all cursor-pointer group space-y-2.5"
+                          className="rounded-xl border border-white/10 bg-surface-2 p-3.5 shadow-xs hover:shadow-soft hover:border-primary/50 hover:bg-surface-3 transition-all cursor-pointer group space-y-2.5"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0 flex-1">
-                              <div className="font-bold text-ink text-sm group-hover:text-primary transition-colors truncate">
+                              <div className="font-bold text-white text-sm group-hover:text-primary transition-colors truncate">
                                 {a.full_name}
                               </div>
                               <div className="text-[11px] text-muted-foreground truncate">
