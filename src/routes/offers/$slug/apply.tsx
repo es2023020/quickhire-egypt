@@ -257,7 +257,54 @@ function ApplyPage() {
           Shortlisted candidates receive a direct call or WhatsApp from HR within <b>24–48 hours</b>.
         </p>
 
-        <div className="mt-8 w-full rounded-2xl border border-white/10 bg-surface-1 p-6 text-left shadow-xl space-y-4">
+        {/* ── Personalized Referral & Bounty Pass ── */}
+        {generatedRefCode && (
+          <div className="mt-8 w-full rounded-2xl border border-primary/30 bg-surface-1 p-6 text-left shadow-xl space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                  <Gift className="size-3.5" /> Your Personal Ambassador Code
+                </span>
+                <div className="font-mono text-xl font-bold text-white mt-1">
+                  {generatedRefCode}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(buildCandidateShareUrl(generatedRefCode));
+                  toast.success("Personalized referral link copied!");
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3.5 py-2 text-xs font-bold text-primary hover:bg-primary/20 transition-all cursor-pointer"
+              >
+                <Copy className="size-3.5" /> Copy Link
+              </button>
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Earn <b>1,000 to 3,500 EGP cash</b> directly to your InstaPay or Vodafone Cash for every friend who applies through your link and gets hired!
+            </p>
+
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                buildCandidateReferralShareMessage({
+                  referrerName: fullName,
+                  code: generatedRefCode,
+                  offerTitle: offer.title,
+                  company: offer.company,
+                  shareUrl: buildCandidateShareUrl(generatedRefCode),
+                })
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-primary-foreground shadow-[0_0_15px_rgba(182,255,46,0.25)] hover:bg-[#c2ff47] transition-all"
+            >
+              <Share2 className="size-4" /> Share on WhatsApp to Earn Bounties
+            </a>
+          </div>
+        )}
+
+        <div className="mt-6 w-full rounded-2xl border border-white/10 bg-surface-1 p-6 text-left shadow-xl space-y-4">
           <div>
             <p className="text-sm font-bold text-white">Confirm Your Contact Number</p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -477,7 +524,7 @@ function ApplyPage() {
             type="text"
             value={referralInput}
             onChange={(e) => setReferralInput(e.target.value.toUpperCase())}
-            placeholder="e.g. REF-OMAR-4783"
+            placeholder="e.g. REF-AHMED-1029"
             className="w-full rounded-xl border border-white/10 bg-surface-1 px-4 py-3 text-sm text-white uppercase tracking-wider font-mono outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/40 transition-all"
           />
         </section>

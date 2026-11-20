@@ -493,29 +493,11 @@ function ReferralsPage() {
             </button>
           </form>
 
-          {/* Quick Demo Preview Chips */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-            <span className="text-[11px] text-muted-foreground">Quick test profiles:</span>
-            <button
-              type="button"
-              onClick={() => {
-                setTrackingQuery("REF-OMAR-4783");
-                setActiveSearchQuery("REF-OMAR-4783");
-              }}
-              className="rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-mono font-bold text-primary hover:bg-primary/20 transition-colors cursor-pointer"
-            >
-              REF-OMAR-4783
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setTrackingQuery("REF-SARAH-3322");
-                setActiveSearchQuery("REF-SARAH-3322");
-              }}
-              className="rounded-lg border border-white/10 bg-surface-2 px-2.5 py-1 text-[11px] font-mono font-medium text-zinc-300 hover:text-white hover:bg-surface-3 transition-colors cursor-pointer"
-            >
-              REF-SARAH-3322
-            </button>
+          {/* Search Guidance */}
+          <div className="flex items-center justify-center gap-1.5 pt-1 text-center">
+            <span className="text-[11px] text-muted-foreground">
+              Tip: Enter your registered WhatsApp number or custom referral code to track live rewards
+            </span>
           </div>
         </div>
 

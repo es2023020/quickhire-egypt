@@ -60,30 +60,6 @@ export interface AmbassadorDashboardData {
 const STORAGE_KEY_AMBASSADORS = "qh_ambassadors_v1";
 const STORAGE_KEY_PAYOUTS = "qh_payout_requests_v1";
 
-// Demo ambassadors for instant preview
-const DEMO_AMBASSADORS: AmbassadorAccount[] = [
-  {
-    id: "amb-1",
-    name: "Omar Khaled",
-    phone: "01029324783",
-    email: "omar.khaled@example.com",
-    referral_code: "REF-OMAR-4783",
-    payout_method: "instapay",
-    payout_account: "omar@instapay",
-    created_at: "2026-10-01T10:00:00Z",
-  },
-  {
-    id: "amb-2",
-    name: "Sarah Mansour",
-    phone: "01155443322",
-    email: "sarah.m@example.com",
-    referral_code: "REF-SARAH-3322",
-    payout_method: "vodafone_cash",
-    payout_account: "01099887766",
-    created_at: "2026-10-15T12:00:00Z",
-  },
-];
-
 // Helper to determine bounty by role & language
 export function getBountyForOffer(offer?: { title?: string; language?: string | null } | null): number {
   if (!offer) return 1000;
@@ -98,16 +74,17 @@ export function getBountyForOffer(offer?: { title?: string; language?: string | 
 }
 
 function getStoredAmbassadors(): AmbassadorAccount[] {
-  if (typeof window === "undefined") return [...DEMO_AMBASSADORS];
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY_AMBASSADORS);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY_AMBASSADORS, JSON.stringify(DEMO_AMBASSADORS));
-      return [...DEMO_AMBASSADORS];
-    }
-    return JSON.parse(raw) as AmbassadorAccount[];
+    if (!raw) return [];
+    const list = JSON.parse(raw) as AmbassadorAccount[];
+    // Filter out any legacy mock demo accounts
+    return (list || []).filter(
+      (a) => a && a.referral_code && !a.referral_code.includes("OMAR") && !a.referral_code.includes("SARAH-3322")
+    );
   } catch {
-    return [...DEMO_AMBASSADORS];
+    return [];
   }
 }
 
@@ -279,10 +256,11 @@ export async function getAmbassadorDashboard(queryCodeOrPhone: string): Promise<
   // 3. Fallback: If user entered a valid format REF-NAME-CODE or REF-..., auto register
   if (!amb && (queryUpper.startsWith("REF-") || queryUpper.includes("-"))) {
     const code = queryUpper.startsWith("REF-") ? queryUpper : `REF-${queryUpper}`;
-    const namePart = code.replace("REF-", "").split("-")[0] || "Ambassador";
+    const rawPart = code.replace("REF-", "").split("-")[0] || "";
+    const cleanName = rawPart ? rawPart.charAt(0).toUpperCase() + rawPart.slice(1).toLowerCase() : "Ambassador";
     amb = {
       id: `amb-auto-${Date.now()}`,
-      name: namePart,
+      name: cleanName,
       phone: cleanPhone || "01000000000",
       referral_code: code,
       payout_method: "instapay",
