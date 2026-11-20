@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -9,7 +9,9 @@ export const Route = createFileRoute("/_authenticated")({
       if (!session) {
         localStorage.removeItem("qh_admin");
         localStorage.removeItem("qh_admin_email");
-        throw redirect({ to: "/auth" });
+        // Cloaking: Never redirect to /auth (which leaks the admin portal location).
+        // Render standard 404 as if the admin route does not exist.
+        throw notFound();
       }
     }
   },

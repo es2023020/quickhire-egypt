@@ -36,8 +36,9 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
     }
     localStorage.removeItem("qh_admin");
     localStorage.removeItem("qh_admin_email");
+    sessionStorage.removeItem("qh_gate_clearance");
     toast.success("Signed out");
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/", replace: true });
   }
 
   function isActive(item: (typeof navItems)[number]) {

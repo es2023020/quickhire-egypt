@@ -1,11 +1,42 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Eye, EyeOff, ShieldAlert, KeyRound, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { QuickHireLogo } from "@/components/logo";
 import { supabase } from "@/integrations/supabase/client";
 
+type AuthSearchParams = {
+  key?: string;
+  gate?: string;
+};
+
+const VALID_GATE_KEYS = ["qh-ops-2026", "qh2026", "ops9910", "secure99"];
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>): AuthSearchParams => ({
+    key: typeof search.key === "string" ? search.key : undefined,
+    gate: typeof search.gate === "string" ? search.gate : undefined,
+  }),
+  beforeLoad: async ({ search }) => {
+    if (typeof window !== "undefined") {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // If already authenticated with Supabase, allow access
+        return;
+      }
+
+      const providedKey = (search.key || search.gate || "").trim().toLowerCase();
+      const hasSessionClearance = sessionStorage.getItem("qh_gate_clearance") === "granted";
+
+      if (!VALID_GATE_KEYS.includes(providedKey) && !hasSessionClearance) {
+        // Cloaking: Public visitors who type /auth simply see a standard 404
+        throw notFound();
+      }
+
+      // Store gate clearance in this browser tab session
+      sessionStorage.setItem("qh_gate_clearance", "granted");
+    }
+  },
   component: AuthPage,
 });
 
@@ -13,7 +44,6 @@ function AuthPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [accessPasscode, setAccessPasscode] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [failedAttempts, setFailedAttempts] = useState(0);
@@ -69,7 +99,7 @@ function AuthPage() {
             <QuickHireLogo size={52} className="rounded-2xl ring-1 ring-white/10" />
           </div>
           <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-surface-1 px-3 py-1 text-[11px] font-mono font-semibold text-zinc-300">
-            <Lock className="size-3 text-primary" /> RESTRICTED ENVIRONMENT
+            <Lock className="size-3 text-primary" /> RESTRICTED CLOAKED GATEWAY
           </div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-white">
             QuickHire Operations Gate
