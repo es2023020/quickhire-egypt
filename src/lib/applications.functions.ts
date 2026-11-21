@@ -943,6 +943,36 @@ export type WaveRosterResponse = {
 export async function getWaveRoster({ data }: { data: { waveTag: string } }): Promise<WaveRosterResponse> {
   const targetTag = (data.waveTag || "").trim();
 
+  // 1. Try serverless API first (securely bypasses client-side RLS for external corporate HR)
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch(`/api/wave?tag=${encodeURIComponent(targetTag)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.ok && Array.isArray(json.candidates)) {
+          return {
+            waveTag: json.waveTag,
+            totalCandidates: json.totalCandidates,
+            confirmedCount: json.confirmedCount,
+            attendedCount: json.attendedCount,
+            passedCount: json.passedCount,
+            noShowCount: json.noShowCount,
+            siteName: json.siteName,
+            siteAddress: json.siteAddress,
+            mapsLink: json.mapsLink,
+            companyName: json.companyName,
+            interviewDate: json.interviewDate,
+            candidates: json.candidates,
+            allAvailableWaves: json.allAvailableWaves || [],
+          };
+        }
+      }
+    } catch (apiErr) {
+      console.warn("[QuickHire] /api/wave fallback to direct supabase query:", apiErr);
+    }
+  }
+
+  // 2. Direct Supabase query fallback (when user is authenticated admin)
   // Collect all unique wave tags
   const { data: waveRows } = await supabase
     .from("applications")
@@ -1038,7 +1068,8 @@ export async function clientUpdateCandidateWaveStatus({
   if (typeof window !== "undefined") {
     try {
       const codeFromUrl = new URLSearchParams(window.location.search).get("code") || data.code || "";
-      const res = await fetch("/api/candidate", {
+      const apiEndpoint = codeFromUrl ? "/api/candidate" : "/api/wave";
+      const res = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
