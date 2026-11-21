@@ -1309,10 +1309,10 @@ function ApplicantDetail() {
                         toast.success(`Shareable candidate link & access code (${accessCode}) copied!`);
                       });
                     }}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-violet-300 bg-violet-50 px-3 py-2 text-xs font-bold text-violet-700 hover:bg-violet-100 transition-colors shadow-2xs"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-bold text-primary hover:bg-primary/20 transition-colors shadow-sm cursor-pointer"
                     title="Copy WhatsApp Share Link with Access Code"
                   >
-                    <Share2 className="size-4 text-violet-600" /> Share to Company HR
+                    <Share2 className="size-4 text-primary" /> Share to Company HR
                   </button>
                   <button
                     onClick={() => setEditMode(true)}
@@ -1363,6 +1363,85 @@ function ApplicantDetail() {
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* ── 🏢 PROMINENT EMPLOYER REVIEW LINK & DOSSIER PASS ── */}
+      <div className="rounded-2xl border border-primary/40 bg-surface-1 p-5 shadow-xl backdrop-blur-xs space-y-3.5 no-print">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-black font-bold shadow-[0_0_15px_rgba(182,255,46,0.4)]">
+              <Building2 className="size-5" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-base font-bold text-white tracking-tight">Employer Candidate Review Link</h3>
+                <span className="rounded-full bg-primary/20 border border-primary/40 px-2.5 py-0.5 text-xs font-mono font-bold text-primary">
+                  Access Code: {generateCandidateAccessCode(app.id)}
+                </span>
+                <span className="rounded-full bg-surface-2 border border-white/10 px-2 py-0.5 text-[10px] uppercase font-bold text-zinc-300">
+                  Target: {company}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Share this secure link with company HR to evaluate this applicant, listen to voice notes, preview the verified CV, and extend direct hiring offers.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <a
+              href={`/c/${app.id}?code=${generateCandidateAccessCode(app.id)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-black hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.3)] cursor-pointer"
+            >
+              <ExternalLink className="size-3.5" /> Open Review Page (Employer View)
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                const url = `${window.location.origin}/c/${app.id}?code=${generateCandidateAccessCode(app.id)}`;
+                navigator.clipboard.writeText(url);
+                toast.success("Employer Review URL copied to clipboard!");
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-surface-2 px-3.5 py-2 text-xs font-semibold text-white hover:bg-surface-3 transition-colors cursor-pointer"
+            >
+              <Copy className="size-3.5 text-primary" /> Copy Link
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const accessCode = generateCandidateAccessCode(app.id);
+                const shareUrl = `${window.location.origin}/c/${app.id}?code=${accessCode}`;
+                const msg =
+                  `🌟 *QuickHire Candidate Profile: ${app.full_name}*\n` +
+                  `💼 *Role:* ${role} (${company})\n` +
+                  `🗣️ *English Level:* ${app.english_level || "B2+"} | *AI Score:* ${liveTotal}/30\n` +
+                  `🛡️ *Access Code:* ${accessCode}\n\n` +
+                  `Review full candidate dossier, listen to voice note recordings, and extend an offer directly here:\n` +
+                  `👉 ${shareUrl}\n\n` +
+                  `*QuickHire Egypt Operations*`;
+                navigator.clipboard.writeText(msg);
+                toast.success("Full WhatsApp employer share message copied!");
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+            >
+              <MessageCircle className="size-3.5 text-emerald-400" /> WhatsApp Message
+            </button>
+          </div>
+        </div>
+
+        {/* Live URL Read-Only Field */}
+        <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-surface-2 px-3.5 py-2 text-xs">
+          <span className="font-mono font-bold text-zinc-400 select-none shrink-0">Review URL:</span>
+          <input
+            readOnly
+            value={typeof window !== "undefined" ? `${window.location.origin}/c/${app.id}?code=${generateCandidateAccessCode(app.id)}` : `/c/${app.id}?code=${generateCandidateAccessCode(app.id)}`}
+            className="flex-1 bg-transparent font-mono text-xs text-primary outline-none select-all truncate"
+            onClick={(e) => (e.target as HTMLInputElement).select()}
+          />
+          <span className="text-[10px] text-zinc-500 shrink-0">Click to select all</span>
         </div>
       </div>
 

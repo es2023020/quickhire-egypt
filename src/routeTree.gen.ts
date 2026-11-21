@@ -13,6 +13,7 @@ import { Route as TrackRouteImport } from './routes/track'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as PrepRouteImport } from './routes/prep'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as EmployerRouteImport } from './routes/employer'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -50,6 +51,11 @@ const PrepRoute = PrepRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmployerRoute = EmployerRouteImport.update({
+  id: '/employer',
+  path: '/employer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -153,6 +159,7 @@ const AuthenticatedAdminApplicantsIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/employer': typeof EmployerRoute
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/referrals': typeof ReferralsRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/employer': typeof EmployerRoute
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/referrals': typeof ReferralsRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/employer': typeof EmployerRoute
   '/how-it-works': typeof HowItWorksRoute
   '/prep': typeof PrepRoute
   '/referrals': typeof ReferralsRoute
@@ -224,6 +233,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/employer'
     | '/how-it-works'
     | '/prep'
     | '/referrals'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/employer'
     | '/how-it-works'
     | '/prep'
     | '/referrals'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/employer'
     | '/how-it-works'
     | '/prep'
     | '/referrals'
@@ -294,6 +306,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  EmployerRoute: typeof EmployerRoute
   HowItWorksRoute: typeof HowItWorksRoute
   PrepRoute: typeof PrepRoute
   ReferralsRoute: typeof ReferralsRoute
@@ -333,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employer': {
+      id: '/employer'
+      path: '/employer'
+      fullPath: '/employer'
+      preLoaderRoute: typeof EmployerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -523,6 +543,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  EmployerRoute: EmployerRoute,
   HowItWorksRoute: HowItWorksRoute,
   PrepRoute: PrepRoute,
   ReferralsRoute: ReferralsRoute,
