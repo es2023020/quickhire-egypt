@@ -423,7 +423,7 @@ function Applicants() {
             <button
               onClick={() => { if (waveTagInput.trim()) bulkAssignWave.mutate({ ids: [...selectedIds], tag: waveTagInput.trim() }); }}
               disabled={!waveTagInput.trim() || bulkAssignWave.isPending}
-              className="inline-flex items-center gap-1 rounded-xl bg-violet-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-violet-700 transition-colors disabled:opacity-60 cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-black hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.25)] disabled:opacity-60 cursor-pointer"
             >
               <Tag className="size-3.5" /> Assign Wave
             </button>
@@ -546,7 +546,7 @@ function Applicants() {
               href={`/wave/${encodeURIComponent(waveFilter)}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 rounded-xl bg-violet-600 px-3 py-2.5 text-xs font-bold text-white hover:bg-violet-700 transition-colors shadow-soft"
+              className="inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-2.5 text-xs font-bold text-black hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.25)]"
             >
               Open Wave Link <ArrowUpRight className="size-3.5" />
             </a>
@@ -570,7 +570,7 @@ function Applicants() {
             {kanbanColumns.map((col) => (
               <div
                 key={col.id}
-                className="flex flex-col rounded-2xl border border-border/80 bg-sand/30 p-3.5 w-72 lg:w-80 flex-shrink-0"
+                className="flex flex-col rounded-2xl border border-white/10 bg-surface-1/60 p-3.5 w-72 lg:w-80 flex-shrink-0"
               >
                 {/* Column Header */}
                 <div className="flex items-center justify-between mb-3 px-1">
@@ -616,23 +616,23 @@ function Applicants() {
                           <div className="flex flex-wrap gap-1.5 pt-0.5">
                             {cooldown.hasCooldownRisk && (
                               <span
-                                className="inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-300"
+                                className="inline-flex items-center gap-1 rounded bg-amber-950/60 px-1.5 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/40"
                                 title={cooldown.reason || "90-day cooldown alert"}
                               >
-                                <AlertTriangle className="size-2.5 text-amber-600" /> 90d Cooldown
+                                <AlertTriangle className="size-2.5 text-amber-400" /> 90d Cooldown
                               </span>
                             )}
                             {a.interview_date && (
-                              <span className="inline-flex items-center gap-1 rounded bg-violet-50 px-1.5 py-0.5 text-[10px] font-semibold text-violet-700 border border-violet-200">
+                              <span className="inline-flex items-center gap-1 rounded bg-purple-950/60 px-1.5 py-0.5 text-[10px] font-semibold text-purple-300 border border-purple-500/40">
                                 <Calendar className="size-2.5" /> {a.interview_date} ({a.interview_time || "11:30 AM"})
                               </span>
                             )}
                             {a.interview_attendance && a.interview_attendance !== "pending" && (
                               <span className={cn(
                                 "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold border",
-                                a.interview_attendance === "confirmed" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                                a.interview_attendance === "attended" ? "bg-blue-50 text-blue-700 border-blue-200" :
-                                "bg-rose-50 text-rose-700 border-rose-200"
+                                a.interview_attendance === "confirmed" ? "bg-emerald-950/60 text-emerald-300 border-emerald-500/40" :
+                                a.interview_attendance === "attended" ? "bg-blue-950/60 text-blue-300 border-blue-500/40" :
+                                "bg-rose-950/60 text-rose-300 border-rose-500/40"
                               )}>
                                 {a.interview_attendance}
                               </span>
@@ -643,21 +643,21 @@ function Applicants() {
                                 target="_blank"
                                 rel="noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="inline-flex items-center gap-1 rounded bg-sand px-1.5 py-0.5 text-[10px] font-mono font-semibold text-violet-700 border border-violet-200 hover:bg-violet-50 transition-colors"
+                                className="inline-flex items-center gap-1 rounded bg-surface-3 px-1.5 py-0.5 text-[10px] font-mono font-semibold text-primary border border-primary/30 hover:bg-surface-2 transition-colors"
                                 title="Open Client Wave Portal"
                               >
-                                <Tag className="size-2.5 text-violet-600" /> {a.wave_tag} ↗
+                                <Tag className="size-2.5 text-primary" /> {a.wave_tag} ↗
                               </a>
                             )}
                             {a.referred_by && (
-                              <span className="inline-flex items-center gap-1 rounded bg-violet-100 px-1.5 py-0.5 text-[10px] font-mono font-bold text-violet-800">
-                                <Gift className="size-2.5 text-violet-600" /> {a.referred_by}
+                              <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-mono font-bold text-primary border border-primary/20">
+                                <Gift className="size-2.5 text-primary" /> {a.referred_by}
                               </span>
                             )}
                             {a.outcome_code && (
                               <span className={cn(
                                 "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold border",
-                                getOutcomeDefinition(a.outcome_code)?.badgeStyle || "bg-sand text-ink border-border"
+                                getOutcomeDefinition(a.outcome_code)?.badgeStyle || "bg-surface-2 text-zinc-300 border-white/10"
                               )}>
                                 {getOutcomeDefinition(a.outcome_code)?.shortLabel || a.outcome_code}
                               </span>
@@ -665,11 +665,11 @@ function Applicants() {
                           </div>
 
                           {/* Card Footer */}
-                          <div className="flex items-center justify-between border-t border-border/50 pt-2" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-between border-t border-white/10 pt-2" onClick={(e) => e.stopPropagation()}>
                             <select
                               value={a.status}
                               onChange={(e) => updateStatus.mutate({ id: a.id, s: e.target.value as any })}
-                              className="rounded-lg border border-border bg-sand/60 px-2 py-1 text-[11px] font-medium text-ink outline-none cursor-pointer"
+                              className="rounded-lg border border-white/10 bg-surface-3 px-2 py-1 text-[11px] font-medium text-white outline-none cursor-pointer"
                             >
                               <option value="new">Move: New</option>
                               <option value="shortlisted">Move: Shortlist ⭐</option>
@@ -682,7 +682,7 @@ function Applicants() {
                                 href={waLink(a.phone, a.full_name, a.offer?.title ?? "the role")}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="grid size-6 place-items-center rounded-md bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors"
+                                className="grid size-6 place-items-center rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30 transition-colors"
                                 title="WhatsApp candidate"
                               >
                                 <MessageCircle className="size-3" />
@@ -690,7 +690,7 @@ function Applicants() {
                               <Link
                                 to="/admin/applicants/$id"
                                 params={{ id: a.id }}
-                                className="grid size-6 place-items-center rounded-md border border-border text-muted-foreground hover:text-ink transition-colors"
+                                className="grid size-6 place-items-center rounded-md border border-white/10 text-zinc-400 hover:text-white hover:bg-surface-3 transition-colors"
                                 title="Open full profile"
                               >
                                 <ChevronRight className="size-3" />

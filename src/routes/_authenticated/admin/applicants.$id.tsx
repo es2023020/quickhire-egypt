@@ -63,39 +63,39 @@ export const Route = createFileRoute("/_authenticated/admin/applicants/$id")({
 });
 
 const STATUS_CFG = {
-  new: { label: "New", cls: "bg-blue-100 text-blue-700 border-blue-200", dot: "bg-blue-500" },
-  shortlisted: { label: "Shortlisted", cls: "bg-amber-100 text-amber-700 border-amber-200", dot: "bg-amber-500" },
-  hired: { label: "Hired", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
-  rejected: { label: "Rejected", cls: "bg-red-100 text-red-600 border-red-200", dot: "bg-red-500" },
+  new: { label: "New", cls: "bg-blue-950/60 text-blue-300 border-blue-500/40", dot: "bg-blue-400" },
+  shortlisted: { label: "Shortlisted", cls: "bg-amber-950/60 text-amber-300 border-amber-500/40", dot: "bg-amber-400" },
+  hired: { label: "Hired", cls: "bg-primary/20 text-primary border-primary/40", dot: "bg-primary" },
+  rejected: { label: "Rejected", cls: "bg-rose-950/60 text-rose-300 border-rose-500/40", dot: "bg-rose-400" },
 } as const;
 
 export const PIPELINE_STAGES = [
-  { key: "applied", label: "Applied / New", color: "bg-blue-100 text-blue-700 border-blue-200" },
-  { key: "interview_scheduled", label: "Interview Scheduled", color: "bg-violet-100 text-violet-700 border-violet-200" },
-  { key: "interview_done", label: "Interview Done / Under Evaluation", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
-  { key: "test_invited", label: "Test Sent / Assessment Invited", color: "bg-amber-100 text-amber-700 border-amber-200" },
-  { key: "test_completed", label: "Test Completed", color: "bg-orange-100 text-orange-700 border-orange-200" },
-  { key: "offer_pending", label: "Offer Pending / Approval", color: "bg-yellow-100 text-yellow-800 border-yellow-300" },
-  { key: "offer_extended", label: "Offer Extended", color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  { key: "accepted", label: "Accepted", color: "bg-green-100 text-green-800 border-green-300" },
-  { key: "rejected", label: "Rejected / Archived", color: "bg-red-100 text-red-600 border-red-200" },
-  { key: "withdrawn", label: "Withdrawn", color: "bg-slate-100 text-slate-600 border-slate-200" },
+  { key: "applied", label: "Applied / New", color: "bg-blue-950/60 text-blue-300 border-blue-500/40" },
+  { key: "interview_scheduled", label: "Interview Scheduled", color: "bg-purple-950/60 text-purple-300 border-purple-500/40" },
+  { key: "interview_done", label: "Interview Done / Under Evaluation", color: "bg-indigo-950/60 text-indigo-300 border-indigo-500/40" },
+  { key: "test_invited", label: "Test Sent / Assessment Invited", color: "bg-amber-950/60 text-amber-300 border-amber-500/40" },
+  { key: "test_completed", label: "Test Completed", color: "bg-orange-950/60 text-orange-300 border-orange-500/40" },
+  { key: "offer_pending", label: "Offer Pending / Approval", color: "bg-yellow-950/60 text-yellow-300 border-yellow-500/40" },
+  { key: "offer_extended", label: "Offer Extended", color: "bg-primary/20 text-primary border-primary/50" },
+  { key: "accepted", label: "Accepted", color: "bg-emerald-950/60 text-emerald-300 border-emerald-500/40" },
+  { key: "rejected", label: "Rejected / Archived", color: "bg-rose-950/60 text-rose-300 border-rose-500/40" },
+  { key: "withdrawn", label: "Withdrawn", color: "bg-zinc-800/80 text-zinc-400 border-zinc-700" },
 ] as const;
 
 function scoreGrade(s: number, max: number) {
   const pct = s / max;
-  if (pct >= 0.9) return { label: "Excellent", color: "text-emerald-600", bar: "bg-emerald-500" };
-  if (pct >= 0.75) return { label: "Good", color: "text-blue-600", bar: "bg-blue-500" };
-  if (pct >= 0.6) return { label: "Average", color: "text-amber-600", bar: "bg-amber-400" };
-  return { label: "Below avg", color: "text-red-500", bar: "bg-red-400" };
+  if (pct >= 0.9) return { label: "Excellent", color: "text-primary", bar: "bg-primary" };
+  if (pct >= 0.75) return { label: "Good", color: "text-blue-400", bar: "bg-blue-500" };
+  if (pct >= 0.6) return { label: "Average", color: "text-amber-400", bar: "bg-amber-500" };
+  return { label: "Below avg", color: "text-rose-400", bar: "bg-rose-500" };
 }
 
 function totalGrade(s: number) {
-  if (s >= 27) return { label: "🎯 Exceptional", color: "from-emerald-500 to-emerald-600", badge: "bg-emerald-100 text-emerald-700" };
-  if (s >= 24) return { label: "⭐ Excellent", color: "from-primary to-primary/80", badge: "bg-blue-100 text-blue-700" };
-  if (s >= 20) return { label: "👍 Good", color: "from-blue-500 to-blue-600", badge: "bg-sky-100 text-sky-700" };
-  if (s >= 15) return { label: "🔍 Average", color: "from-amber-500 to-amber-600", badge: "bg-amber-100 text-amber-700" };
-  return { label: "⚠️ Below avg", color: "from-red-500 to-red-600", badge: "bg-red-100 text-red-600" };
+  if (s >= 27) return { label: "🎯 Exceptional", color: "from-primary to-emerald-400", badge: "bg-primary/20 text-primary border border-primary/30" };
+  if (s >= 24) return { label: "⭐ Excellent", color: "from-primary to-primary/80", badge: "bg-blue-950/60 text-blue-300 border border-blue-500/30" };
+  if (s >= 20) return { label: "👍 Good", color: "from-blue-500 to-blue-600", badge: "bg-sky-950/60 text-sky-300 border border-sky-500/30" };
+  if (s >= 15) return { label: "🔍 Average", color: "from-amber-500 to-amber-600", badge: "bg-amber-950/60 text-amber-300 border border-amber-500/30" };
+  return { label: "⚠️ Below avg", color: "from-rose-500 to-rose-600", badge: "bg-rose-950/60 text-rose-300 border border-rose-500/30" };
 }
 
 function buildCompanyShareMessage(app: {
@@ -657,28 +657,28 @@ function ApplicantDetail() {
           <div className="w-full max-w-sm rounded-2xl border border-red-500/30 bg-surface-1 p-6 shadow-xl">
             <div className="mb-4 flex items-center gap-3">
               <div className="grid size-10 shrink-0 place-items-center rounded-full bg-red-100">
-                <AlertTriangle className="size-5 text-red-600" />
+                <AlertTriangle className="size-5 text-red-500" />
               </div>
               <div>
-                <div className="font-semibold text-ink">Delete {app.full_name}?</div>
-                <div className="text-xs text-muted-foreground">This cannot be undone.</div>
+                <div className="font-semibold text-white">Delete {app.full_name}?</div>
+                <div className="text-xs text-zinc-400">This cannot be undone.</div>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-5">
+            <p className="text-sm text-zinc-400 mb-5">
               All data including scores, voice notes, CV, transcripts and admin notes will be permanently removed.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => deleteApp.mutate()}
                 disabled={deleteApp.isPending}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60 cursor-pointer"
               >
                 {deleteApp.isPending && <Loader2 className="size-4 animate-spin" />}
                 Delete Permanently
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-sand transition-colors"
+                className="flex-1 rounded-xl border border-white/10 bg-surface-2 px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -689,25 +689,25 @@ function ApplicantDetail() {
 
       {/* Schedule On-Site Interview & Logistics Modal (The No-Show Killer) */}
       {scheduleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="w-full max-w-xl rounded-2xl border border-primary/20 bg-surface-1 p-6 shadow-2xl my-8">
-            <div className="mb-4 flex items-start justify-between gap-3 pb-3 border-b border-border">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="w-full max-w-xl rounded-2xl border border-primary/30 bg-surface-1 p-6 shadow-2xl my-8">
+            <div className="mb-4 flex items-start justify-between gap-3 pb-3 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700">
+                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
                   <CalendarCheck className="size-5" />
                 </div>
                 <div>
-                  <h2 className="font-display text-lg font-bold text-ink">
+                  <h2 className="font-display text-lg font-bold text-white">
                     Schedule On-Site Assessment Slot
                   </h2>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-zinc-400">
                     Set wave logistics, shuttle bus hubs, and generate gate-pass invitations.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setScheduleModalOpen(false)}
-                className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-sand"
+                className="grid size-8 place-items-center rounded-lg border border-white/10 text-zinc-400 hover:bg-surface-2 hover:text-white cursor-pointer"
               >
                 <X className="size-4" />
               </button>
@@ -716,8 +716,8 @@ function ApplicantDetail() {
             <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
               {/* Date & Quick Shortcuts */}
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1.5 flex items-center gap-1.5">
-                  <Calendar className="size-3.5 text-violet-600" /> Interview Date
+                <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                  <Calendar className="size-3.5 text-primary" /> Interview Date
                 </label>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <button
@@ -727,7 +727,7 @@ function ApplicantDetail() {
                       d.setDate(d.getDate() + 1);
                       setInterviewDate(d.toISOString().split("T")[0]);
                     }}
-                    className="rounded-lg border border-border bg-sand/60 px-2.5 py-1 text-xs font-medium text-ink hover:bg-sand transition-colors"
+                    className="rounded-lg border border-white/10 bg-surface-2 px-2.5 py-1 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
                   >
                     Tomorrow
                   </button>
@@ -738,7 +738,7 @@ function ApplicantDetail() {
                       d.setDate(d.getDate() + 2);
                       setInterviewDate(d.toISOString().split("T")[0]);
                     }}
-                    className="rounded-lg border border-border bg-sand/60 px-2.5 py-1 text-xs font-medium text-ink hover:bg-sand transition-colors"
+                    className="rounded-lg border border-white/10 bg-surface-2 px-2.5 py-1 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
                   >
                     In 2 Days
                   </button>
@@ -751,7 +751,7 @@ function ApplicantDetail() {
                       d.setDate(d.getDate() + diff);
                       setInterviewDate(d.toISOString().split("T")[0]);
                     }}
-                    className="rounded-lg border border-border bg-sand/60 px-2.5 py-1 text-xs font-medium text-ink hover:bg-sand transition-colors"
+                    className="rounded-lg border border-white/10 bg-surface-2 px-2.5 py-1 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
                   >
                     Next Sunday Wave
                   </button>
@@ -760,20 +760,20 @@ function ApplicantDetail() {
                   type="date"
                   value={interviewDate}
                   onChange={(e) => setInterviewDate(e.target.value)}
-                  className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                  className="w-full rounded-xl border border-white/10 bg-surface-2 px-3 py-2 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20"
                 />
               </div>
 
               {/* Time Slot & Bus Departure */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1.5 flex items-center gap-1.5">
-                    <Clock className="size-3.5 text-violet-600" /> Assessment Time Slot
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                    <Clock className="size-3.5 text-primary" /> Assessment Time Slot
                   </label>
                   <select
                     value={interviewTime}
                     onChange={(e) => setInterviewTime(e.target.value)}
-                    className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-surface-2"
+                    className="w-full rounded-xl border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 bg-surface-2"
                   >
                     {TIME_SLOTS.map((t) => (
                       <option key={t} value={t}>
@@ -784,23 +784,23 @@ function ApplicantDetail() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1.5 flex items-center gap-1.5">
-                    <Bus className="size-3.5 text-violet-600" /> Bus Departure Time
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                    <Bus className="size-3.5 text-primary" /> Bus Departure Time
                   </label>
                   <input
                     type="text"
                     value={busTime}
                     onChange={(e) => setBusTime(e.target.value)}
                     placeholder="e.g. 10:30 AM Sharp"
-                    className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                    className="w-full rounded-xl border border-white/10 bg-surface-2 px-3 py-2 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 placeholder:text-zinc-500"
                   />
                 </div>
               </div>
 
               {/* BPO Site Selection */}
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1.5 flex items-center gap-1.5">
-                  <MapPin className="size-3.5 text-violet-600" /> Assessment Center / BPO Hub
+                <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                  <MapPin className="size-3.5 text-primary" /> Assessment Center / BPO Hub
                 </label>
                 <select
                   value={selectedSiteId}
@@ -811,7 +811,7 @@ function ApplicantDetail() {
                       setBusPoint(preset.recommendedBusHubs[0]);
                     }
                   }}
-                  className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-surface-2 mb-2"
+                  className="w-full rounded-xl border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 bg-surface-2 mb-2"
                 >
                   {BPO_SITE_PRESETS.map((site) => (
                     <option key={site.id} value={site.id}>
@@ -822,33 +822,33 @@ function ApplicantDetail() {
                 </select>
 
                 {selectedSiteId === "custom" ? (
-                  <div className="space-y-2 p-3 rounded-xl border border-border bg-sand/30">
+                  <div className="space-y-2 p-3 rounded-xl border border-white/10 bg-surface-2">
                     <input
                       type="text"
                       placeholder="Center or Office Name (e.g. Sutherland Tech Lab)"
                       value={customSiteName}
                       onChange={(e) => setCustomSiteName(e.target.value)}
-                      className="w-full rounded-lg border border-border px-3 py-1.5 text-xs text-ink outline-none focus:ring-2 focus:ring-violet-500/20"
+                      className="w-full rounded-lg border border-white/10 bg-surface-1 px-3 py-1.5 text-xs text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 placeholder:text-zinc-500"
                     />
                     <input
                       type="text"
                       placeholder="Full Address & Floor details"
                       value={customAddress}
                       onChange={(e) => setCustomAddress(e.target.value)}
-                      className="w-full rounded-lg border border-border px-3 py-1.5 text-xs text-ink outline-none focus:ring-2 focus:ring-violet-500/20"
+                      className="w-full rounded-lg border border-white/10 bg-surface-1 px-3 py-1.5 text-xs text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 placeholder:text-zinc-500"
                     />
                     <input
                       type="url"
                       placeholder="Google Maps Navigation Link"
                       value={customMapsUrl}
                       onChange={(e) => setCustomMapsUrl(e.target.value)}
-                      className="w-full rounded-lg border border-border px-3 py-1.5 text-xs text-ink outline-none focus:ring-2 focus:ring-violet-500/20"
+                      className="w-full rounded-lg border border-white/10 bg-surface-1 px-3 py-1.5 text-xs text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 placeholder:text-zinc-500"
                     />
                   </div>
                 ) : (
                   activePreset && (
-                    <div className="p-2.5 rounded-xl border border-primary/20 bg-primary/5 text-xs space-y-1">
-                      <div className="font-medium text-ink flex items-center justify-between">
+                    <div className="p-2.5 rounded-xl border border-primary/30 bg-primary/10 text-xs space-y-1">
+                      <div className="font-medium text-white flex items-center justify-between">
                         <span>📍 {activePreset.address}</span>
                         <a
                           href={activePreset.mapsUrl}
@@ -859,7 +859,7 @@ function ApplicantDetail() {
                           <ExternalLink className="size-3" /> View Map
                         </a>
                       </div>
-                      <div className="text-[11px] text-muted-foreground">
+                      <div className="text-[11px] text-zinc-400">
                         🛡️ Gate Security: {activePreset.gateSecurityNote}
                       </div>
                     </div>
@@ -869,13 +869,13 @@ function ApplicantDetail() {
 
               {/* Shuttle Bus Meeting Point */}
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1.5 flex items-center gap-1.5">
-                  <Bus className="size-3.5 text-violet-600" /> Shuttle Bus Pickup Point
+                <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                  <Bus className="size-3.5 text-primary" /> Shuttle Bus Pickup Point
                 </label>
                 <select
                   value={busPoint}
                   onChange={(e) => setBusPoint(e.target.value)}
-                  className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-surface-2"
+                  className="w-full rounded-xl border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 bg-surface-2"
                 >
                   {BUS_MEETING_POINTS.map((hub) => (
                     <option key={hub} value={hub}>
@@ -888,26 +888,26 @@ function ApplicantDetail() {
               {/* Coordinator Phone & Dress Code */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1.5 flex items-center gap-1.5">
-                    <Phone className="size-3.5 text-violet-600" /> Coordinator Hotline
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                    <Phone className="size-3.5 text-primary" /> Coordinator Hotline
                   </label>
                   <input
                     type="text"
                     value={coordinatorPhone}
                     onChange={(e) => setCoordinatorPhone(e.target.value)}
                     placeholder="+2010..."
-                    className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 font-mono"
+                    className="w-full rounded-xl border border-white/10 bg-surface-2 px-3 py-2 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 font-mono placeholder:text-zinc-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1.5 flex items-center gap-1.5">
-                    <GraduationCap className="size-3.5 text-violet-600" /> Dress Code
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5 flex items-center gap-1.5">
+                    <GraduationCap className="size-3.5 text-primary" /> Dress Code
                   </label>
                   <select
                     value={dressCode}
                     onChange={(e) => setDressCode(e.target.value)}
-                    className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-surface-2"
+                    className="w-full rounded-xl border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 bg-surface-2"
                   >
                     {DRESS_CODES.map((dc) => (
                       <option key={dc} value={dc}>
@@ -920,7 +920,7 @@ function ApplicantDetail() {
 
               {/* Notes / Special Instructions */}
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1.5">
+                <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                   Special Gate or Candidate Instructions (Optional)
                 </label>
                 <input
@@ -928,17 +928,17 @@ function ApplicantDetail() {
                   value={interviewNotes}
                   onChange={(e) => setInterviewNotes(e.target.value)}
                   placeholder="e.g. Ask for HR reception at Gate 1, bring hardcopy CV"
-                  className="w-full rounded-xl border border-border px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                  className="w-full rounded-xl border border-white/10 bg-surface-2 px-3 py-2 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 placeholder:text-zinc-500"
                 />
               </div>
             </div>
 
             {/* Modal Actions */}
-            <div className="mt-5 pt-3 border-t border-border flex flex-wrap items-center justify-between gap-2">
+            <div className="mt-5 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
               <button
                 type="button"
                 onClick={() => setScheduleModalOpen(false)}
-                className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-sand transition-colors"
+                className="rounded-xl border border-white/10 bg-surface-2 px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -961,7 +961,7 @@ function ApplicantDetail() {
                       interview_attendance: "pending",
                     });
                   }}
-                  className="rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-semibold text-ink hover:bg-sand transition-colors disabled:opacity-60"
+                  className="rounded-xl border border-white/10 bg-surface-2 px-4 py-2.5 text-sm font-semibold text-white hover:bg-surface-3 transition-colors disabled:opacity-60 cursor-pointer"
                 >
                   {scheduleInterview.isPending ? <Loader2 className="size-4 animate-spin" /> : "Save Logistics Only"}
                 </button>
@@ -1108,12 +1108,12 @@ function ApplicantDetail() {
                   setSelectedPendingStage(isSelected ? null : s.key);
                 }}
                 className={cn(
-                  "px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all text-left",
+                  "px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all text-left cursor-pointer",
                   isCurrent
-                    ? `${s.color} ring-2 ring-violet-500 ring-offset-1 font-bold`
+                    ? `${s.color} ring-2 ring-primary ring-offset-1 font-bold`
                     : isSelected
-                    ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                    : "border-border/80 bg-sand/30 text-ink/80 hover:bg-sand hover:text-ink"
+                    ? "bg-primary text-black border-primary shadow-sm font-bold"
+                    : "border-white/10 bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
                 )}
               >
                 {s.label}
@@ -1124,15 +1124,15 @@ function ApplicantDetail() {
 
         {/* Stage Change Confirmation Form */}
         {selectedPendingStage && (
-          <div className="p-3.5 rounded-xl bg-sand/40 border border-primary/20 space-y-2">
+          <div className="p-3.5 rounded-xl bg-surface-2 border border-primary/20 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-ink">
-                Move to: <span className="text-violet-700 font-bold">{PIPELINE_STAGES.find(s => s.key === selectedPendingStage)?.label}</span>
+              <span className="text-xs font-semibold text-white">
+                Move to: <span className="text-primary font-bold">{PIPELINE_STAGES.find(s => s.key === selectedPendingStage)?.label}</span>
               </span>
               <button
                 type="button"
                 onClick={() => { setSelectedPendingStage(null); setStageComment(""); }}
-                className="text-xs text-muted-foreground hover:text-ink"
+                className="text-xs text-zinc-400 hover:text-white cursor-pointer"
               >
                 Cancel
               </button>
@@ -1213,35 +1213,35 @@ function ApplicantDetail() {
                     <input
                       value={editFields.full_name}
                       onChange={e => setEditFields(f => f ? { ...f, full_name: e.target.value } : f)}
-                      className="w-full rounded-lg border border-border px-3 py-1.5 text-lg font-bold text-ink outline-none focus:ring-2 focus:ring-primary/30"
+                      className="w-full rounded-lg border border-white/10 bg-surface-2 px-3 py-1.5 text-lg font-bold text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20"
                       placeholder="Full name"
                     />
                     <div className="flex flex-wrap gap-2">
                       <input
                         value={editFields.email}
                         onChange={e => setEditFields(f => f ? { ...f, email: e.target.value } : f)}
-                        className="flex-1 min-w-48 rounded-lg border border-border px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                        className="flex-1 min-w-48 rounded-lg border border-white/10 bg-surface-2 px-3 py-1.5 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20"
                         placeholder="Email"
                         type="email"
                       />
                       <input
                         value={editFields.phone}
                         onChange={e => setEditFields(f => f ? { ...f, phone: e.target.value } : f)}
-                        className="flex-1 min-w-40 rounded-lg border border-border px-3 py-1.5 text-sm font-mono outline-none focus:ring-2 focus:ring-primary/30"
+                        className="flex-1 min-w-40 rounded-lg border border-white/10 bg-surface-2 px-3 py-1.5 text-sm font-mono text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20"
                         placeholder="Phone (auto-prefixed)"
                       />
                     </div>
                     <input
                       value={editFields.location}
                       onChange={e => setEditFields(f => f ? { ...f, location: e.target.value } : f)}
-                      className="w-full rounded-lg border border-border px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                      className="w-full rounded-lg border border-white/10 bg-surface-2 px-3 py-1.5 text-sm text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20"
                       placeholder="Location"
                     />
                   </div>
                 ) : (
                   <>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="font-display text-2xl font-bold text-ink md:text-3xl">{app.full_name}</h1>
+                      <h1 className="font-display text-2xl font-bold text-white md:text-3xl">{app.full_name}</h1>
                       <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold", statusCfg.cls)}>
                         <span className={cn("size-1.5 rounded-full", statusCfg.dot)} />
                         {statusCfg.label}
@@ -1285,7 +1285,7 @@ function ApplicantDetail() {
                   </button>
                   <button
                     onClick={() => { setEditMode(false); }}
-                    className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium hover:bg-sand transition-colors"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-surface-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
                   >
                     <X className="size-4" /> Cancel
                   </button>
@@ -1316,7 +1316,7 @@ function ApplicantDetail() {
                   </button>
                   <button
                     onClick={() => setEditMode(true)}
-                    className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium hover:bg-sand transition-colors"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-surface-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
                   >
                     <Edit3 className="size-4" /> Edit Profile
                   </button>
@@ -1335,13 +1335,13 @@ function ApplicantDetail() {
                   </a>
                   <a
                     href={`tel:${app.phone}`}
-                    className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium hover:bg-sand transition-colors"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-surface-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors cursor-pointer"
                   >
                     <Phone className="size-4" /> Call
                   </a>
                   <button
                     onClick={() => setScheduleModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-700 transition-colors shadow-sm"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-bold text-black hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.25)] cursor-pointer"
                   >
                     <CalendarCheck className="size-4" />
                     {app.interview_date ? "Reschedule Wave" : "Schedule Interview"}
@@ -1349,13 +1349,13 @@ function ApplicantDetail() {
                   <button
                     onClick={() => rescore.mutate()}
                     disabled={rescore.isPending}
-                    className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium hover:bg-sand transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-surface-2 px-3 py-2 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     <RefreshCw className={cn("size-4", rescore.isPending && "animate-spin")} /> Re-score
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100 transition-colors"
+                    className="inline-flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-950/40 px-3 py-2 text-xs font-medium text-rose-300 hover:bg-rose-900/50 transition-colors cursor-pointer"
                   >
                     <Trash2 className="size-4" /> Delete
                   </button>
@@ -1608,10 +1608,10 @@ function ApplicantDetail() {
                   onClick={() => updateAttendance.mutate("confirmed")}
                   disabled={updateAttendance.isPending}
                   className={cn(
-                    "rounded-lg px-2.5 py-1 text-xs font-medium border transition-colors",
+                    "rounded-lg px-2.5 py-1 text-xs font-semibold border transition-colors cursor-pointer",
                     app.interview_attendance === "confirmed"
-                      ? "bg-emerald-600 text-white border-emerald-600"
-                      : "border-border bg-white text-muted-foreground hover:bg-emerald-50 hover:text-emerald-700"
+                      ? "bg-emerald-600 text-white border-emerald-500 shadow-xs"
+                      : "border-white/10 bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
                   )}
                 >
                   Confirmed
@@ -1620,10 +1620,10 @@ function ApplicantDetail() {
                   onClick={() => updateAttendance.mutate("attended")}
                   disabled={updateAttendance.isPending}
                   className={cn(
-                    "rounded-lg px-2.5 py-1 text-xs font-medium border transition-colors",
+                    "rounded-lg px-2.5 py-1 text-xs font-semibold border transition-colors cursor-pointer",
                     app.interview_attendance === "attended"
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "border-border bg-white text-muted-foreground hover:bg-blue-50 hover:text-blue-700"
+                      ? "bg-blue-600 text-white border-blue-500 shadow-xs"
+                      : "border-white/10 bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
                   )}
                 >
                   Attended
@@ -1632,10 +1632,10 @@ function ApplicantDetail() {
                   onClick={() => updateAttendance.mutate("no_show")}
                   disabled={updateAttendance.isPending}
                   className={cn(
-                    "rounded-lg px-2.5 py-1 text-xs font-medium border transition-colors",
+                    "rounded-lg px-2.5 py-1 text-xs font-semibold border transition-colors cursor-pointer",
                     app.interview_attendance === "no_show"
-                      ? "bg-red-600 text-white border-red-600"
-                      : "border-border bg-white text-muted-foreground hover:bg-red-50 hover:text-red-700"
+                      ? "bg-red-600 text-white border-red-500 shadow-xs"
+                      : "border-white/10 bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
                   )}
                 >
                   No-Show
@@ -1644,10 +1644,10 @@ function ApplicantDetail() {
                   onClick={() => updateAttendance.mutate("pending")}
                   disabled={updateAttendance.isPending}
                   className={cn(
-                    "rounded-lg px-2.5 py-1 text-xs font-medium border transition-colors",
+                    "rounded-lg px-2.5 py-1 text-xs font-semibold border transition-colors cursor-pointer",
                     app.interview_attendance === "pending" || !app.interview_attendance
-                      ? "bg-amber-500 text-white border-amber-500"
-                      : "border-border bg-white text-muted-foreground hover:bg-amber-50 hover:text-amber-700"
+                      ? "bg-amber-600 text-white border-amber-500 shadow-xs"
+                      : "border-white/10 bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
                   )}
                 >
                   Reset Pending
@@ -1668,29 +1668,29 @@ function ApplicantDetail() {
                   href={`https://wa.me/${waNumber(app.phone)}?text=${encodeURIComponent(reminder24hWaMsg)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-950/60 px-2.5 py-1.5 text-xs font-medium text-amber-300 hover:bg-amber-900/60 transition-colors"
                 >
-                  <Clock3 className="size-3.5 text-amber-700" /> Send 24h Reminder
+                  <Clock3 className="size-3.5 text-amber-400" /> Send 24h Reminder
                 </a>
                 <a
                   href={`https://wa.me/${waNumber(app.phone)}?text=${encodeURIComponent(checkin2hWaMsg)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-800 hover:bg-red-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/40 bg-rose-950/60 px-2.5 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-900/60 transition-colors"
                 >
-                  <AlertCircle className="size-3.5 text-red-600" /> Send 2h Check-in
+                  <AlertCircle className="size-3.5 text-rose-400" /> Send 2h Check-in
                 </a>
               </div>
             </div>
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-border bg-sand/40 p-4 text-center">
-            <p className="text-xs text-muted-foreground mb-3">
+          <div className="rounded-xl border border-dashed border-white/10 bg-surface-2/40 p-4 text-center">
+            <p className="text-xs text-zinc-400 mb-3">
               This candidate is not scheduled yet. Pick an interview wave, BPO center, and transportation hub to generate a no-show proof invitation.
             </p>
             <button
               onClick={() => setScheduleModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-700 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-black hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.25)] cursor-pointer"
             >
               <CalendarCheck className="size-4" /> Schedule On-Site Assessment Now
             </button>
@@ -1701,7 +1701,7 @@ function ApplicantDetail() {
       {/* ── SCORES SECTION ── */}
       <div className="rounded-2xl border border-white/10 bg-card shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-base font-semibold text-ink flex items-center gap-2">
+          <h2 className="font-display text-base font-semibold text-white flex items-center gap-2">
             <Target className="size-4 text-primary" /> AI Assessment Scores
           </h2>
           <div className="flex items-center gap-2">
@@ -1710,7 +1710,7 @@ function ApplicantDetail() {
                 <button
                   onClick={saveScores}
                   disabled={update.isPending}
-                  className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
+                  className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-black hover:bg-[#c2ff47] transition-all disabled:opacity-60 cursor-pointer"
                 >
                   <Check className="size-3.5" /> Save scores
                 </button>
@@ -1719,7 +1719,7 @@ function ApplicantDetail() {
                     setScoreEdits({ english: app.english_score ?? 0, comm: app.comm_score ?? 0, exp: app.exp_score ?? 0 });
                     setEditingScore(null);
                   }}
-                  className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-sand"
+                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-2 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-white cursor-pointer"
                 >
                   <X className="size-3.5" /> Cancel
                 </button>
@@ -1727,7 +1727,7 @@ function ApplicantDetail() {
             ) : (
               <button
                 onClick={() => setEditingScore("english")}
-                className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-sand hover:text-primary transition-colors"
+                className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-surface-2 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-surface-3 hover:text-primary transition-colors cursor-pointer"
               >
                 <Edit3 className="size-3.5" /> Edit scores
               </button>
@@ -1804,27 +1804,27 @@ function ApplicantDetail() {
       )}
 
       {/* ── CLIENT ASSESSMENT OUTCOME & SCORECARD ── */}
-      <div className="rounded-2xl border border-border/80 bg-white shadow-sm p-5 space-y-4">
+      <div className="rounded-2xl border border-white/10 bg-surface-1 shadow-sm p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="grid size-9 place-items-center rounded-xl bg-violet-100 text-violet-700">
+            <div className="grid size-9 place-items-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
               <BadgeCheck className="size-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-display text-base font-semibold text-ink">
+                <h2 className="font-display text-base font-semibold text-white">
                   Client Interview Outcome &amp; Scorecard
                 </h2>
                 {app.outcome_code && (
                   <span className={cn(
                     "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold border",
-                    getOutcomeDefinition(app.outcome_code)?.badgeStyle || "bg-sand text-ink border-border"
+                    getOutcomeDefinition(app.outcome_code)?.badgeStyle || "bg-surface-2 text-zinc-300 border-white/10"
                   )}>
                     {getOutcomeDefinition(app.outcome_code)?.shortLabel || app.outcome_code}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-zinc-400">
                 Record exact reason codes from the client assessment (V&amp;A, Ops, Tech, or Candidate Decision).
               </p>
             </div>
@@ -1841,7 +1841,7 @@ function ApplicantDetail() {
                 });
               }}
               disabled={updateOutcome.isPending}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-black hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.25)] disabled:opacity-60 cursor-pointer"
             >
               {updateOutcome.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
               Save Outcome &amp; Update Status
@@ -1866,16 +1866,16 @@ function ApplicantDetail() {
                   });
                 }}
                 className={cn(
-                  "flex flex-col items-start p-3 rounded-xl border text-left transition-all",
+                  "flex flex-col items-start p-3 rounded-xl border text-left transition-all cursor-pointer",
                   isSelected
-                    ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs"
-                    : "border-border/80 bg-sand/30 hover:bg-sand hover:border-border"
+                    ? "border-primary bg-primary/10 ring-2 ring-primary/40 shadow-xs"
+                    : "border-white/10 bg-surface-2 hover:bg-surface-3 hover:border-white/20"
                 )}
               >
                 <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border mb-1", o.badgeStyle)}>
                   {o.shortLabel}
                 </span>
-                <span className="text-[11px] font-semibold text-ink leading-tight">{o.label}</span>
+                <span className="text-[11px] font-semibold text-white leading-tight">{o.label}</span>
               </button>
             );
           })}
@@ -1883,7 +1883,7 @@ function ApplicantDetail() {
 
         {/* Outcome Notes Textarea */}
         <div className="pt-2">
-          <label className="block text-xs font-semibold text-ink mb-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
             Client Evaluator Notes &amp; Feedback:
           </label>
           <textarea
@@ -1891,7 +1891,7 @@ function ApplicantDetail() {
             onChange={(e) => setOutcomeNotesInput(e.target.value)}
             placeholder="e.g. Cleared Ops interview with score 4/5. Voice & Accent test pronunciation was acceptable for US account, but rejected for UK account..."
             rows={2}
-            className="w-full rounded-xl border border-white/10 bg-surface-2 p-3 text-xs text-white outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full rounded-xl border border-white/10 bg-surface-2 p-3 text-xs text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 placeholder:text-zinc-500"
           />
         </div>
       </div>
@@ -2037,7 +2037,7 @@ function ApplicantDetail() {
             })}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-border bg-white p-4 text-center text-xs text-muted-foreground">
+          <div className="rounded-xl border border-dashed border-white/10 bg-surface-2 p-4 text-center text-xs text-zinc-400">
             No alternative active waves currently open matching this profile.
           </div>
         )}
@@ -2170,13 +2170,13 @@ function ApplicantDetail() {
                   Candidate's Referral Code
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-ink font-mono">{candidateRefCode}</span>
+                  <span className="text-sm font-bold text-white font-mono">{candidateRefCode}</span>
                   <button
                     type="button"
                     onClick={() => copyText(candidateRefCode, "candidate-ref-code")}
-                    className="inline-flex items-center gap-1 text-xs text-violet-600 font-semibold hover:underline"
+                    className="inline-flex items-center gap-1 text-xs text-primary font-semibold hover:underline cursor-pointer"
                   >
-                    {copied === "candidate-ref-code" ? <CheckCheck className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
+                    {copied === "candidate-ref-code" ? <CheckCheck className="size-3 text-emerald-400" /> : <Copy className="size-3" />}
                     Copy
                   </button>
                 </div>
@@ -2185,9 +2185,9 @@ function ApplicantDetail() {
                     href={adminReferralWaUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-md hover:bg-emerald-100 transition-colors"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 px-2.5 py-1 rounded-lg hover:bg-emerald-900/60 transition-colors"
                   >
-                    <MessageCircle className="size-3 text-emerald-600" /> Ask {app.full_name.split(" ")[0]} for Referrals
+                    <MessageCircle className="size-3 text-emerald-400" /> Ask {app.full_name.split(" ")[0]} for Referrals
                   </a>
                 </div>
               </div>
@@ -2550,11 +2550,11 @@ function ApplicantDetail() {
       </div>
 
       {/* ── SHARE TO COMPANY HR ── */}
-      <div className="rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50 to-violet-50/30 shadow-sm p-5 no-print">
-        <h2 className="font-display text-base font-semibold text-ink mb-1 flex items-center gap-2">
-          <Share2 className="size-4 text-violet-600" /> Share Full Profile to Company HR
+      <div className="rounded-2xl border border-white/10 bg-surface-1 shadow-sm p-5 no-print">
+        <h2 className="font-display text-base font-semibold text-white mb-1 flex items-center gap-2">
+          <Share2 className="size-4 text-primary" /> Share Full Profile to Company HR
         </h2>
-        <p className="text-xs text-muted-foreground mb-4">
+        <p className="text-xs text-zinc-400 mb-4">
           Send the complete candidate profile — scores, transcript, all details — directly to the company's HR.
         </p>
 
@@ -2563,7 +2563,7 @@ function ApplicantDetail() {
             <a
               href={`https://wa.me/${waNumber(hrPhone)}?text=${encodeURIComponent(shareMsg)}`}
               target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-black hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.25)]"
             >
               <MessageCircle className="size-4" />
               Send to Company HR via WhatsApp
@@ -2580,10 +2580,10 @@ function ApplicantDetail() {
           <button
             onClick={() => copyText(shareMsg, "share-profile")}
             className={cn(
-              "inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors shadow-sm",
+              "inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors shadow-sm cursor-pointer",
               copied === "share-profile"
-                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                : "border-violet-200 bg-white text-violet-700 hover:bg-violet-50",
+                ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-300"
+                : "border-white/10 bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white",
             )}
           >
             {copied === "share-profile" ? <CheckCheck className="size-4" /> : <Copy className="size-4" />}
@@ -2592,15 +2592,15 @@ function ApplicantDetail() {
           <a
             href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Interview: ${app.full_name} — ${role} @ ${company}`)}&details=${encodeURIComponent(`Candidate: ${app.full_name}\nPhone: ${app.phone}\nEmail: ${app.email}\nRole: ${role}\nCompany: ${company}\nScore: ${liveTotal}/30\n\nScheduled via QuickHire`)}`}
             target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-sand transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-surface-2 px-4 py-2.5 text-sm font-semibold text-zinc-300 hover:bg-surface-3 hover:text-white transition-colors shadow-sm"
           >
-            <Calendar className="size-4" /> Add Interview to Calendar
+            <Calendar className="size-4 text-primary" /> Add Interview to Calendar
           </a>
         </div>
 
         {/* Preview of share message */}
         <details className="group">
-          <summary className="cursor-pointer text-xs font-semibold text-violet-600 hover:text-violet-700 flex items-center gap-1 select-none">
+          <summary className="cursor-pointer text-xs font-semibold text-primary hover:underline flex items-center gap-1 select-none">
             <ExternalLink className="size-3" />
             Preview message that will be sent
           </summary>

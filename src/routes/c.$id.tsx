@@ -23,12 +23,12 @@ import { cn } from "@/lib/utils";
 import { openDocumentSafely, downloadDocumentSafely } from "@/lib/document-utils";
 
 const HR_PIPELINE_STAGES = [
-  { key: "interview_done", label: "Interview Done / Under Evaluation", color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
-  { key: "offer_pending", label: "Offer Pending / Approval", color: "bg-yellow-100 text-yellow-800 border-yellow-300" },
-  { key: "offer_extended", label: "Offer Extended", color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  { key: "accepted", label: "Accepted", color: "bg-green-100 text-green-800 border-green-300" },
-  { key: "rejected", label: "Rejected / Archived", color: "bg-red-100 text-red-600 border-red-200" },
-  { key: "withdrawn", label: "Withdrawn", color: "bg-slate-100 text-slate-600 border-slate-200" },
+  { key: "interview_done", label: "Interview Done / Under Evaluation", color: "bg-indigo-950/60 text-indigo-300 border-indigo-500/40" },
+  { key: "offer_pending", label: "Offer Pending / Approval", color: "bg-amber-950/60 text-amber-300 border-amber-500/40" },
+  { key: "offer_extended", label: "Offer Extended", color: "bg-primary/20 text-primary border-primary/50" },
+  { key: "accepted", label: "Accepted", color: "bg-emerald-950/60 text-emerald-300 border-emerald-500/40" },
+  { key: "rejected", label: "Rejected / Archived", color: "bg-rose-950/60 text-rose-300 border-rose-500/40" },
+  { key: "withdrawn", label: "Withdrawn", color: "bg-zinc-800/80 text-zinc-400 border-zinc-700" },
 ] as const;
 
 export const Route = createFileRoute("/c/$id")({
@@ -249,8 +249,8 @@ function ClientCandidateProfilePage() {
               Unlock Dossier &amp; Voice Notes 🚀
             </button>
 
-            <div className="p-3 rounded-xl bg-sand/60 border border-border text-center">
-              <span className="text-[11px] text-muted-foreground">
+            <div className="p-3 rounded-xl bg-surface-2 border border-white/10 text-center">
+              <span className="text-[11px] text-zinc-400">
                 Authorized hiring managers only. QuickHire Egypt Enterprise Security.
               </span>
             </div>
@@ -267,7 +267,7 @@ function ClientCandidateProfilePage() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-16">
       {/* Top Client Bar */}
-      <header className="border-b border-white/[0.08] bg-surface-1 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-white/[0.08] bg-surface-1/90 backdrop-blur-md sticky top-0 z-30 shadow-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <QuickHireLogo size={32} className="rounded-xl" />
@@ -278,7 +278,7 @@ function ClientCandidateProfilePage() {
                   Client HR Dossier
                 </span>
               </div>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[11px] text-zinc-400">
                 Verified Candidate Profile &amp; Direct Hiring Scorecard
               </p>
             </div>
@@ -293,7 +293,7 @@ function ClientCandidateProfilePage() {
             </button>
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground shadow-[0_0_10px_rgba(182,255,46,0.25)] hover:bg-[#c2ff47] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-black shadow-[0_0_12px_rgba(182,255,46,0.3)] hover:bg-[#c2ff47] transition-all cursor-pointer"
             >
               Print / Save PDF
             </button>
@@ -304,14 +304,14 @@ function ClientCandidateProfilePage() {
       {/* Main Content Hero */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
         {/* Banner with Candidate Name & Scores */}
-        <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 shadow-soft border border-slate-800 relative overflow-hidden">
+        <div className="rounded-3xl bg-gradient-to-br from-surface-1 via-surface-2 to-surface-1 text-white p-6 sm:p-8 shadow-2xl border border-white/10 relative overflow-hidden">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
             <div>
-              <div className="flex items-center gap-2 text-violet-300 text-xs font-semibold mb-2">
+              <div className="flex items-center gap-2 text-primary text-xs font-semibold mb-2">
                 <Building2 className="size-4" />
                 <span>{candidate.offer?.company || "BPO Partner"}</span>
-                <span>•</span>
-                <span className="bg-violet-800/80 px-2 py-0.5 rounded text-[11px] text-violet-100 font-mono">
+                <span className="text-zinc-600">•</span>
+                <span className="bg-primary/10 border border-primary/30 px-2 py-0.5 rounded text-[11px] text-primary font-mono font-bold">
                   Code: {expectedCode}
                 </span>
               </div>
@@ -320,11 +320,11 @@ function ClientCandidateProfilePage() {
                 {candidate.full_name}
               </h1>
 
-              <p className="mt-1.5 text-sm sm:text-base text-violet-200/90 font-medium">
+              <p className="mt-1.5 text-sm sm:text-base text-zinc-300 font-medium">
                 {candidate.offer?.title || "Customer Care Representative"}
               </p>
 
-              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-violet-200/80">
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-400">
                 <span>📞 <strong className="text-white font-mono">{candidate.phone}</strong></span>
                 <span>✉️ {candidate.email}</span>
                 {candidate.location && <span>📍 {candidate.location}</span>}
@@ -335,20 +335,20 @@ function ClientCandidateProfilePage() {
 
             {/* AI CEFR Score Card Badge */}
             <div className="flex items-center gap-3 shrink-0">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center min-w-28">
-                <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-400">
+              <div className="bg-surface-2/90 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center min-w-28 shadow-lg">
+                <div className="text-2xl sm:text-3xl font-bold font-mono text-primary">
                   {candidate.total_score != null ? `${candidate.total_score}/30` : "Done"}
                 </div>
-                <div className="text-[10px] uppercase font-bold tracking-wider text-violet-200 mt-0.5">
+                <div className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 mt-0.5">
                   AI Fit Score
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center min-w-28">
+              <div className="bg-surface-2/90 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center min-w-28 shadow-lg">
                 <div className="text-xl sm:text-2xl font-bold font-mono text-amber-300">
                   {candidate.english_level ? candidate.english_level.split("–")[0].trim() : "B2+"}
                 </div>
-                <div className="text-[10px] uppercase font-bold tracking-wider text-violet-200 mt-0.5">
+                <div className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 mt-0.5">
                   CEFR Level
                 </div>
               </div>
@@ -361,35 +361,35 @@ function ClientCandidateProfilePage() {
           {/* Left Column: Dossier Details, Audio, CV (2 spans) */}
           <div className="lg:col-span-2 space-y-6">
             {/* 90-Day Cooldown & Screening Guardrails */}
-            <div className="rounded-2xl border border-border bg-white p-5 shadow-xs">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
-                <ShieldCheck className="size-4 text-emerald-600" /> Compliance & 90-Day Cooldown Clearance
+            <div className="rounded-2xl border border-white/10 bg-surface-1 p-5 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3 flex items-center gap-1.5">
+                <ShieldCheck className="size-4 text-emerald-400" /> Compliance & 90-Day Cooldown Clearance
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className={`p-3 rounded-xl border ${
                   cooldownCheck.hasCooldownRisk
-                    ? "bg-rose-50 border-rose-200 text-rose-800"
-                    : "bg-emerald-50 border-emerald-200 text-emerald-800"
+                    ? "bg-rose-950/40 border-rose-500/40 text-rose-300"
+                    : "bg-emerald-950/40 border-emerald-500/40 text-emerald-300"
                 }`}>
                   <div className="flex items-center gap-1.5 font-bold text-xs">
                     {cooldownCheck.hasCooldownRisk ? (
-                      <AlertTriangle className="size-4 text-rose-600" />
+                      <AlertTriangle className="size-4 text-rose-400" />
                     ) : (
-                      <CheckCircle2 className="size-4 text-emerald-600" />
+                      <CheckCircle2 className="size-4 text-emerald-400" />
                     )}
                     <span>{cooldownCheck.hasCooldownRisk ? "Cooldown Risk Flagged" : "90-Day Cooldown: Cleared"}</span>
                   </div>
-                  <p className="text-[11px] mt-1 leading-relaxed">
+                  <p className="text-[11px] mt-1 leading-relaxed text-zinc-300">
                     {cooldownCheck.reason || "No prior interview history detected at this client account within 90 days. Safe to schedule on-site."}
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl border border-border bg-sand/30">
-                  <div className="font-bold text-xs text-ink flex items-center gap-1.5">
+                <div className="p-3 rounded-xl border border-white/10 bg-surface-2/60">
+                  <div className="font-bold text-xs text-white flex items-center gap-1.5">
                     <Briefcase className="size-3.5 text-primary" /> Notice Period & Availability
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-1">
+                  <p className="text-[11px] text-zinc-400 mt-1">
                     {candidate.answers?.has_contract_or_resigned || "Currently free to join immediately"}.
                   </p>
                 </div>
@@ -397,26 +397,26 @@ function ClientCandidateProfilePage() {
             </div>
 
             {/* Voice Notes Audio Player Card */}
-            <div className="rounded-2xl border border-border bg-white p-5 shadow-xs">
+            <div className="rounded-2xl border border-white/10 bg-surface-1 p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="grid size-8 place-items-center rounded-xl bg-violet-100 text-violet-700">
+                  <div className="grid size-8 place-items-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
                     <Volume2 className="size-4" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-ink">Assessment Voice Recordings</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Spoken English & fluency recordings scored by QuickHire
+                    <h3 className="font-bold text-sm text-white">Assessment Voice Recordings</h3>
+                    <p className="text-xs text-zinc-400">
+                      Spoken English &amp; fluency recordings scored by QuickHire
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-mono font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-mono font-semibold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-full">
                   {(candidate.voice_notes ?? []).length} Recording(s)
                 </span>
               </div>
 
               {(candidate.voice_notes ?? []).length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+                <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-xs text-zinc-400">
                   No voice notes submitted with this application.
                 </div>
               ) : (
@@ -436,38 +436,38 @@ function ClientCandidateProfilePage() {
             </div>
 
             {/* AI Evaluator Notes & Criteria */}
-            <div className="rounded-2xl border border-border bg-white p-5 shadow-xs">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
-                <Sparkles className="size-4 text-amber-500" /> AI Evaluator Assessment Breakdown
+            <div className="rounded-2xl border border-white/10 bg-surface-1 p-5 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3 flex items-center gap-1.5">
+                <Sparkles className="size-4 text-primary" /> AI Evaluator Assessment Breakdown
               </h3>
               
               <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
-                  <div className="text-lg font-bold font-mono text-ink">{candidate.english_score ?? 8}/10</div>
-                  <div className="text-[10px] text-muted-foreground uppercase font-bold">English Fluency</div>
+                <div className="p-3 rounded-xl bg-surface-2 border border-white/10 text-center">
+                  <div className="text-lg font-bold font-mono text-white">{candidate.english_score ?? 8}/10</div>
+                  <div className="text-[10px] text-zinc-400 uppercase font-bold">English Fluency</div>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
-                  <div className="text-lg font-bold font-mono text-ink">{candidate.comm_score ?? 8}/10</div>
-                  <div className="text-[10px] text-muted-foreground uppercase font-bold">Communication</div>
+                <div className="p-3 rounded-xl bg-surface-2 border border-white/10 text-center">
+                  <div className="text-lg font-bold font-mono text-white">{candidate.comm_score ?? 8}/10</div>
+                  <div className="text-[10px] text-zinc-400 uppercase font-bold">Communication</div>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
-                  <div className="text-lg font-bold font-mono text-ink">{candidate.exp_score ?? 7}/10</div>
-                  <div className="text-[10px] text-muted-foreground uppercase font-bold">Relevance</div>
+                <div className="p-3 rounded-xl bg-surface-2 border border-white/10 text-center">
+                  <div className="text-lg font-bold font-mono text-white">{candidate.exp_score ?? 7}/10</div>
+                  <div className="text-[10px] text-zinc-400 uppercase font-bold">Relevance</div>
                 </div>
               </div>
 
               {candidate.ai_notes && (
-                <div className="p-3.5 rounded-xl bg-violet-50/60 border border-violet-100 text-xs text-slate-700 leading-relaxed italic">
+                <div className="p-3.5 rounded-xl bg-surface-2 border border-primary/20 text-xs text-zinc-300 leading-relaxed italic">
                   "{candidate.ai_notes}"
                 </div>
               )}
             </div>
 
             {/* Candidate Resume / CV Section */}
-            <div className="rounded-2xl border border-border bg-white p-5 shadow-xs">
+            <div className="rounded-2xl border border-white/10 bg-surface-1 p-5 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <FileText className="size-4 text-violet-600" /> Candidate Resume / CV Document
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                  <FileText className="size-4 text-primary" /> Candidate Resume / CV Document
                 </h3>
                 {candidate.cv_data || candidate.cv_path ? (
                   <button
@@ -491,7 +491,7 @@ function ClientCandidateProfilePage() {
                     </div>
                     <div>
                       <div className="font-semibold text-xs text-white">{candidate.full_name} — CV.pdf</div>
-                      <div className="text-[10px] text-muted-foreground">Verified Document on File</div>
+                      <div className="text-[10px] text-zinc-400">Verified Document on File</div>
                     </div>
                   </div>
                   <button
@@ -500,13 +500,13 @@ function ClientCandidateProfilePage() {
                       const docTarget = (candidate.cv_path?.startsWith("http") ? candidate.cv_path : candidate.cv_data) || "/placeholder-cv.pdf";
                       downloadDocumentSafely(docTarget, `${candidate.full_name.replace(/\s+/g, "_")}_CV.pdf`);
                     }}
-                    className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
+                    className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-black hover:bg-[#c2ff47] transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
                   >
                     <Download className="size-3.5" /> Download CV
                   </button>
                 </div>
               ) : (
-                <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-xs text-muted-foreground">
+                <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-xs text-zinc-400">
                   No CV file uploaded. Candidate applied with voice screening and profile questions.
                 </div>
               )}
@@ -515,13 +515,13 @@ function ClientCandidateProfilePage() {
 
           {/* Right Column: Direct Partner Action Panel (Real-Time Database Sync) */}
           <div className="space-y-6">
-            <div className="rounded-2xl border border-white/10 bg-surface-1 p-5 shadow-soft sticky top-20">
+            <div className="rounded-2xl border border-white/10 bg-surface-1 p-5 shadow-2xl sticky top-20">
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div>
                   <h3 className="font-display font-bold text-base text-white">
                     Client Decision Panel
                   </h3>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[11px] text-zinc-400">
                     Action directly updates QuickHire operations
                   </p>
                 </div>
@@ -543,7 +543,7 @@ function ClientCandidateProfilePage() {
                       status: "hired",
                     })
                   }
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-2.5 px-4 transition-colors shadow-soft disabled:opacity-60"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-2.5 px-4 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] disabled:opacity-60 cursor-pointer"
                 >
                   <ThumbsUp className="size-4" /> Extend Offer / Direct Hire 🎉
                 </button>
@@ -557,15 +557,15 @@ function ClientCandidateProfilePage() {
                       status: "shortlisted",
                     })
                   }
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2 px-3 transition-colors shadow-2xs disabled:opacity-60"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-surface-2 hover:bg-surface-3 text-zinc-200 border border-white/10 hover:border-white/20 font-semibold text-xs py-2 px-3 transition-colors disabled:opacity-60 cursor-pointer"
                 >
-                  <Check className="size-3.5" /> Accept as Wave Backup / Bench ⏳
+                  <Check className="size-3.5 text-primary" /> Accept as Wave Backup / Bench ⏳
                 </button>
               </div>
 
               {/* Action 2: Granular Outcome Codes */}
               <div className="mb-5">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-2">
                   Evaluation Outcome Codes
                 </label>
                 <div className="grid grid-cols-2 gap-1.5">
@@ -577,10 +577,10 @@ function ClientCandidateProfilePage() {
                         type="button"
                         disabled={updateCandidateMutation.isPending}
                         onClick={() => updateCandidateMutation.mutate({ outcome_code: code.code })}
-                        className={`px-2 py-1.5 rounded-lg text-left text-xs font-semibold border transition-all ${
+                        className={`px-2 py-1.5 rounded-lg text-left text-xs font-semibold border transition-all cursor-pointer ${
                           isSelected
-                            ? `${code.badgeStyle} ring-2 ring-violet-500 font-bold shadow-2xs`
-                            : "border-border/80 bg-white text-muted-foreground hover:bg-sand hover:text-ink"
+                            ? `${code.badgeStyle} ring-2 ring-primary border-primary font-bold shadow-md`
+                            : "border-white/10 bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
                         }`}
                       >
                         {code.shortLabel}
@@ -592,7 +592,7 @@ function ClientCandidateProfilePage() {
 
               {/* Action 3: Client Feedback Notes */}
               <div className="mb-5">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1.5">
                   Client Interviewer Feedback
                 </label>
                 <textarea
@@ -600,27 +600,27 @@ function ClientCandidateProfilePage() {
                   placeholder="e.g. Cleared technical interview, C1 British accent, offered 18k package."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full rounded-xl border border-border p-2.5 text-xs text-ink outline-none focus:ring-2 focus:ring-violet-500/20 bg-sand/30"
+                  className="w-full rounded-xl border border-white/10 p-2.5 text-xs text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 bg-surface-2 placeholder:text-zinc-500"
                 />
                 <button
                   type="button"
                   onClick={handleSaveNotes}
                   disabled={isSavingNotes || notes === (candidate.outcome_notes || "")}
-                  className="mt-1.5 w-full rounded-xl bg-slate-900 text-white font-semibold text-xs py-1.5 hover:bg-slate-800 transition-colors disabled:opacity-40"
+                  className="mt-2 w-full rounded-xl bg-primary text-black font-bold text-xs py-2 hover:bg-[#c2ff47] transition-all shadow-[0_0_12px_rgba(182,255,46,0.2)] disabled:opacity-40 cursor-pointer"
                 >
                   {isSavingNotes ? "Saving to Database..." : "Save Feedback Note"}
                 </button>
               </div>
 
               {/* Action 4: Set Pipeline Stage */}
-              <div className="mb-5 border-t border-border/60 pt-4">
+              <div className="mb-5 border-t border-white/10 pt-4">
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-400">
                     Recruitment Stage
                   </label>
                   <span className={cn(
                     "px-2 py-0.5 rounded text-[10px] font-bold border",
-                    HR_PIPELINE_STAGES.find((s) => s.key === candidate.pipeline_stage)?.color || "bg-sand text-ink border-border"
+                    HR_PIPELINE_STAGES.find((s) => s.key === candidate.pipeline_stage)?.color || "bg-surface-2 text-zinc-300 border-white/10"
                   )}>
                     {HR_PIPELINE_STAGES.find((s) => s.key === candidate.pipeline_stage)?.label || candidate.pipeline_stage || "Applied"}
                   </span>
@@ -638,12 +638,12 @@ function ClientCandidateProfilePage() {
                           setSelectedHrStage(isSelected ? null : s.key);
                         }}
                         className={cn(
-                          "px-2 py-1.5 rounded-lg text-left text-xs font-semibold border transition-all truncate",
+                          "px-2 py-1.5 rounded-lg text-left text-xs font-semibold border transition-all truncate cursor-pointer",
                           isCurrent
-                            ? `${s.color} ring-2 ring-violet-500 font-bold shadow-2xs`
+                            ? `${s.color} ring-2 ring-primary font-bold shadow-xs`
                             : isSelected
-                            ? "bg-slate-900 text-white border-slate-900 font-bold shadow-2xs"
-                            : "border-border/80 bg-white text-muted-foreground hover:bg-sand hover:text-ink"
+                            ? "bg-primary text-black border-primary font-bold shadow-xs"
+                            : "border-white/10 bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
                         )}
                         title={s.label}
                       >
@@ -654,22 +654,22 @@ function ClientCandidateProfilePage() {
                 </div>
 
                 {selectedHrStage && (
-                  <div className="rounded-xl border border-violet-200 bg-sand/40 p-2.5 space-y-2 mb-2">
-                    <div className="text-[11px] font-semibold text-ink">
-                      Move stage to: <span className="text-violet-700 font-bold">{HR_PIPELINE_STAGES.find(s => s.key === selectedHrStage)?.label}</span>
+                  <div className="rounded-xl border border-primary/30 bg-surface-2 p-2.5 space-y-2 mb-2">
+                    <div className="text-[11px] font-semibold text-white">
+                      Move stage to: <span className="text-primary font-bold">{HR_PIPELINE_STAGES.find(s => s.key === selectedHrStage)?.label}</span>
                     </div>
                     <input
                       type="text"
                       placeholder="Comment / note (optional)"
                       value={hrStageComment}
                       onChange={(e) => setHrStageComment(e.target.value)}
-                      className="w-full rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-violet-500/20"
+                      className="w-full rounded-lg border border-white/10 bg-surface-1 px-2.5 py-1.5 text-xs text-white outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20"
                     />
                     <div className="flex gap-1.5 justify-end">
                       <button
                         type="button"
                         onClick={() => { setSelectedHrStage(null); setHrStageComment(""); }}
-                        className="px-2 py-1 text-xs text-muted-foreground hover:text-ink"
+                        className="px-2 py-1 text-xs text-zinc-400 hover:text-white cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -677,7 +677,7 @@ function ClientCandidateProfilePage() {
                         type="button"
                         onClick={() => updatePipelineStageMutation.mutate({ stage: selectedHrStage, comment: hrStageComment })}
                         disabled={updatePipelineStageMutation.isPending}
-                        className="px-3 py-1 bg-violet-600 text-white rounded-lg text-xs font-semibold hover:bg-violet-700 transition-colors disabled:opacity-50"
+                        className="px-3 py-1 bg-primary text-black rounded-lg text-xs font-bold hover:bg-[#c2ff47] transition-colors disabled:opacity-50 cursor-pointer"
                       >
                         {updatePipelineStageMutation.isPending ? "Updating..." : "Update Stage"}
                       </button>
@@ -687,19 +687,19 @@ function ClientCandidateProfilePage() {
 
                 {/* Recent Pipeline History in Dossier */}
                 {candidate.pipeline_history && candidate.pipeline_history.length > 0 && (
-                  <div className="space-y-1 pt-1">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <div className="space-y-1.5 pt-1">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                       Recent Activity
                     </div>
                     {[...candidate.pipeline_history].reverse().slice(0, 3).map((entry, idx) => (
-                      <div key={idx} className="text-[11px] flex flex-wrap items-center gap-1.5 bg-sand/30 rounded p-1.5">
-                        <span className="font-bold text-ink">
+                      <div key={idx} className="text-[11px] flex flex-wrap items-center gap-1.5 bg-surface-2/60 border border-white/5 rounded-lg p-2">
+                        <span className="font-bold text-white">
                           {HR_PIPELINE_STAGES.find(s => s.key === entry.stage)?.label || entry.stage}
                         </span>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-[10px] text-zinc-400">
                           ({entry.role === "client_hr" ? "HR" : "Admin"})
                         </span>
-                        {entry.comment && <span className="text-muted-foreground italic truncate">"{entry.comment}"</span>}
+                        {entry.comment && <span className="text-zinc-400 italic truncate">"{entry.comment}"</span>}
                       </div>
                     ))}
                   </div>
@@ -707,14 +707,14 @@ function ClientCandidateProfilePage() {
               </div>
 
               {/* Direct WhatsApp Contact */}
-              <div className="pt-3 border-t border-border">
+              <div className="pt-3 border-t border-white/10">
                 <a
                   href={`https://wa.me/${candidate.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
                     `Hi ${candidate.full_name}, this is HR from ${candidate.offer?.company || "QuickHire partner"}. We have reviewed your assessment and would like to proceed!`
                   )}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366]/20 font-bold text-xs py-2 px-3 transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366]/15 border border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/25 font-bold text-xs py-2 px-3 transition-colors cursor-pointer"
                 >
                   <MessageCircle className="size-4" /> Message Candidate on WhatsApp
                 </a>
@@ -809,7 +809,7 @@ function DossierAudioPlayer({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-2">
+    <div className="rounded-xl border border-white/10 bg-surface-2 p-3.5 space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <audio
@@ -821,15 +821,15 @@ function DossierAudioPlayer({
           <button
             type="button"
             onClick={togglePlay}
-            className={`size-8 rounded-full flex items-center justify-center transition-colors shadow-2xs ${
-              isPlaying ? "bg-primary text-white" : "bg-primary text-white hover:opacity-90"
+            className={`size-8 rounded-full flex items-center justify-center transition-all shadow-md cursor-pointer ${
+              isPlaying ? "bg-primary text-black" : "bg-primary text-black hover:bg-[#c2ff47]"
             }`}
           >
             {isPlaying ? <Pause className="size-3.5 fill-current" /> : <Play className="size-3.5 fill-current ml-0.5" />}
           </button>
           <div>
-            <div className="text-xs font-bold text-slate-800">{lang} Voice Screening</div>
-            <div className="text-[10px] text-muted-foreground font-mono">
+            <div className="text-xs font-bold text-white">{lang} Voice Screening</div>
+            <div className="text-[10px] text-zinc-400 font-mono">
               {isPlaying ? "Playing..." : "Click play to listen"}
             </div>
           </div>
@@ -838,23 +838,23 @@ function DossierAudioPlayer({
         <button
           type="button"
           onClick={cycleSpeed}
-          className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors"
+          className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-surface-3 border border-white/10 text-zinc-300 hover:bg-surface-1 hover:text-white transition-colors cursor-pointer"
         >
           {speed}x
         </button>
       </div>
 
       {transcript && (
-        <div className="mt-2 pt-2 border-t border-slate-200/80">
+        <div className="mt-2 pt-2 border-t border-white/10">
           <button
             type="button"
             onClick={() => setShowTranscript(!showTranscript)}
-            className="text-[10px] font-semibold text-violet-700 hover:underline uppercase tracking-wider block mb-1"
+            className="text-[10px] font-semibold text-primary hover:underline uppercase tracking-wider block mb-1 cursor-pointer"
           >
             {showTranscript ? "▼ Spoken Transcript" : "▶ Show Spoken Transcript"}
           </button>
           {showTranscript && (
-            <p className="text-xs text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200 leading-relaxed italic">
+            <p className="text-xs text-zinc-300 bg-surface-1 p-2.5 rounded-lg border border-white/10 leading-relaxed italic">
               "{transcript}"
             </p>
           )}
