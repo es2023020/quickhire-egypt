@@ -1,9 +1,24 @@
 import { createClient } from "@supabase/supabase-js";
-import { calculateAgencyPlacementFee } from "../src/lib/billing-engine";
 
 export const config = {
   runtime: "nodejs",
 };
+
+function calculateAgencyPlacementFee(offerTitle: string, company: string, language?: string | null): { fee: number; tier: string } {
+  const lang = (language || "").toLowerCase();
+  const title = (offerTitle || "").toLowerCase();
+
+  if (lang.includes("german") || lang.includes("deutsch") || title.includes("german") || title.includes("dutch")) {
+    return { fee: 22000, tier: "German / High-Value European Tier" };
+  }
+  if (lang.includes("french") || lang.includes("français") || title.includes("french") || lang.includes("italian") || title.includes("italian")) {
+    return { fee: 14000, tier: "French / Southern European Tier" };
+  }
+  if (lang.includes("arabic") || title.includes("arabic") || title.includes("عربي")) {
+    return { fee: 3000, tier: "Arabic Domestic Account" };
+  }
+  return { fee: 5000, tier: "BPO English Account" };
+}
 
 const SUPABASE_URL =
   process.env.VITE_SUPABASE_URL ||
