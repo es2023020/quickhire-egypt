@@ -55,6 +55,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getFile } from "@/lib/db";
 import { openDocumentSafely, downloadDocumentSafely } from "@/lib/document-utils";
+import { uploadCandidateAsset } from "@/lib/storage";
 
 export const Route = createFileRoute("/_authenticated/admin/applicants/$id")({
   head: () => ({ meta: [{ title: "Applicant — QuickHire Admin" }, { name: "robots", content: "noindex" }] }),
@@ -288,7 +289,13 @@ function ApplicantDetail() {
     async function loadCv() {
       if (!app) return;
 
-      // Fallback to cv_data if present
+      // 1. Supabase Cloud Storage CDN URL
+      if (app.cv_path?.startsWith("http")) {
+        setCvUrl(app.cv_path);
+        return;
+      }
+
+      // 2. Database Base64 document
       if (app.cv_data) {
         setCvUrl(app.cv_data);
         return;
@@ -374,6 +381,17 @@ function ApplicantDetail() {
 
   const uploadCvMutation = useMutation({
     mutationFn: async (file: File) => {
+      let publicUrl = file.name;
+      const uploaded = await uploadCandidateAsset({
+        file,
+        bucket: "resumes",
+        candidateId: id,
+        fileName: file.name,
+      });
+      if (uploaded?.publicUrl) {
+        publicUrl = uploaded.publicUrl;
+      }
+
       const reader = new FileReader();
       const base64 = await new Promise<string>((resolve, reject) => {
         reader.onloadend = () => resolve(reader.result as string);
@@ -383,13 +401,13 @@ function ApplicantDetail() {
       return adminUpdateApplicant({
         data: {
           id,
-          cv_path: file.name,
+          cv_path: publicUrl,
           cv_data: base64,
         },
       });
     },
     onSuccess: () => {
-      toast.success("CV uploaded & saved to database successfully!");
+      toast.success("CV uploaded to cloud storage & saved to database successfully!");
       qc.invalidateQueries({ queryKey: ["admin", "application", id] });
       qc.invalidateQueries({ queryKey: ["admin", "applications"] });
     },
@@ -2607,7 +2625,13 @@ function VoiceNoteCard({
     let url: string | null = null;
 
     async function loadAudio() {
-      // 1. Fallback to voiceNote.data if it's base64
+      // 1. Supabase Storage CDN URL
+      if (voiceNote.path?.startsWith("http")) {
+        setAudioSrc(voiceNote.path);
+        return;
+      }
+
+      // 2. Fallback to voiceNote.data if it's base64
       if (voiceNote.data) {
         setAudioSrc(voiceNote.data);
         return;

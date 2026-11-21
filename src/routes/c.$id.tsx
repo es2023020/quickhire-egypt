@@ -426,6 +426,7 @@ function ClientCandidateProfilePage() {
                       key={vn.path || i}
                       candidateId={candidate.id}
                       lang={vn.lang}
+                      path={vn.path}
                       dataUrl={vn.data}
                       transcript={candidate.transcripts?.[vn.lang] || null}
                     />
@@ -472,7 +473,7 @@ function ClientCandidateProfilePage() {
                   <button
                     type="button"
                     onClick={() => {
-                      const docTarget = candidate.cv_data || (candidate.cv_path?.startsWith("http") ? candidate.cv_path : "/placeholder-cv.pdf");
+                      const docTarget = (candidate.cv_path?.startsWith("http") ? candidate.cv_path : candidate.cv_data) || "/placeholder-cv.pdf";
                       openDocumentSafely(docTarget, `${candidate.full_name.replace(/\s+/g, "_")}_CV.pdf`);
                     }}
                     className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline cursor-pointer"
@@ -496,7 +497,7 @@ function ClientCandidateProfilePage() {
                   <button
                     type="button"
                     onClick={() => {
-                      const docTarget = candidate.cv_data || (candidate.cv_path?.startsWith("http") ? candidate.cv_path : "/placeholder-cv.pdf");
+                      const docTarget = (candidate.cv_path?.startsWith("http") ? candidate.cv_path : candidate.cv_data) || "/placeholder-cv.pdf";
                       downloadDocumentSafely(docTarget, `${candidate.full_name.replace(/\s+/g, "_")}_CV.pdf`);
                     }}
                     className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-[#c2ff47] transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
@@ -732,11 +733,13 @@ function ClientCandidateProfilePage() {
 function DossierAudioPlayer({
   candidateId,
   lang,
+  path,
   dataUrl,
   transcript,
 }: {
   candidateId: string;
   lang: string;
+  path?: string;
   dataUrl?: string;
   transcript: string | null;
 }) {
@@ -751,6 +754,13 @@ function DossierAudioPlayer({
     let objectUrl: string | null = null;
 
     async function resolveSource() {
+      // 1. Supabase Storage CDN URL
+      if (path && path.startsWith("http")) {
+        setSrc(path);
+        return;
+      }
+
+      // 2. Base64 database data
       if (dataUrl) {
         setSrc(dataUrl);
         return;
@@ -774,7 +784,7 @@ function DossierAudioPlayer({
       active = false;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [candidateId, lang, dataUrl]);
+  }, [candidateId, lang, path, dataUrl]);
 
   function togglePlay() {
     if (!audioRef.current) return;

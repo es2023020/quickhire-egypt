@@ -8,6 +8,7 @@ import { submitApplication } from "@/lib/applications.functions";
 import { VoiceRecorder } from "@/components/voice-recorder";
 import { saveFile } from "@/lib/db";
 import { LANGUAGE_BOUNTIES, buildCandidateReferralShareMessage, buildCandidateShareUrl } from "@/lib/referral-engine";
+import { uploadCandidateAsset } from "@/lib/storage";
 
 const QUICKHIRE_WA = "201029324783";
 const QUICKHIRE_EMAIL = "hello@quickhire.eg";
@@ -192,9 +193,8 @@ function ApplyPage() {
     }
     setSubmitting(true);
     try {
-      const cvPath = fakePath("cvs", cvFile.name);
-      
-      // Convert CV to base64 so it is saved permanently in Supabase
+      // 1. Upload CV to Supabase Storage Bucket ('resumes')
+      let cvPath = fakePath("cvs", cvFile.name);
       let cvDataUrl: string | null = null;
       try {
         cvDataUrl = await blobToBase64(cvFile);
@@ -202,6 +202,16 @@ function ApplyPage() {
         console.warn("Failed to encode CV base64:", err);
       }
 
+      const uploadedCv = await uploadCandidateAsset({
+        file: cvFile,
+        bucket: "resumes",
+        fileName: cvFile.name,
+      });
+      if (uploadedCv?.publicUrl) {
+        cvPath = uploadedCv.publicUrl;
+      }
+
+      // 2. Upload Voice Notes to Supabase Storage Bucket ('voice-notes')
       const voiceNotes: { lang: string; path: string; data?: string }[] = [];
       for (const v of voiceReqs) {
         const blob = voiceBlobs[v.lang]!;
@@ -215,9 +225,20 @@ function ApplyPage() {
         } catch (err) {
           console.warn("Failed to encode voice note base64:", err);
         }
+
+        let voicePath = fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`);
+        const uploadedVoice = await uploadCandidateAsset({
+          file: blob,
+          bucket: "voice-notes",
+          fileName: `${v.lang.toLowerCase()}_recording.${ext}`,
+        });
+        if (uploadedVoice?.publicUrl) {
+          voicePath = uploadedVoice.publicUrl;
+        }
+
         voiceNotes.push({
           lang: v.lang,
-          path: fakePath("voice-notes", `${v.lang.toLowerCase()}.${ext}`),
+          path: voicePath,
           data: audioDataUrl,
         });
       }
